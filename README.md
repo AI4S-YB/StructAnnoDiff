@@ -8,6 +8,39 @@ documentation, lightweight summary tables, and publication figures. Large raw
 FASTA/GFF/GTF inputs and large per-gene logs are intentionally excluded by
 `.gitignore`.
 
+## ABCD Evaluation Examples
+
+The single-species ABCD figure is the main visual summary for checking one
+species before and after manual curation:
+
+- **A. Quantity changes**: global annotation counts, including genes, transcripts,
+  exons, and CDS features.
+- **B. Locus fate**: before/after gene accounting after reciprocal-overlap locus
+  matching, including confirmed 1:1 pairs, split/merged loci, novel genes, and
+  deleted genes.
+- **C. 1:1 structural attributes**: structural changes among genes with confirmed
+  before/after one-to-one correspondence.
+- **D. Paired change magnitude**: per-pair delta distributions for gene span,
+  transcript count, exon count, and CDS length.
+
+### Pineapple
+
+![Pineapple ABCD evaluation](figures/Pineapple_ABCD_single_species.png)
+
+### Peach
+
+![Peach ABCD evaluation](figures/Peach_ABCD_single_species.png)
+
+### Rice
+
+![Rice ABCD evaluation](figures/Rice_ABCD_single_species.png)
+
+Additional species figures:
+[Artemisia annua](figures/Artemisia_annua_ABCD_single_species.png),
+[Cucumber](figures/Cucumber_ABCD_single_species.png),
+[Fragaria ananassa](figures/Fragaria_ananassa_ABCD_single_species.png), and
+[Fragaria vesca](figures/Fragaria_vesca_ABCD_single_species.png).
+
 ## Inputs
 
 Each species is expected to have one `before` and one `after` annotation file in
@@ -79,6 +112,31 @@ Generate A/B/C/D single-species summary tables and a four-panel figure:
 
 ```bash
 python plot_single_species_abcd.py --species Pineapple
+```
+
+Concrete single-species example using Pineapple:
+
+```bash
+# Rebuild the Pineapple ABCD tables and figure from existing summary/locus outputs.
+python plot_single_species_abcd.py --species Pineapple
+
+# Main figure:
+ls figures/Pineapple_ABCD_single_species.png
+
+# Supporting tables:
+ls results/single_species/Pineapple_ABCD_tables.md
+ls results/single_species/Pineapple_figureA_quantity_table.csv
+ls results/single_species/Pineapple_figureB_locus_fate_table.csv
+ls results/single_species/Pineapple_figureC_syntenic_structure_table.csv
+ls results/single_species/Pineapple_figureD_pair_delta_summary.csv
+```
+
+Regenerate all tracked single-species ABCD figures:
+
+```bash
+for sp in Artemisia_annua Cucumber Fragaria_ananassa Fragaria_vesca Peach Pineapple Rice; do
+  python plot_single_species_abcd.py --species "$sp"
+done
 ```
 
 For table and figure regeneration from existing AGAT/gffcompare/locus outputs:
