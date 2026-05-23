@@ -1,0 +1,8 @@
+base_level_sensitivity,base_level_precision,exon_level_sensitivity,exon_level_precision,intron_level_sensitivity,intron_level_precision,intron_chain_level_sensitivity,intron_chain_level_precision,transcript_level_sensitivity,transcript_level_precision,locus_level_sensitivity,locus_level_precision,matching_intron_chains,matching_transcripts,matching_loci,species,class_=,class_u,class_j,class_o,class_k,class_m,class_x,class_n,class_c,class_s,class_i,class_p,class_y,class_e
+66.0,84.5,75.1,76.5,85.8,83.0,60.8,56.3,52.3,59.6,52.3,69.9,23770,29901,29901,Artemisia_annua,29901,4656,9015,1186,1119,1540,895,801,633,95,168,73,43,45
+94.6,87.8,87.8,87.7,93.6,93.2,71.5,73.7,67.5,68.0,67.6,68.2,13886,16424,16421,Cucumber,16424,1490,2061,197,1410,727,357,190,585,2,89,116,7,490
+88.0,88.6,79.4,79.9,84.1,87.1,65.0,53.6,65.2,55.2,65.2,66.4,58684,70479,70479,Fragaria_ananassa,71103,1769,33301,1667,4817,4637,600,7230,1436,3,102,112,12,957
+87.6,70.1,70.5,55.0,78.9,68.3,49.0,19.6,48.7,21.5,48.7,41.2,11548,13918,13918,Fragaria_vesca,13920,6987,25469,1469,1981,6699,541,5456,1085,32,360,179,20,400
+98.3,94.8,95.1,96.0,96.2,97.7,89.4,92.5,90.0,88.9,91.7,88.7,27848,31842,27670,Peach,31847,501,1095,91,211,1062,145,160,429,38,43,62,3,140
+98.9,71.8,78.9,75.0,97.2,91.7,75.8,72.5,75.2,73.8,75.2,74.6,15578,19663,19659,Pineapple,19666,782,936,86,4393,267,94,152,180,1,13,16,1,70
+87.5,79.5,76.4,75.4,81.2,81.7,62.5,63.3,64.0,63.7,71.1,68.7,33647,40205,27383,Rice,40581,3685,9173,682,1321,1860,1273,1860,2039,12,77,165,24,345

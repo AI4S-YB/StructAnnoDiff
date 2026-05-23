@@ -1,0 +1,27 @@
+[workspace]
+channels = ["conda-forge", "bioconda"]
+name = "Analysis"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+analyze = "bash run_analyses.sh"
+summarize = "python summarize.py"
+locus = "python run_locus_comparisons.py"
+tables = "python generate_tables.py"
+figures = "python visualize.py && python visualize_locus.py"
+target-figures = "python plot_target_figures.py"
+validate = "python validate_results.py"
+report = "python summarize.py && python generate_tables.py && python visualize.py && python visualize_locus.py && python plot_target_figures.py && python validate_results.py"
+full = "bash run_analyses.sh && python summarize.py && python run_locus_comparisons.py && python generate_tables.py && python visualize.py && python visualize_locus.py && python plot_target_figures.py && python validate_results.py"
+test = "python -m unittest discover -s tests"
+
+[dependencies]
+python = ">=3.12"
+pandas = ">=2.0"
+numpy = ">=1.26"
+matplotlib = ">=3.8"
+seaborn = ">=0.13"
+agat = ">=1.7.0,<2"
+gffcompare = ">=0.12.10,<0.13"
+bedtools = ">=2.31.1,<3"

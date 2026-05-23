@@ -1,0 +1,39 @@
+__pycache__/
+*.py[cod]
+.cache/
+.pixi/
+logs/
+
+# Local assistant/editor state
+.agents/
+.claude/
+.codex/
+
+# Raw annotation/genome inputs and derived primary-tool files.
+# Keep these outside GitHub; place them in the analysis directory locally
+# or point ANALYSIS_DIR to a data directory when running the workflow.
+*.fa
+*.fasta
+*.fai
+*.gff
+*.gff3
+*.gff.gz
+*.gff3.gz
+*.gtf
+*.tmap
+*.refmap
+
+# External tool outputs and large intermediate directories
+agat_log_*/
+compare/
+tcompare/
+stats/
+
+# Large per-gene result details; summary tables remain tracked.
+results/locus/*_change_log.csv
+results/single_species/*_syntenic_pair_deltas.csv
+
+# Java build/generated outputs
+java-locus-compare/build/
+java-locus-compare/dist/
+java-locus-compare/results/

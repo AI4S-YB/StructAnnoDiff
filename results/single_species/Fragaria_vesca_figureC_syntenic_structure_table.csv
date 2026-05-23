@@ -1,0 +1,14 @@
+figure,layer,attribute,count,pct_of_syntenic
+C,Confirmed 1:1 structural attributes,Exact 1:1,2918.0,13.619603267211202
+C,Confirmed 1:1 structural attributes,Gene boundary changed,17473.0,81.55425904317386
+C,Confirmed 1:1 structural attributes,UTR added,3617.0,16.882147024504086
+C,Confirmed 1:1 structural attributes,UTR lost,1750.0,8.168028004667445
+C,Confirmed 1:1 structural attributes,UTR exon gained,1062.0,4.956826137689615
+C,Confirmed 1:1 structural attributes,UTR exon removed,1692.0,7.897316219369895
+C,Confirmed 1:1 structural attributes,UTR refined,13088.0,61.08751458576429
+C,Confirmed 1:1 structural attributes,Coding exon gain,1516.0,7.075845974329055
+C,Confirmed 1:1 structural attributes,Coding exon loss,2382.0,11.117852975495916
+C,Confirmed 1:1 structural attributes,Exon boundary refined,13037.0,60.84947491248541
+C,Confirmed 1:1 structural attributes,CDS changed,6979.0,32.574095682613766
+C,Confirmed 1:1 structural attributes,CDS boundary refined,179.0,0.8354725787631271
+C,Confirmed 1:1 structural attributes,Isoform changed,8797.0,41.05950991831972

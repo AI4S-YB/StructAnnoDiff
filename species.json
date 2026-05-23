@@ -1,0 +1,37 @@
+[
+  {
+    "id": "Artemisia_annua",
+    "label": "A. annua",
+    "short_label": "A.annua"
+  },
+  {
+    "id": "Cucumber",
+    "label": "Cucumber",
+    "short_label": "Cucumber"
+  },
+  {
+    "id": "Fragaria_ananassa",
+    "label": "F. ananassa",
+    "short_label": "F.ananassa"
+  },
+  {
+    "id": "Fragaria_vesca",
+    "label": "F. vesca",
+    "short_label": "F.vesca"
+  },
+  {
+    "id": "Peach",
+    "label": "Peach",
+    "short_label": "Peach"
+  },
+  {
+    "id": "Pineapple",
+    "label": "Pineapple",
+    "short_label": "Pineapple"
+  },
+  {
+    "id": "Rice",
+    "label": "Rice",
+    "short_label": "Rice"
+  }
+]

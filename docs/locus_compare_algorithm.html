@@ -1,0 +1,931 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>基因结构注释校准前后比较算法说明</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --ink: #1f2937;
+      --muted: #5f6b7a;
+      --line: #d8dee8;
+      --blue: #2f6fed;
+      --green: #208a5b;
+      --orange: #b76300;
+      --red: #c43b3b;
+      --purple: #7457c8;
+      --cyan: #0f7c91;
+      --code: #eef2f7;
+      --soft-blue: #e9f1ff;
+      --soft-green: #e7f6ef;
+      --soft-orange: #fff2df;
+      --soft-red: #fff0ef;
+      --soft-purple: #f2ecff;
+      --soft-cyan: #e6f6f9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC",
+            "Microsoft YaHei", Arial, sans-serif;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 20px 56px;
+    }
+    header {
+      padding: 28px 30px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 0 8px 22px rgba(31, 41, 55, 0.06);
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: #344054;
+      background: #fbfcfe;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    nav {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+    nav a {
+      display: block;
+      padding: 8px 10px;
+      color: var(--ink);
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      font-size: 13px;
+    }
+    section {
+      margin-top: 22px;
+      padding: 24px 26px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    h2 {
+      margin: 0 0 14px;
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    h3 {
+      margin: 22px 0 8px;
+      font-size: 17px;
+      line-height: 1.4;
+    }
+    p { margin: 8px 0 12px; }
+    ul, ol { margin: 8px 0 12px; padding-left: 22px; }
+    li { margin: 5px 0; }
+    code {
+      padding: 2px 5px;
+      background: var(--code);
+      border-radius: 4px;
+      color: #26384f;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+    }
+    pre {
+      margin: 12px 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      background: #172033;
+      color: #f2f6ff;
+      border-radius: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 18px;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      text-align: left;
+      background: #f2f5f9;
+      color: #344054;
+      font-weight: 700;
+    }
+    tbody tr:nth-child(even) td { background: #fafbfe; }
+    .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .box {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+    .box h3:first-child { margin-top: 0; }
+    .note {
+      padding: 12px 14px;
+      margin: 12px 0;
+      border-left: 4px solid var(--orange);
+      background: var(--soft-orange);
+      border-radius: 0 7px 7px 0;
+    }
+    .ok {
+      border-left-color: var(--green);
+      background: var(--soft-green);
+    }
+    .warn {
+      border-left-color: var(--red);
+      background: var(--soft-red);
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin: 16px 0 8px;
+    }
+    .step {
+      min-height: 116px;
+      padding: 13px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      position: relative;
+    }
+    .step b {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 15px;
+    }
+    .step p {
+      margin: 0;
+      color: #415065;
+      font-size: 13px;
+    }
+    .s1 { background: var(--soft-blue); border-color: #b8cdfb; }
+    .s2 { background: var(--soft-green); border-color: #a9dec5; }
+    .s3 { background: var(--soft-orange); border-color: #ffd19a; }
+    .s4 { background: var(--soft-purple); border-color: #d2c3ff; }
+    .s5 { background: var(--soft-cyan); border-color: #a9dce5; }
+    .diagram {
+      margin: 18px 0 4px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fbfcfe;
+      overflow-x: auto;
+    }
+    .diagram svg {
+      display: block;
+      min-width: 980px;
+      width: 100%;
+      height: auto;
+    }
+    .diagram .caption {
+      margin: 10px 0 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .blue { background: var(--blue); }
+    .green { background: var(--green); }
+    .orange { background: var(--orange); }
+    .red { background: var(--red); }
+    .purple { background: var(--purple); }
+    .cyan { background: var(--cyan); }
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; }
+    .formula {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .formula pre { margin: 0; }
+    .callout-title {
+      margin: 0 0 6px;
+      font-weight: 700;
+    }
+    footer {
+      margin-top: 24px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+    @media (max-width: 900px) {
+      nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flow, .grid.three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 680px) {
+      .wrap { padding: 18px 12px 36px; }
+      header, section { padding: 18px 16px; }
+      nav, .flow, .grid, .grid.three, .formula { grid-template-columns: 1fr; }
+      h1 { font-size: 24px; }
+      table { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>基因结构注释校准前后比较算法说明</h1>
+    <p class="subtitle">
+      基于当前项目代码的最新逻辑：以基因座坐标互逆重叠建立前后一一对应关系，再对确认的 1:1 基因进行结构变化评估。
+    </p>
+    <div class="meta">
+      <span class="pill">文档日期：2026-05-22</span>
+      <span class="pill">核心脚本：<code>locus_compare.py</code></span>
+      <span class="pill">统计脚本：<code>generate_tables.py</code></span>
+      <span class="pill">目标图：<code>plot_target_figures.py</code></span>
+      <span class="pill">验证脚本：<code>validate_results.py</code></span>
+    </div>
+    <nav aria-label="目录">
+      <a href="#scope">1. 分析范围</a>
+      <a href="#model">2. 数据模型</a>
+      <a href="#match">3. 基因座匹配</a>
+      <a href="#classify">4. 结构变化分类</a>
+      <a href="#transcripts">5. 多转录本处理</a>
+      <a href="#tables">6. 统计表与图</a>
+      <a href="#validation">7. 验证逻辑</a>
+      <a href="#limits">8. 边界与限制</a>
+    </nav>
+  </header>
+
+  <section id="scope">
+    <h2>1. 分析范围与当前配置</h2>
+    <p>
+      当前项目只分析 <code>species.json</code> 中列出的物种。虽然工作目录中仍保留猕猴桃和红薯的原始文件，
+      但批处理、表格、验证和图形脚本均以 <code>species.json</code> 为准，未列入配置的物种不会进入当前结果。
+    </p>
+    <table>
+      <thead>
+        <tr><th>物种 ID</th><th>图表标签</th><th>状态</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Artemisia_annua</code></td><td>A. annua</td><td><span class="tag green">纳入</span></td></tr>
+        <tr><td><code>Cucumber</code></td><td>Cucumber</td><td><span class="tag green">纳入</span></td></tr>
+        <tr><td><code>Fragaria_ananassa</code></td><td>F. ananassa</td><td><span class="tag green">纳入</span></td></tr>
+        <tr><td><code>Fragaria_vesca</code></td><td>F. vesca</td><td><span class="tag green">纳入</span></td></tr>
+        <tr><td><code>Peach</code></td><td>Peach</td><td><span class="tag green">纳入</span></td></tr>
+        <tr><td><code>Pineapple</code></td><td>Pineapple</td><td><span class="tag green">纳入</span></td></tr>
+        <tr><td><code>Rice</code></td><td>Rice</td><td><span class="tag green">纳入</span></td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <p class="callout-title">默认分析对象</p>
+      <p>
+        <code>run_locus_comparisons.py</code> 默认使用 <code>--gene-scope mrna</code>，即只比较含 mRNA/transcript 的基因模型。
+        ncRNA、tRNA 等非 mRNA 基因类型不进入当前目标图与核心统计，这是为了与本项目的 mRNA 结构校准目标保持一致。
+      </p>
+    </div>
+  </section>
+
+  <section id="overview">
+    <h2>2. 总体流程</h2>
+    <div class="flow">
+      <div class="step s1">
+        <b>解析 GFF</b>
+        <p>读取 gene、mRNA/transcript、exon、CDS、five_prime_UTR、three_prime_UTR。</p>
+      </div>
+      <div class="step s2">
+        <b>补全结构</b>
+        <p>保留原始 gene 边界，并从 exon/CDS/mRNA 范围推导缺失的 UTR 或 exon。</p>
+      </div>
+      <div class="step s3">
+        <b>坐标匹配</b>
+        <p>按 seqid 和 strand 分组，用扫描算法寻找满足互逆重叠阈值的候选基因对。</p>
+      </div>
+      <div class="step s4">
+        <b>基因座归类</b>
+        <p>对候选对构建二部图连通分量，区分 1:1、split、merge、complex、弱重叠未决、严格 novel/deleted。</p>
+      </div>
+      <div class="step s5">
+        <b>结构评估</b>
+        <p>仅对确认的 1:1 基因进行 exon、CDS、UTR、边界和多转录本变化分类。</p>
+      </div>
+    </div>
+
+    <div class="diagram" role="img" aria-label="算法流程示意图">
+      <svg viewBox="0 0 1180 620" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow-main" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+            <path d="M0,0 L9,3.5 L0,7 Z" fill="#5f6b7a"/>
+          </marker>
+          <marker id="arrow-green" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+            <path d="M0,0 L9,3.5 L0,7 Z" fill="#208a5b"/>
+          </marker>
+          <marker id="arrow-orange" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+            <path d="M0,0 L9,3.5 L0,7 Z" fill="#b76300"/>
+          </marker>
+          <filter id="shadow" x="-10%" y="-18%" width="120%" height="136%">
+            <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#1f2937" flood-opacity="0.12"/>
+          </filter>
+          <style>
+            .node { filter: url(#shadow); }
+            .title { font: 700 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; fill: #1f2937; }
+            .label { font: 700 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; fill: #1f2937; }
+            .sub { font: 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; fill: #415065; }
+            .tiny { font: 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; fill: #5f6b7a; }
+            .white { fill: #fff; }
+            .line { stroke: #5f6b7a; stroke-width: 2; fill: none; marker-end: url(#arrow-main); }
+            .line-green { stroke: #208a5b; stroke-width: 2.2; fill: none; marker-end: url(#arrow-green); }
+            .line-orange { stroke: #b76300; stroke-width: 2.2; fill: none; marker-end: url(#arrow-orange); }
+            .dash { stroke-dasharray: 6 5; }
+          </style>
+        </defs>
+
+        <text x="590" y="34" text-anchor="middle" class="title">图 A. 当前项目算法流程示意图</text>
+
+        <!-- Inputs -->
+        <rect class="node" x="30" y="70" width="190" height="92" rx="10" fill="#e9f1ff" stroke="#9bb8f8"/>
+        <text x="125" y="98" text-anchor="middle" class="label">输入与配置</text>
+        <text x="125" y="121" text-anchor="middle" class="sub">species.json</text>
+        <text x="125" y="140" text-anchor="middle" class="sub">before/after GFF</text>
+
+        <!-- Parse -->
+        <rect class="node" x="270" y="70" width="210" height="92" rx="10" fill="#e7f6ef" stroke="#a9dec5"/>
+        <text x="375" y="98" text-anchor="middle" class="label">解析并标准化模型</text>
+        <text x="375" y="121" text-anchor="middle" class="sub">gene -> mRNA -> exon/CDS/UTR</text>
+        <text x="375" y="140" text-anchor="middle" class="sub">保存 raw gene/mRNA 边界</text>
+
+        <!-- Derive -->
+        <rect class="node" x="530" y="70" width="210" height="92" rx="10" fill="#fff2df" stroke="#ffd19a"/>
+        <text x="635" y="98" text-anchor="middle" class="label">补全缺失结构</text>
+        <text x="635" y="121" text-anchor="middle" class="sub">UTR: exon/CDS 或 mRNA/CDS</text>
+        <text x="635" y="140" text-anchor="middle" class="sub">exon: CDS + UTR 区间并集</text>
+
+        <!-- Group -->
+        <rect class="node" x="790" y="70" width="170" height="92" rx="10" fill="#f2ecff" stroke="#d2c3ff"/>
+        <text x="875" y="98" text-anchor="middle" class="label">分组排序</text>
+        <text x="875" y="121" text-anchor="middle" class="sub">按 seqid x strand</text>
+        <text x="875" y="140" text-anchor="middle" class="sub">按 start 排序</text>
+
+        <!-- Scan -->
+        <rect class="node" x="1010" y="70" width="140" height="92" rx="10" fill="#e6f6f9" stroke="#a9dce5"/>
+        <text x="1080" y="98" text-anchor="middle" class="label">候选扫描</text>
+        <text x="1080" y="121" text-anchor="middle" class="sub">双指针区间重叠</text>
+        <text x="1080" y="140" text-anchor="middle" class="sub">同链同 seqid</text>
+
+        <path class="line" d="M220 116 H263"/>
+        <path class="line" d="M480 116 H523"/>
+        <path class="line" d="M740 116 H783"/>
+        <path class="line" d="M960 116 H1003"/>
+
+        <!-- Threshold -->
+        <rect class="node" x="975" y="222" width="210" height="88" rx="10" fill="#fff" stroke="#d8dee8"/>
+        <text x="1080" y="248" text-anchor="middle" class="label">reciprocal overlap 过滤</text>
+        <text x="1080" y="272" text-anchor="middle" class="sub">overlap / max(lenA, lenB)</text>
+        <text x="1080" y="292" text-anchor="middle" class="sub">默认阈值 >= 0.5</text>
+
+        <path class="line" d="M1080 162 V215"/>
+
+        <!-- Graph -->
+        <rect class="node" x="760" y="222" width="170" height="88" rx="10" fill="#f2ecff" stroke="#d2c3ff"/>
+        <text x="845" y="248" text-anchor="middle" class="label">构建二部图</text>
+        <text x="845" y="272" text-anchor="middle" class="sub">before gene 节点</text>
+        <text x="845" y="292" text-anchor="middle" class="sub">after gene 节点</text>
+
+        <path class="line" d="M975 266 H937"/>
+
+        <!-- Components -->
+        <rect class="node" x="500" y="222" width="210" height="88" rx="10" fill="#f6f8fb" stroke="#c9d2df"/>
+        <text x="605" y="248" text-anchor="middle" class="label">连通分量解析</text>
+        <text x="605" y="272" text-anchor="middle" class="sub">保留完整 locus 关系</text>
+        <text x="605" y="292" text-anchor="middle" class="sub">避免贪心误拆 split/merge</text>
+
+        <path class="line" d="M760 266 H717"/>
+
+        <!-- Branch decision -->
+        <polygon class="node" points="350,222 450,266 350,310 250,266" fill="#fff" stroke="#d8dee8"/>
+        <text x="350" y="260" text-anchor="middle" class="label">分量规模</text>
+        <text x="350" y="280" text-anchor="middle" class="sub">是否 1:1?</text>
+        <path class="line" d="M500 266 H458"/>
+
+        <!-- Non 1:1 -->
+        <rect class="node" x="50" y="213" width="170" height="106" rx="10" fill="#fff0ef" stroke="#f3b2ad"/>
+        <text x="135" y="242" text-anchor="middle" class="label">非 1:1 事件</text>
+        <text x="135" y="266" text-anchor="middle" class="sub">split / merge / complex</text>
+        <text x="135" y="286" text-anchor="middle" class="sub">weak overlap unresolved</text>
+        <text x="135" y="306" text-anchor="middle" class="sub">strict novel / deleted</text>
+        <path class="line-orange" d="M250 266 H228"/>
+        <text x="226" y="254" class="tiny" fill="#b76300">否</text>
+
+        <!-- 1:1 path -->
+        <rect class="node" x="270" y="385" width="190" height="94" rx="10" fill="#e7f6ef" stroke="#a9dec5"/>
+        <text x="365" y="414" text-anchor="middle" class="label">代表转录本配对</text>
+        <text x="365" y="438" text-anchor="middle" class="sub">before: primary_mRNA</text>
+        <text x="365" y="458" text-anchor="middle" class="sub">after: 最相似 mRNA</text>
+        <path class="line-green" d="M350 310 V378"/>
+        <text x="360" y="348" class="tiny" fill="#208a5b">是</text>
+
+        <rect class="node" x="510" y="385" width="190" height="94" rx="10" fill="#e9f1ff" stroke="#9bb8f8"/>
+        <text x="605" y="414" text-anchor="middle" class="label">结构属性评估</text>
+        <text x="605" y="438" text-anchor="middle" class="sub">gene 边界 / UTR / CDS</text>
+        <text x="605" y="458" text-anchor="middle" class="sub">coding exon / UTR-only exon</text>
+        <path class="line" d="M460 432 H503"/>
+
+        <rect class="node" x="750" y="385" width="190" height="94" rx="10" fill="#fff2df" stroke="#ffd19a"/>
+        <text x="845" y="414" text-anchor="middle" class="label">多转录本校验</text>
+        <text x="845" y="438" text-anchor="middle" class="sub">gene_structure_signature</text>
+        <text x="845" y="458" text-anchor="middle" class="sub">isoform_change</text>
+        <path class="line" d="M700 432 H743"/>
+
+        <rect class="node" x="990" y="385" width="160" height="94" rx="10" fill="#e6f6f9" stroke="#a9dce5"/>
+        <text x="1070" y="414" text-anchor="middle" class="label">1:1 输出</text>
+        <text x="1070" y="438" text-anchor="middle" class="sub">互斥 subtype</text>
+        <text x="1070" y="458" text-anchor="middle" class="sub">非互斥 one_to_one_*</text>
+        <path class="line" d="M940 432 H983"/>
+
+        <!-- Outputs -->
+        <rect class="node" x="50" y="525" width="240" height="70" rx="10" fill="#f6f8fb" stroke="#c9d2df"/>
+        <text x="170" y="552" text-anchor="middle" class="label">逐物种 locus 输出</text>
+        <text x="170" y="575" text-anchor="middle" class="sub">change_summary.csv / change_log.csv</text>
+
+        <rect class="node" x="360" y="525" width="220" height="70" rx="10" fill="#f6f8fb" stroke="#c9d2df"/>
+        <text x="470" y="552" text-anchor="middle" class="label">汇总统计表</text>
+        <text x="470" y="575" text-anchor="middle" class="sub">summary.csv / multilabel.csv</text>
+
+        <rect class="node" x="650" y="525" width="210" height="70" rx="10" fill="#f6f8fb" stroke="#c9d2df"/>
+        <text x="755" y="552" text-anchor="middle" class="label">验证检查</text>
+        <text x="755" y="575" text-anchor="middle" class="sub">闭合、物种范围、直接映射</text>
+
+        <rect class="node" x="930" y="525" width="220" height="70" rx="10" fill="#f6f8fb" stroke="#c9d2df"/>
+        <text x="1040" y="552" text-anchor="middle" class="label">目标图形</text>
+        <text x="1040" y="575" text-anchor="middle" class="sub">figure1_quantity_changes / figure2_syntenic_structure</text>
+
+        <path class="line dash" d="M130 310 V515 Q130 525 140 525"/>
+        <path class="line dash" d="M1070 479 V505 Q1070 515 1060 515 H190 Q170 515 170 518"/>
+        <path class="line" d="M290 560 H353"/>
+        <path class="line" d="M580 560 H643"/>
+        <path class="line" d="M860 560 H923"/>
+      </svg>
+      <p class="caption">
+        流程图强调两条主线：非 1:1 基因座只做事件级统计；确认 1:1 后才进入 exon/CDS/UTR/isoform 结构变化评估。
+      </p>
+    </div>
+  </section>
+
+  <section id="model">
+    <h2>3. 数据模型与特征补全</h2>
+    <div class="grid">
+      <div class="box">
+        <h3>基因模型</h3>
+        <pre>GeneModel
+  gene_id, seqid, start, end, strand
+  raw_start, raw_end
+  mrnas: list[MRNAModel]
+
+MRNAModel
+  mrna_id
+  raw_start, raw_end
+  exons: list[ExonFeature]
+  cds:   list[CDSFeature]
+  utrs:  list[UTRFeature]</pre>
+        <p>
+          <code>start/end</code> 是用于基因座重叠匹配的模型跨度，可能由子特征扩展；
+          <code>raw_start/raw_end</code> 保存 GFF 中原始 gene 或 mRNA 行的边界，用于判断人工校准是否改变了 gene 边界。
+        </p>
+      </div>
+      <div class="box">
+        <h3>结构签名</h3>
+        <pre>exon_signature = sorted((start, end))
+cds_signature  = sorted((start, end, phase))
+utr_signature  = sorted((start, end, utr_type))
+
+transcript_signature = (
+  exon_signature,
+  cds_signature,
+  utr_signature
+)
+
+gene_structure_signature =
+  sorted(transcript_signature for all transcripts)</pre>
+        <p>
+          结构签名不依赖前后文件中的基因 ID 或转录本 ID，适合处理人工校准后 ID 完全改变的情况。
+        </p>
+      </div>
+    </div>
+
+    <h3>缺失结构的补全策略</h3>
+    <table>
+      <thead>
+        <tr><th>情况</th><th>当前处理</th><th>目的</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>UTR 行缺失，但有 exon 和 CDS</td>
+          <td>用 exon 中落在 CDS 区间外的部分推导 5' 或 3' UTR；负链会交换基因组坐标方向上的 5'/3' 判定。</td>
+          <td>避免仅因输入文件未显式写 UTR 而漏掉 UTR 变化。</td>
+        </tr>
+        <tr>
+          <td>UTR 行缺失，且没有 exon</td>
+          <td>用 mRNA 原始边界或 gene 原始边界与 CDS 范围的差异推导末端 UTR。</td>
+          <td>兼容只提供 mRNA/CDS 的 GFF。</td>
+        </tr>
+        <tr>
+          <td>exon 行缺失</td>
+          <td>用 CDS 与 UTR 区间的并集合并为 exon 区间。</td>
+          <td>保证 exon 计数和边界比较有稳定输入。</td>
+        </tr>
+        <tr>
+          <td>gene 边界与子特征不一致</td>
+          <td>模型跨度扩展到所有 mRNA 子特征的最外侧；原始 gene 边界仍保留。</td>
+          <td>匹配使用更完整的 locus span，边界变化评估仍基于原始 gene 行。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="match">
+    <h2>4. 基因座匹配算法</h2>
+    <p>
+      校准前后 ID 不可靠，因此匹配只依赖基因组坐标、染色体/scaffold 和链向。当前默认模式是严格的 reciprocal overlap。
+    </p>
+    <div class="formula">
+      <pre>overlap(A, B) =
+  max(0, min(A.end, B.end) - max(A.start, B.start) + 1)</pre>
+      <pre>reciprocal_overlap(A, B) =
+  overlap(A, B) / max(length(A), length(B))
+
+等价于：
+  min(overlap/length(A), overlap/length(B))</pre>
+    </div>
+    <div class="note ok">
+      <p class="callout-title">关键点</p>
+      <p>
+        当前代码使用 <code>overlap / max(length_before, length_after)</code>，默认阈值为 <code>0.5</code>。
+        这比 <code>overlap / min(length)</code> 更严格，可避免短片段被错误匹配到长基因的一小段。
+      </p>
+    </div>
+
+    <h3>候选基因对条件</h3>
+    <ol>
+      <li><code>seqid</code> 相同；没有公共 <code>seqid</code> 时该物种比较返回空结果。</li>
+      <li><code>strand</code> 相同；反义重叠不会视为同一基因座。</li>
+      <li><code>reciprocal_overlap >= 0.5</code>，阈值可由 <code>--reciprocal-overlap</code> 修改。</li>
+    </ol>
+    <p>
+      搜索实现采用每个 <code>seqid x strand</code> 内按起点排序的双指针扫描。该策略保留所有满足阈值的候选对，
+      后续再由连通分量决定是 1:1、拆分、合并还是复杂事件。
+    </p>
+    <div class="note warn">
+      <p class="callout-title">Novel/Deleted 的保守口径</p>
+      <p>
+        如果一个基因未进入 reciprocal overlap 候选对，但存在 <code>overlap / min(length_before, length_after) >= 0.5</code>
+        的 containment 风格重叠，当前不会把它计为严格 <code>novel</code> 或 <code>deleted</code>。
+        这类基因单独输出为 <code>unresolved_overlap_after</code> 或 <code>unresolved_overlap_before</code>，
+        表示坐标上有关联但一一对应关系不足以确认。
+      </p>
+    </div>
+
+    <h3>连通分量解析</h3>
+    <table>
+      <thead>
+        <tr><th>连通分量规模</th><th>输出类别</th><th>含义</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1 before : 1 after</td><td><span class="tag green">syntenic</span></td><td>确认一一对应，进入结构变化分类。</td></tr>
+        <tr><td>1 before : N after</td><td><span class="tag orange">split</span></td><td>一个原基因被拆分成多个校准后基因。</td></tr>
+        <tr><td>N before : 1 after</td><td><span class="tag purple">merge</span></td><td>多个原基因被合并成一个校准后基因。</td></tr>
+        <tr><td>M before : N after</td><td><span class="tag red">complex</span></td><td>复杂重排，无法简化为单个拆分或合并。</td></tr>
+        <tr><td>弱 containment 重叠但未达 reciprocal 阈值</td><td><span class="tag orange">unresolved_overlap</span></td><td>坐标上存在较强包含式重叠，但不能确认一一对应；不计入严格新增或删除。</td></tr>
+        <tr><td>0 before : 1 after，且无弱 containment 重叠</td><td><span class="tag blue">novel</span></td><td>严格校准后新增基因。</td></tr>
+        <tr><td>1 before : 0 after，且无弱 containment 重叠</td><td><span class="tag cyan">deleted</span></td><td>严格校准后删除的原基因。</td></tr>
+      </tbody>
+    </table>
+    <p>
+      采用连通分量而不是贪心最佳匹配，是为了避免把真实的 split/merge 事件误拆成多个局部 1:1 匹配。
+    </p>
+  </section>
+
+  <section id="classify">
+    <h2>5. 1:1 基因的结构变化分类</h2>
+    <p>
+      结构变化只对 <code>syntenic</code> 1:1 基因对进行详细评估。当前评估同时产生两个层次的结果：
+      一是互斥的详细 subtype，用于总表闭合；二是非互斥的 <code>one_to_one_*</code> 属性，用于图 2 的结构变化热图。
+    </p>
+
+    <h3>基础阈值</h3>
+    <table>
+      <thead>
+        <tr><th>参数</th><th>默认值</th><th>作用</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>--boundary-tol</code></td><td class="num">10 bp</td><td>原始 gene 起止坐标差异超过该值时，记为 gene boundary changed。</td></tr>
+        <tr><td><code>--cds-change-pct</code></td><td class="num">0.1</td><td>CDS 长度相对变化达到 10% 时，记为 CDS 显著变化；CDS 坐标或 phase 改变也会触发 CDS change。</td></tr>
+        <tr><td><code>--utr-change-pct</code></td><td class="num">0.1</td><td>同一侧 UTR 在前后均存在且长度变化达到 10% 时，记为 UTR refined；UTR 坐标变动也会纳入。</td></tr>
+      </tbody>
+    </table>
+
+    <h3>非互斥结构属性</h3>
+    <table>
+      <thead>
+        <tr><th>属性列</th><th>判定口径</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>one_to_one_exact</code></td><td>原始 gene 边界未超过容差，且所有转录本结构签名完全一致。</td></tr>
+        <tr><td><code>one_to_one_gene_boundary_changed</code></td><td>原始 gene 起点或终点变化超过 <code>boundary_tol</code>。</td></tr>
+        <tr><td><code>one_to_one_utr_added</code></td><td>代表转录本中新出现 5' 或 3' UTR。</td></tr>
+        <tr><td><code>one_to_one_utr_lost</code></td><td>代表转录本中原有 5' 或 3' UTR 消失。</td></tr>
+        <tr><td><code>one_to_one_utr_exon_added</code></td><td>代表转录本的 UTR-only exon 数增加。</td></tr>
+        <tr><td><code>one_to_one_utr_exon_removed</code></td><td>代表转录本的 UTR-only exon 数减少。</td></tr>
+        <tr><td><code>one_to_one_utr_refined</code></td><td>UTR 坐标或长度发生变化，但不是简单的 UTR 出现/消失。</td></tr>
+        <tr><td><code>one_to_one_coding_exon_gain</code></td><td>代表转录本中与 CDS 重叠的 exon 数增加。</td></tr>
+        <tr><td><code>one_to_one_coding_exon_loss</code></td><td>代表转录本中与 CDS 重叠的 exon 数减少。</td></tr>
+        <tr><td><code>one_to_one_exon_boundary_refined</code></td><td>coding exon 和 UTR-only exon 数均不变，但 exon 坐标发生改变。</td></tr>
+        <tr><td><code>one_to_one_cds_change</code></td><td>CDS 长度达到阈值变化，或 CDS 坐标/phase 签名改变。</td></tr>
+        <tr><td><code>one_to_one_cds_boundary_refined</code></td><td>CDS 被判定变化，但总 CDS 长度不变，主要体现为边界或 phase 调整。</td></tr>
+        <tr><td><code>one_to_one_isoform_change</code></td><td>mRNA 数量改变，或非代表转录本层面的 exon/CDS/UTR 结构发生额外变化。</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note ok">
+      <p class="callout-title">当前关键修正</p>
+      <p>
+        外显子增减现在分成 <code>coding_exon_count</code> 和 <code>utr_only_exon_count</code> 两条独立路径。
+        一个新增 UTR-only exon 即使伴随 CDS 边界变化，也不会被误计为 coding exon gain。
+      </p>
+    </div>
+
+    <h3>互斥 subtype 与汇总表</h3>
+    <p>
+      <code>classify_syntenic_change()</code> 会为每个 1:1 基因生成一个详细 subtype，例如
+      <code>utr_exon_added</code>、<code>exon_gain_cds_extended</code>、<code>cds_boundary_refined</code>、
+      <code>isoform_mrna_1x2_restructured</code>。随后 <code>generate_tables.py</code> 按固定优先级聚合到互斥大类：
+    </p>
+    <pre>Exact
+Boundary_refined_only
+UTR_added / UTR_lost
+UTR_exon_gained / UTR_exon_removed
+UTR_refined
+Coding_exon_gain / Coding_exon_loss
+Exon_boundary_refined
+CDS_change_only / CDS_boundary_refined
+Isoform_change</pre>
+    <p>
+      互斥汇总的所有类别之和必须等于 <code>Syntenic</code>。其中 <code>Boundary_refined_only</code>
+      只表示没有其他结构变化时的纯 gene 边界变化；若 gene 边界变化同时伴随 UTR/CDS/exon/isoform 变化，
+      该信息由非互斥列 <code>Any_gene_boundary_changed</code> 保留。
+    </p>
+  </section>
+
+  <section id="transcripts">
+    <h2>6. 多转录本处理</h2>
+    <p>
+      当前方法不是简单丢弃多转录本，而是采用“代表转录本详细比较 + 全基因转录本签名校验”的组合策略。
+    </p>
+    <div class="grid">
+      <div class="box">
+        <h3>代表转录本选择</h3>
+        <ol>
+          <li>校准前基因选择 <code>primary_mrna</code>：优先 CDS 总长度最长，其次 exon 数更多，完全相同则按文件读取顺序。</li>
+          <li>校准后基因不是盲选最长转录本，而是在所有 after mRNA 中寻找与 before primary 最相似的转录本。</li>
+          <li>相似度优先考虑完整结构签名相同，其次 CDS、exon、UTR 签名相同，再比较共同片段数和长度差异。</li>
+        </ol>
+      </div>
+      <div class="box">
+        <h3>全基因层面校验</h3>
+        <p>
+          <code>exact</code> 要求所有转录本的结构签名集合完全一致，而不是只要求代表转录本一致。
+          因此非代表转录本发生变化时，基因不会被误判为 exact。
+        </p>
+        <p>
+          <code>isoform_change</code> 捕获 mRNA 数量变化、总 exon 数或总 CDS 长度变化，以及非代表转录本结构变化。
+        </p>
+      </div>
+    </div>
+    <div class="note">
+      <p class="callout-title">方法边界</p>
+      <p>
+        当前算法没有对每一个 isoform 做完整的前后一对一转录本匹配。代表转录本之外的细节主要归入
+        <code>isoform_change</code>，不会进一步拆成每个非代表 isoform 的具体 exon/CDS/UTR 子类型。
+      </p>
+    </div>
+  </section>
+
+  <section id="tables">
+    <h2>7. 统计表与目标图生成逻辑</h2>
+    <h3>核心输出文件</h3>
+    <table>
+      <thead>
+        <tr><th>文件</th><th>来源脚本</th><th>内容</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>results/locus/{Species}_change_summary.csv</code></td>
+          <td><code>run_locus_comparisons.py</code></td>
+          <td>每个物种一行：参数、匹配事件、互斥 subtype 计数、非互斥 <code>one_to_one_*</code> 计数。</td>
+        </tr>
+        <tr>
+          <td><code>results/locus/{Species}_change_log.csv</code></td>
+          <td><code>locus_compare.py</code></td>
+          <td>每个事件一行：before/after gene、match type、change subtype、坐标和结构字段。</td>
+        </tr>
+        <tr>
+          <td><code>results/locus_comparison_summary.csv</code></td>
+          <td><code>generate_tables.py</code></td>
+          <td>面向总览和图形的互斥 1:1 结构变化汇总，以及 split/merge/complex、弱重叠未决、严格 novel/deleted。</td>
+        </tr>
+        <tr>
+          <td><code>results/locus_comparison_multilabel.csv</code></td>
+          <td><code>generate_tables.py</code></td>
+          <td>面向图 2 的非互斥结构属性表；最终计数直接读取 <code>one_to_one_*</code> 列，不从 subtype 字符串反推。</td>
+        </tr>
+        <tr>
+          <td><code>results/locus_diagnostics.csv</code></td>
+          <td><code>generate_tables.py</code></td>
+          <td>重叠模式、候选对数量、同链重叠数量、被 reciprocal 阈值过滤的 containment 风格候选数。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>两个目标图</h3>
+    <div class="grid">
+      <div class="box">
+        <h3>图 1：数量变化</h3>
+        <p>
+          输出：<code>figures/figure1_quantity_changes.png</code>
+        </p>
+        <p>
+          数据源：<code>results/summary_stats.csv</code>。
+          展示校准前后基因数量、单外显子基因数量、每个 mRNA 的平均 exon 数、平均 CDS 长度。
+        </p>
+      </div>
+      <div class="box">
+        <h3>图 2：1:1 结构变化</h3>
+        <p>
+          输出：<code>figures/figure2_syntenic_structure_changes.png</code>
+        </p>
+        <p>
+          数据源：<code>results/locus_comparison_multilabel.csv</code> 和
+          <code>results/locus_comparison_summary.csv</code>。
+          主热图展示各非互斥结构属性占 1:1 基因的百分比；底部柱图展示 1:1 基因占校准前基因的比例。
+        </p>
+      </div>
+    </div>
+
+    <h3>当前汇总结果快照</h3>
+    <p class="muted">
+      以下数值来自当前 <code>results/locus_comparison_summary.csv</code>，用于说明当前结果规模。完整结构属性请查看
+      <code>results/locus_comparison_multilabel.csv</code>。
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>物种</th><th class="num">Before</th><th class="num">After</th><th class="num">Syntenic</th>
+          <th class="num">Exact</th><th class="num">Unresolved after</th><th class="num">Unresolved before</th>
+          <th class="num">Novel</th><th class="num">Deleted</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>A. annua</td><td class="num">54,347</td><td class="num">39,322</td><td class="num">33,523</td><td class="num">18,953</td><td class="num">2,688</td><td class="num">5,364</td><td class="num">3,103</td><td class="num">15,456</td></tr>
+        <tr><td>Cucumber</td><td class="num">24,317</td><td class="num">24,145</td><td class="num">19,965</td><td class="num">15,508</td><td class="num">2,092</td><td class="num">2,300</td><td class="num">2,079</td><td class="num">2,046</td></tr>
+        <tr><td>F. ananassa</td><td class="num">108,087</td><td class="num">108,447</td><td class="num">93,658</td><td class="num">50,847</td><td class="num">10,825</td><td class="num">7,322</td><td class="num">2,468</td><td class="num">6,360</td></tr>
+        <tr><td>F. vesca</td><td class="num">28,588</td><td class="num">34,006</td><td class="num">21,425</td><td class="num">2,918</td><td class="num">5,312</td><td class="num">3,691</td><td class="num">7,201</td><td class="num">3,438</td></tr>
+        <tr><td>Peach</td><td class="num">30,181</td><td class="num">31,751</td><td class="num">28,986</td><td class="num">26,562</td><td class="num">1,294</td><td class="num">784</td><td class="num">792</td><td class="num">89</td></tr>
+        <tr><td>Pineapple</td><td class="num">26,162</td><td class="num">26,657</td><td class="num">24,639</td><td class="num">15,053</td><td class="num">1,051</td><td class="num">1,103</td><td class="num">930</td><td class="num">398</td></tr>
+        <tr><td>Rice</td><td class="num">39,406</td><td class="num">40,326</td><td class="num">32,163</td><td class="num">17,711</td><td class="num">3,673</td><td class="num">3,135</td><td class="num">4,382</td><td class="num">3,953</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="validation">
+    <h2>8. 验证与一致性检查</h2>
+    <p>
+      <code>validate_results.py</code> 负责发现结果表之间的逻辑不一致。当前检查重点不是重新计算算法，
+      而是确保各层输出闭合、物种范围正确、图表输入没有使用过时字段。
+    </p>
+    <table>
+      <thead>
+        <tr><th>检查项</th><th>失败含义</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>物种覆盖</td>
+          <td>所有结果表必须只包含 <code>species.json</code> 中的 7 个物种，且顺序一致。</td>
+        </tr>
+        <tr>
+          <td>互斥类别闭合</td>
+          <td><code>Exact + Boundary_refined_only + ... + Isoform_change</code> 必须等于 <code>Syntenic</code>。</td>
+        </tr>
+        <tr>
+          <td>详细 subtype 闭合</td>
+          <td>每个物种的所有 <code>syntenic_*</code> subtype 之和必须等于 <code>syntenic_total</code>。</td>
+        </tr>
+        <tr>
+          <td>before/after 基因核算</td>
+          <td>syntenic、split、merge、complex、弱重叠未决、deleted/novel 必须完整覆盖校准前后基因集合。</td>
+        </tr>
+        <tr>
+          <td>多标签直接映射</td>
+          <td><code>locus_comparison_multilabel.csv</code> 的 <code>Any_*</code> 列必须等于对应的 <code>one_to_one_*</code> 源列。</td>
+        </tr>
+        <tr>
+          <td>多标签上限</td>
+          <td>任一非互斥结构属性计数不能超过该物种的 <code>Syntenic</code> 总数。</td>
+        </tr>
+      </tbody>
+    </table>
+    <pre>python run_locus_comparisons.py
+python generate_tables.py
+python validate_results.py
+python plot_target_figures.py
+python -m unittest discover -s tests</pre>
+  </section>
+
+  <section id="limits">
+    <h2>9. 当前算法边界与仍可优化点</h2>
+    <div class="grid three">
+      <div class="box">
+        <h3>mRNA 范围限定</h3>
+        <p>
+          默认只分析 mRNA/transcript 结构。若未来要比较 ncRNA/tRNA，需要显式切换 <code>--gene-scope all</code>
+          并重新定义相应的结构统计口径。
+        </p>
+      </div>
+      <div class="box">
+        <h3>多 isoform 细节</h3>
+        <p>
+          当前详细 exon/CDS/UTR 子类型基于代表转录本；非代表转录本变化主要归入 <code>isoform_change</code>。
+          若需要转录本级别结论，可新增 isoform-to-isoform 全量匹配层。
+        </p>
+      </div>
+      <div class="box">
+        <h3>复杂事件未细分</h3>
+        <p>
+          split、merge、complex 只在基因座事件层面计数，没有进一步给每个子基因对拆解结构变化。
+          这避免过度解释不稳定的一对多/多对多关系。
+        </p>
+      </div>
+    </div>
+    <div class="note warn">
+      <p class="callout-title">解释结果时需要注意</p>
+      <p>
+        图 2 的结构类别是非互斥属性。同一个 1:1 基因可以同时计入 UTR refined、CDS changed、gene boundary changed
+        和 isoform changed。因此这些百分比不能相加为 100%；只有 <code>locus_comparison_summary.csv</code>
+        中的互斥类别可以相加并闭合到 <code>Syntenic</code>。
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    本文件由当前项目脚本逻辑整理生成，可直接在浏览器中打开：<code>docs/locus_compare_algorithm.html</code>
+  </footer>
+</div>
+</body>
+</html>

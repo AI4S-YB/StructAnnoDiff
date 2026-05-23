@@ -1,0 +1,7 @@
+figure,layer,category,before_genes,before_pct,after_genes,after_pct
+B,Locus fate,Syntenic 1:1,93658.0,86.6505685235042,93658.0,86.36292382454101
+B,Locus fate,Split,747.0,0.6911099392156318,1496.0,1.3794756885852075
+B,Locus fate,Merge,0.0,0.0,0.0,0.0
+B,Locus fate,Complex,0.0,0.0,0.0,0.0
+B,Locus fate,Unresolved weak-overlap,7322.0,6.774172657211321,10825.0,9.981834444475181
+B,Locus fate,Strict deleted / novel,6360.0,5.8841488800688335,2468.0,2.2757660423985913

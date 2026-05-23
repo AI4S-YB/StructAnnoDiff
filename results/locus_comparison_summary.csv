@@ -1,0 +1,8 @@
+Species,Before,After,Syntenic,Exact,Boundary_refined_only,UTR_added,UTR_lost,UTR_exon_gained,UTR_exon_removed,UTR_refined,Coding_exon_gain,Coding_exon_loss,Exon_boundary_refined,CDS_change_only,CDS_boundary_refined,Isoform_change,Split_events,Merge_events,Complex_events,Unresolved_overlap_after_genes,Unresolved_overlap_before_genes,Novel_genes,Deleted_genes
+A. annua,54347,39322,33523,18953,4,0,0,905,345,0,1837,375,6668,269,31,4136,4,0,0,2688,5364,3103,15456
+Cucumber,24317,24145,19965,15508,912,0,0,744,643,0,320,1076,742,0,20,0,4,1,0,2092,2300,2079,2046
+F. ananassa,108087,108447,93658,50847,0,0,0,1051,1652,0,3042,6553,21097,0,604,8812,747,0,0,10825,7322,2468,6360
+F. vesca,28588,34006,21425,2918,0,0,0,191,446,0,889,1317,6809,0,58,8797,34,0,0,5312,3691,7201,3438
+Peach,30181,31751,28986,26562,0,0,0,35,102,0,407,961,233,0,119,567,322,0,0,1294,784,792,89
+Pineapple,26162,26657,24639,15053,58,0,0,3394,0,0,180,806,4826,2,320,0,16,1,2,1051,1103,930,398
+Rice,39406,40326,32163,17711,3,0,1,286,228,2,375,1650,4868,81,31,6927,13,60,11,3673,3135,4382,3953

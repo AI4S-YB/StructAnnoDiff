@@ -1,0 +1,8 @@
+Species	Before	After	Syntenic	Exact	Boundary_refined_only	UTR_added	UTR_lost	UTR_exon_gained	UTR_exon_removed	UTR_refined	Coding_exon_gain	Coding_exon_loss	Exon_boundary_refined	CDS_change_only	CDS_boundary_refined	Isoform_change	Split_events	Merge_events	Complex_events	Unresolved_overlap_after_genes	Unresolved_overlap_before_genes	Novel_genes	Deleted_genes
+A. annua	54,347	39,322	33,523	18,953	4	0	0	905	345	0	1,837	375	6,668	269	31	4,136	4	0	0	2,688	5,364	3,103	15,456
+Cucumber	24,317	24,145	19,965	15,508	912	0	0	744	643	0	320	1,076	742	0	20	0	4	1	0	2,092	2,300	2,079	2,046
+F. ananassa	108,087	108,447	93,658	50,847	0	0	0	1,051	1,652	0	3,042	6,553	21,097	0	604	8,812	747	0	0	10,825	7,322	2,468	6,360
+F. vesca	28,588	34,006	21,425	2,918	0	0	0	191	446	0	889	1,317	6,809	0	58	8,797	34	0	0	5,312	3,691	7,201	3,438
+Peach	30,181	31,751	28,986	26,562	0	0	0	35	102	0	407	961	233	0	119	567	322	0	0	1,294	784	792	89
+Pineapple	26,162	26,657	24,639	15,053	58	0	0	3,394	0	0	180	806	4,826	2	320	0	16	1	2	1,051	1,103	930	398
+Rice	39,406	40,326	32,163	17,711	3	0	1	286	228	2	375	1,650	4,868	81	31	6,927	13	60	11	3,673	3,135	4,382	3,953

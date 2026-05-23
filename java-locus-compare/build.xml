@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="java-locus-compare" default="build" basedir=".">
+    <property name="src.dir" value="src"/>
+    <property name="test.dir" value="test"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="test.classes.dir" value="${build.dir}/test-classes"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="jar.file" value="${dist.dir}/java-locus-compare.jar"/>
+    <property name="main.class" value="locuscompare.LocusCompareMain"/>
+    <property name="analysis.dir" value=".."/>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+
+    <target name="build">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false"
+               source="11" target="11" encoding="UTF-8" debug="true"/>
+        <mkdir dir="${dist.dir}"/>
+        <jar destfile="${jar.file}" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="test" depends="build">
+        <mkdir dir="${test.classes.dir}"/>
+        <javac srcdir="${test.dir}" destdir="${test.classes.dir}" includeantruntime="false"
+               source="11" target="11" encoding="UTF-8" debug="true">
+            <classpath path="${classes.dir}"/>
+        </javac>
+        <java classname="locuscompare.CoreTests" fork="true" failonerror="true">
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <pathelement path="${test.classes.dir}"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="run-all" depends="build">
+        <java classname="locuscompare.RunLocusComparisonsMain" fork="true" failonerror="true">
+            <classpath path="${classes.dir}"/>
+            <arg value="--analysis-dir"/>
+            <arg value="${analysis.dir}"/>
+            <arg value="--output"/>
+            <arg value="results/locus"/>
+        </java>
+        <java classname="locuscompare.GenerateTablesMain" fork="true" failonerror="true">
+            <classpath path="${classes.dir}"/>
+            <arg value="--analysis-dir"/>
+            <arg value="${analysis.dir}"/>
+            <arg value="--java-results"/>
+            <arg value="results"/>
+        </java>
+    </target>
+
+    <target name="validate-python-parity" depends="build">
+        <java classname="locuscompare.ValidateJavaResultsMain" fork="true" failonerror="true">
+            <classpath path="${classes.dir}"/>
+            <arg value="--python-results"/>
+            <arg value="${analysis.dir}/results"/>
+            <arg value="--java-results"/>
+            <arg value="results"/>
+        </java>
+    </target>
+</project>

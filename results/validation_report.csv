@@ -1,0 +1,8 @@
+species,label,stats_coding_section_before,stats_coding_section_after,stats_gene_before,stats_gene_after,compare_coding_before,compare_coding_after,compare_all_before,compare_all_after,locus_gene_before,locus_gene_after,stats_vs_compare_coding_before_delta,stats_vs_compare_coding_after_delta,stats_vs_locus_before_delta,stats_vs_locus_after_delta
+Artemisia_annua,A. annua,mrna,mrna,54347.0,39322.0,54347,39322,57182,42923,54347,39322,0.0,0.0,0.0,0.0
+Cucumber,Cucumber,mrna,mrna,24317.0,24145.0,24317,24145,24317,24145,24317,24145,0.0,0.0,0.0,0.0
+Fragaria_ananassa,F. ananassa,mrna,mrna,108087.0,108447.0,108087,108447,108087,108447,108087,108447,0.0,0.0,0.0,0.0
+Fragaria_vesca,F. vesca,mrna,mrna,28588.0,34006.0,28588,34006,28588,34006,28588,34006,0.0,0.0,0.0,0.0
+Peach,Peach,mrna,mrna,30181.0,31751.0,30181,31751,30181,31751,30181,31751,0.0,0.0,0.0,0.0
+Pineapple,Pineapple,mrna,mrna,26162.0,26657.0,26162,26657,26162,26657,26162,26657,0.0,0.0,0.0,0.0
+Rice,Rice,mrna,mrna,39406.0,40326.0,39406,40326,39406,40326,39406,40326,0.0,0.0,0.0,0.0

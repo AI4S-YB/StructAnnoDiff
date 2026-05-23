@@ -1,0 +1,1478 @@
+species,state,section,metric,value
+Artemisia_annua,before,mrna,Number of gene,54347.0
+Artemisia_annua,before,mrna,Number of mrna,54347.0
+Artemisia_annua,before,mrna,Number of mrnas with utr both sides,42199.0
+Artemisia_annua,before,mrna,Number of mrnas with at least one utr,50189.0
+Artemisia_annua,before,mrna,Number of cds,54347.0
+Artemisia_annua,before,mrna,Number of exon,226160.0
+Artemisia_annua,before,mrna,Number of five_prime_utr,45872.0
+Artemisia_annua,before,mrna,Number of three_prime_utr,46516.0
+Artemisia_annua,before,mrna,Number of exon in cds,199653.0
+Artemisia_annua,before,mrna,Number of exon in five_prime_utr,61431.0
+Artemisia_annua,before,mrna,Number of exon in three_prime_utr,57463.0
+Artemisia_annua,before,mrna,Number of intron in cds,145306.0
+Artemisia_annua,before,mrna,Number of intron in exon,171813.0
+Artemisia_annua,before,mrna,Number of intron in five_prime_utr,15559.0
+Artemisia_annua,before,mrna,Number of intron in three_prime_utr,10947.0
+Artemisia_annua,before,mrna,Number gene overlapping,1.0
+Artemisia_annua,before,mrna,Number of single exon gene,17013.0
+Artemisia_annua,before,mrna,Number of single exon mrna,17013.0
+Artemisia_annua,before,mrna,mean mrnas per gene,1.0
+Artemisia_annua,before,mrna,mean cdss per mrna,1.0
+Artemisia_annua,before,mrna,mean exons per mrna,4.2
+Artemisia_annua,before,mrna,mean five_prime_utrs per mrna,0.8
+Artemisia_annua,before,mrna,mean three_prime_utrs per mrna,0.9
+Artemisia_annua,before,mrna,mean exons per cds,3.7
+Artemisia_annua,before,mrna,mean exons per five_prime_utr,1.3
+Artemisia_annua,before,mrna,mean exons per three_prime_utr,1.2
+Artemisia_annua,before,mrna,mean introns in cdss per mrna,2.7
+Artemisia_annua,before,mrna,mean introns in exons per mrna,3.2
+Artemisia_annua,before,mrna,mean introns in five_prime_utrs per mrna,0.3
+Artemisia_annua,before,mrna,mean introns in three_prime_utrs per mrna,0.2
+Artemisia_annua,before,mrna,Total gene length (bp),189393358.0
+Artemisia_annua,before,mrna,Total mrna length (bp),189393358.0
+Artemisia_annua,before,mrna,Total cds length (bp),52988195.0
+Artemisia_annua,before,mrna,Total exon length (bp),107335831.0
+Artemisia_annua,before,mrna,Total five_prime_utr length (bp),24292906.0
+Artemisia_annua,before,mrna,Total three_prime_utr length (bp),30054730.0
+Artemisia_annua,before,mrna,Total intron length per cds (bp),62130730.0
+Artemisia_annua,before,mrna,Total intron length per exon (bp),82057527.0
+Artemisia_annua,before,mrna,Total intron length per five_prime_utr (bp),12152022.0
+Artemisia_annua,before,mrna,Total intron length per three_prime_utr (bp),7771883.0
+Artemisia_annua,before,mrna,mean gene length (bp),3485.0
+Artemisia_annua,before,mrna,mean mrna length (bp),3485.0
+Artemisia_annua,before,mrna,mean cds length (bp),975.0
+Artemisia_annua,before,mrna,mean exon length (bp),475.0
+Artemisia_annua,before,mrna,mean five_prime_utr length (bp),530.0
+Artemisia_annua,before,mrna,mean three_prime_utr length (bp),646.0
+Artemisia_annua,before,mrna,mean cds piece length (bp),265.0
+Artemisia_annua,before,mrna,mean five_prime_utr piece length (bp),395.0
+Artemisia_annua,before,mrna,mean three_prime_utr piece length (bp),523.0
+Artemisia_annua,before,mrna,mean intron in cds length (bp),428.0
+Artemisia_annua,before,mrna,mean intron in exon length (bp),478.0
+Artemisia_annua,before,mrna,mean intron in five_prime_utr length (bp),781.0
+Artemisia_annua,before,mrna,mean intron in three_prime_utr length (bp),710.0
+Artemisia_annua,before,mrna,median gene length (bp),2676.0
+Artemisia_annua,before,mrna,median mrna length (bp),2676.0
+Artemisia_annua,before,mrna,median cds length (bp),146.0
+Artemisia_annua,before,mrna,median exon length (bp),189.0
+Artemisia_annua,before,mrna,median five_prime_utr length (bp),168.0
+Artemisia_annua,before,mrna,median three_prime_utr length (bp),283.0
+Artemisia_annua,before,mrna,median cds piece length (bp),146.0
+Artemisia_annua,before,mrna,median five_prime_utr piece length (bp),168.0
+Artemisia_annua,before,mrna,median three_prime_utr piece length (bp),283.0
+Artemisia_annua,before,mrna,median intron in cds length (bp),140.0
+Artemisia_annua,before,mrna,median intron in exon length (bp),153.0
+Artemisia_annua,before,mrna,median intron in five_prime_utr length (bp),329.0
+Artemisia_annua,before,mrna,median intron in three_prime_utr length (bp),230.0
+Artemisia_annua,before,mrna,90 percentile gene length (bp),7202.0
+Artemisia_annua,before,mrna,90 percentile mrna length (bp),7202.0
+Artemisia_annua,before,mrna,90 percentile cds length (bp),585.0
+Artemisia_annua,before,mrna,90 percentile exon length (bp),1173.0
+Artemisia_annua,before,mrna,90 percentile five_prime_utr length (bp),1011.0
+Artemisia_annua,before,mrna,90 percentile three_prime_utr length (bp),1286.0
+Artemisia_annua,before,mrna,90 percentile cds piece length (bp),585.0
+Artemisia_annua,before,mrna,90 percentile five_prime_utr piece length (bp),1011.0
+Artemisia_annua,before,mrna,90 percentile three_prime_utr piece length (bp),1286.0
+Artemisia_annua,before,mrna,90 percentile intron in cds length (bp),952.0
+Artemisia_annua,before,mrna,90 percentile intron in exon length (bp),1064.0
+Artemisia_annua,before,mrna,90 percentile intron in five_prime_utr length (bp),1702.0
+Artemisia_annua,before,mrna,90 percentile intron in three_prime_utr length (bp),1385.0
+Artemisia_annua,before,mrna,Longest gene (bp),36766.0
+Artemisia_annua,before,mrna,Longest mrna (bp),36766.0
+Artemisia_annua,before,mrna,Longest cds (bp),16038.0
+Artemisia_annua,before,mrna,Longest exon (bp),17289.0
+Artemisia_annua,before,mrna,Longest five_prime_utr (bp),12175.0
+Artemisia_annua,before,mrna,Longest three_prime_utr (bp),10102.0
+Artemisia_annua,before,mrna,Longest cds piece (bp),6669.0
+Artemisia_annua,before,mrna,Longest five_prime_utr piece (bp),12175.0
+Artemisia_annua,before,mrna,Longest three_prime_utr piece (bp),9360.0
+Artemisia_annua,before,mrna,Longest intron into cds part (bp),14998.0
+Artemisia_annua,before,mrna,Longest intron into exon part (bp),29676.0
+Artemisia_annua,before,mrna,Longest intron into five_prime_utr part (bp),29676.0
+Artemisia_annua,before,mrna,Longest intron into three_prime_utr part (bp),19703.0
+Artemisia_annua,before,mrna,Shortest gene (bp),150.0
+Artemisia_annua,before,mrna,Shortest mrna (bp),150.0
+Artemisia_annua,before,mrna,Shortest cds piece (bp),3.0
+Artemisia_annua,before,mrna,Shortest five_prime_utr piece (bp),1.0
+Artemisia_annua,before,mrna,Shortest three_prime_utr piece (bp),1.0
+Artemisia_annua,before,mrna,Shortest intron into cds part (bp),40.0
+Artemisia_annua,before,mrna,Shortest intron into exon part (bp),40.0
+Artemisia_annua,before,mrna,Shortest intron into five_prime_utr part (bp),40.0
+Artemisia_annua,before,mrna,Shortest intron into three_prime_utr part (bp),40.0
+Artemisia_annua,before,ncrna,Number of gene,1743.0
+Artemisia_annua,before,ncrna,Number of ncrna,1743.0
+Artemisia_annua,before,ncrna,Number of exon,5027.0
+Artemisia_annua,before,ncrna,Number of intron in exon,3284.0
+Artemisia_annua,before,ncrna,Number gene overlapping,0.0
+Artemisia_annua,before,ncrna,mean ncrnas per gene,1.0
+Artemisia_annua,before,ncrna,mean exons per ncrna,2.9
+Artemisia_annua,before,ncrna,mean introns in exons per ncrna,1.9
+Artemisia_annua,before,ncrna,Total gene length (bp),4004007.0
+Artemisia_annua,before,ncrna,Total ncrna length (bp),4004007.0
+Artemisia_annua,before,ncrna,Total exon length (bp),1655450.0
+Artemisia_annua,before,ncrna,Total intron length per exon (bp),2348557.0
+Artemisia_annua,before,ncrna,mean gene length (bp),2297.0
+Artemisia_annua,before,ncrna,mean ncrna length (bp),2297.0
+Artemisia_annua,before,ncrna,mean exon length (bp),329.0
+Artemisia_annua,before,ncrna,mean intron in exon length (bp),715.0
+Artemisia_annua,before,ncrna,median gene length (bp),1483.0
+Artemisia_annua,before,ncrna,median ncrna length (bp),1483.0
+Artemisia_annua,before,ncrna,median exon length (bp),185.0
+Artemisia_annua,before,ncrna,median intron in exon length (bp),200.0
+Artemisia_annua,before,ncrna,90 percentile gene length (bp),4815.0
+Artemisia_annua,before,ncrna,90 percentile ncrna length (bp),4815.0
+Artemisia_annua,before,ncrna,90 percentile exon length (bp),776.0
+Artemisia_annua,before,ncrna,90 percentile intron in exon length (bp),1487.0
+Artemisia_annua,before,ncrna,Longest gene (bp),56921.0
+Artemisia_annua,before,ncrna,Longest ncrna (bp),56921.0
+Artemisia_annua,before,ncrna,Longest exon (bp),5353.0
+Artemisia_annua,before,ncrna,Longest intron into exon part (bp),17735.0
+Artemisia_annua,before,ncrna,Shortest gene (bp),250.0
+Artemisia_annua,before,ncrna,Shortest ncrna (bp),250.0
+Artemisia_annua,before,ncrna,Shortest intron into exon part (bp),40.0
+Artemisia_annua,before,trna,Number of gene,1092.0
+Artemisia_annua,before,trna,Number of trna,1092.0
+Artemisia_annua,before,trna,Number gene overlapping,0.0
+Artemisia_annua,before,trna,Number of single exon gene,1092.0
+Artemisia_annua,before,trna,mean trnas per gene,1.0
+Artemisia_annua,before,trna,Total gene length (bp),84000.0
+Artemisia_annua,before,trna,Total trna length (bp),84000.0
+Artemisia_annua,before,trna,mean gene length (bp),77.0
+Artemisia_annua,before,trna,mean trna length (bp),77.0
+Artemisia_annua,before,trna,median gene length (bp),75.0
+Artemisia_annua,before,trna,median trna length (bp),75.0
+Artemisia_annua,before,trna,90 percentile gene length (bp),86.0
+Artemisia_annua,before,trna,90 percentile trna length (bp),86.0
+Artemisia_annua,before,trna,Longest gene (bp),112.0
+Artemisia_annua,before,trna,Longest trna (bp),112.0
+Artemisia_annua,before,trna,Shortest gene (bp),60.0
+Artemisia_annua,before,trna,Shortest trna (bp),60.0
+Artemisia_annua,after,mrna,Number of gene,39322.0
+Artemisia_annua,after,mrna,Number of mrna,39322.0
+Artemisia_annua,after,mrna,Number of mrnas with utr both sides,32948.0
+Artemisia_annua,after,mrna,Number of mrnas with at least one utr,37329.0
+Artemisia_annua,after,mrna,Number of cds,39322.0
+Artemisia_annua,after,mrna,Number of exon,203145.0
+Artemisia_annua,after,mrna,Number of five_prime_utr,34818.0
+Artemisia_annua,after,mrna,Number of three_prime_utr,35459.0
+Artemisia_annua,after,mrna,Number of exon in cds,183050.0
+Artemisia_annua,after,mrna,Number of exon in five_prime_utr,46487.0
+Artemisia_annua,after,mrna,Number of exon in three_prime_utr,43627.0
+Artemisia_annua,after,mrna,Number of intron in cds,143728.0
+Artemisia_annua,after,mrna,Number of intron in exon,163823.0
+Artemisia_annua,after,mrna,Number of intron in five_prime_utr,11669.0
+Artemisia_annua,after,mrna,Number of intron in three_prime_utr,8168.0
+Artemisia_annua,after,mrna,Number gene overlapping,931.0
+Artemisia_annua,after,mrna,Number of single exon gene,7932.0
+Artemisia_annua,after,mrna,Number of single exon mrna,7932.0
+Artemisia_annua,after,mrna,mean mrnas per gene,1.0
+Artemisia_annua,after,mrna,mean cdss per mrna,1.0
+Artemisia_annua,after,mrna,mean exons per mrna,5.2
+Artemisia_annua,after,mrna,mean five_prime_utrs per mrna,0.9
+Artemisia_annua,after,mrna,mean three_prime_utrs per mrna,0.9
+Artemisia_annua,after,mrna,mean exons per cds,4.7
+Artemisia_annua,after,mrna,mean exons per five_prime_utr,1.3
+Artemisia_annua,after,mrna,mean exons per three_prime_utr,1.2
+Artemisia_annua,after,mrna,mean introns in cdss per mrna,3.7
+Artemisia_annua,after,mrna,mean introns in exons per mrna,4.2
+Artemisia_annua,after,mrna,mean introns in five_prime_utrs per mrna,0.3
+Artemisia_annua,after,mrna,mean introns in three_prime_utrs per mrna,0.2
+Artemisia_annua,after,mrna,Total gene length (bp),166733435.0
+Artemisia_annua,after,mrna,Total mrna length (bp),166733435.0
+Artemisia_annua,after,mrna,Total cds length (bp),49276449.0
+Artemisia_annua,after,mrna,Total exon length (bp),77960067.0
+Artemisia_annua,after,mrna,Total five_prime_utr length (bp),11804866.0
+Artemisia_annua,after,mrna,Total three_prime_utr length (bp),16878752.0
+Artemisia_annua,after,mrna,Total intron length per cds (bp),69130604.0
+Artemisia_annua,after,mrna,Total intron length per exon (bp),88773368.0
+Artemisia_annua,after,mrna,Total intron length per five_prime_utr (bp),11323636.0
+Artemisia_annua,after,mrna,Total intron length per three_prime_utr (bp),7996491.0
+Artemisia_annua,after,mrna,mean gene length (bp),4240.0
+Artemisia_annua,after,mrna,mean mrna length (bp),4240.0
+Artemisia_annua,after,mrna,mean cds length (bp),1253.0
+Artemisia_annua,after,mrna,mean exon length (bp),384.0
+Artemisia_annua,after,mrna,mean five_prime_utr length (bp),339.0
+Artemisia_annua,after,mrna,mean three_prime_utr length (bp),476.0
+Artemisia_annua,after,mrna,mean cds piece length (bp),269.0
+Artemisia_annua,after,mrna,mean five_prime_utr piece length (bp),254.0
+Artemisia_annua,after,mrna,mean three_prime_utr piece length (bp),387.0
+Artemisia_annua,after,mrna,mean intron in cds length (bp),481.0
+Artemisia_annua,after,mrna,mean intron in exon length (bp),542.0
+Artemisia_annua,after,mrna,mean intron in five_prime_utr length (bp),970.0
+Artemisia_annua,after,mrna,mean intron in three_prime_utr length (bp),979.0
+Artemisia_annua,after,mrna,median gene length (bp),3284.0
+Artemisia_annua,after,mrna,median mrna length (bp),3284.0
+Artemisia_annua,after,mrna,median cds length (bp),139.0
+Artemisia_annua,after,mrna,median exon length (bp),173.0
+Artemisia_annua,after,mrna,median five_prime_utr length (bp),137.0
+Artemisia_annua,after,mrna,median three_prime_utr length (bp),257.0
+Artemisia_annua,after,mrna,median cds piece length (bp),139.0
+Artemisia_annua,after,mrna,median five_prime_utr piece length (bp),137.0
+Artemisia_annua,after,mrna,median three_prime_utr piece length (bp),257.0
+Artemisia_annua,after,mrna,median intron in cds length (bp),145.0
+Artemisia_annua,after,mrna,median intron in exon length (bp),156.0
+Artemisia_annua,after,mrna,median intron in five_prime_utr length (bp),406.0
+Artemisia_annua,after,mrna,median intron in three_prime_utr length (bp),244.0
+Artemisia_annua,after,mrna,90 percentile gene length (bp),8514.0
+Artemisia_annua,after,mrna,90 percentile mrna length (bp),8514.0
+Artemisia_annua,after,mrna,90 percentile cds length (bp),607.0
+Artemisia_annua,after,mrna,90 percentile exon length (bp),926.0
+Artemisia_annua,after,mrna,90 percentile five_prime_utr length (bp),539.0
+Artemisia_annua,after,mrna,90 percentile three_prime_utr length (bp),852.0
+Artemisia_annua,after,mrna,90 percentile cds piece length (bp),607.0
+Artemisia_annua,after,mrna,90 percentile five_prime_utr piece length (bp),539.0
+Artemisia_annua,after,mrna,90 percentile three_prime_utr piece length (bp),852.0
+Artemisia_annua,after,mrna,90 percentile intron in cds length (bp),1021.0
+Artemisia_annua,after,mrna,90 percentile intron in exon length (bp),1153.0
+Artemisia_annua,after,mrna,90 percentile intron in five_prime_utr length (bp),2067.0
+Artemisia_annua,after,mrna,90 percentile intron in three_prime_utr length (bp),2089.0
+Artemisia_annua,after,mrna,Longest gene (bp),46085.0
+Artemisia_annua,after,mrna,Longest mrna (bp),46085.0
+Artemisia_annua,after,mrna,Longest cds (bp),16038.0
+Artemisia_annua,after,mrna,Longest exon (bp),10620.0
+Artemisia_annua,after,mrna,Longest five_prime_utr (bp),8257.0
+Artemisia_annua,after,mrna,Longest three_prime_utr (bp),8405.0
+Artemisia_annua,after,mrna,Longest cds piece (bp),6669.0
+Artemisia_annua,after,mrna,Longest five_prime_utr piece (bp),8257.0
+Artemisia_annua,after,mrna,Longest three_prime_utr piece (bp),8405.0
+Artemisia_annua,after,mrna,Longest intron into cds part (bp),19916.0
+Artemisia_annua,after,mrna,Longest intron into exon part (bp),19953.0
+Artemisia_annua,after,mrna,Longest intron into five_prime_utr part (bp),19953.0
+Artemisia_annua,after,mrna,Longest intron into three_prime_utr part (bp),19892.0
+Artemisia_annua,after,mrna,Shortest gene (bp),228.0
+Artemisia_annua,after,mrna,Shortest mrna (bp),228.0
+Artemisia_annua,after,mrna,Shortest cds piece (bp),1.0
+Artemisia_annua,after,mrna,Shortest five_prime_utr piece (bp),1.0
+Artemisia_annua,after,mrna,Shortest three_prime_utr piece (bp),1.0
+Artemisia_annua,after,mrna,Shortest intron into cds part (bp),20.0
+Artemisia_annua,after,mrna,Shortest intron into exon part (bp),20.0
+Artemisia_annua,after,mrna,Shortest intron into five_prime_utr part (bp),20.0
+Artemisia_annua,after,mrna,Shortest intron into three_prime_utr part (bp),20.0
+Artemisia_annua,after,ncrna,Number of ncrna_gene,3601.0
+Artemisia_annua,after,ncrna,Number of ncrna,3601.0
+Artemisia_annua,after,ncrna,Number of exon,14422.0
+Artemisia_annua,after,ncrna,Number of intron in exon,10821.0
+Artemisia_annua,after,ncrna,Number ncrna_gene overlapping,89.0
+Artemisia_annua,after,ncrna,mean ncrnas per ncrna_gene,1.0
+Artemisia_annua,after,ncrna,mean exons per ncrna,4.0
+Artemisia_annua,after,ncrna,mean introns in exons per ncrna,3.0
+Artemisia_annua,after,ncrna,Total ncrna_gene length (bp),14920722.0
+Artemisia_annua,after,ncrna,Total ncrna length (bp),14920722.0
+Artemisia_annua,after,ncrna,Total exon length (bp),6100564.0
+Artemisia_annua,after,ncrna,Total intron length per exon (bp),8820158.0
+Artemisia_annua,after,ncrna,mean ncrna_gene length (bp),4143.0
+Artemisia_annua,after,ncrna,mean ncrna length (bp),4143.0
+Artemisia_annua,after,ncrna,mean exon length (bp),423.0
+Artemisia_annua,after,ncrna,mean intron in exon length (bp),815.0
+Artemisia_annua,after,ncrna,median ncrna_gene length (bp),3064.0
+Artemisia_annua,after,ncrna,median ncrna length (bp),3064.0
+Artemisia_annua,after,ncrna,median exon length (bp),198.0
+Artemisia_annua,after,ncrna,median intron in exon length (bp),205.0
+Artemisia_annua,after,ncrna,90 percentile ncrna_gene length (bp),8611.0
+Artemisia_annua,after,ncrna,90 percentile ncrna length (bp),8611.0
+Artemisia_annua,after,ncrna,90 percentile exon length (bp),1105.0
+Artemisia_annua,after,ncrna,90 percentile intron in exon length (bp),1360.0
+Artemisia_annua,after,ncrna,Longest ncrna_gene (bp),37895.0
+Artemisia_annua,after,ncrna,Longest ncrna (bp),37895.0
+Artemisia_annua,after,ncrna,Longest exon (bp),17289.0
+Artemisia_annua,after,ncrna,Longest intron into exon part (bp),19934.0
+Artemisia_annua,after,ncrna,Shortest ncrna_gene (bp),345.0
+Artemisia_annua,after,ncrna,Shortest ncrna (bp),345.0
+Artemisia_annua,after,ncrna,Shortest intron into exon part (bp),20.0
+Cucumber,before,mrna,Number of gene,24317.0
+Cucumber,before,mrna,Number of mrna,24317.0
+Cucumber,before,mrna,Number of mrnas with utr both sides,14834.0
+Cucumber,before,mrna,Number of mrnas with at least one utr,16098.0
+Cucumber,before,mrna,Number of cds,24317.0
+Cucumber,before,mrna,Number of exon,127080.0
+Cucumber,before,mrna,Number of five_prime_utr,15483.0
+Cucumber,before,mrna,Number of three_prime_utr,15449.0
+Cucumber,before,mrna,Number of exon in cds,121072.0
+Cucumber,before,mrna,Number of exon in five_prime_utr,19248.0
+Cucumber,before,mrna,Number of exon in three_prime_utr,17611.0
+Cucumber,before,mrna,Number of intron in cds,96755.0
+Cucumber,before,mrna,Number of intron in exon,102763.0
+Cucumber,before,mrna,Number of intron in five_prime_utr,3765.0
+Cucumber,before,mrna,Number of intron in three_prime_utr,2162.0
+Cucumber,before,mrna,Number gene overlapping,1582.0
+Cucumber,before,mrna,Number of single exon gene,4893.0
+Cucumber,before,mrna,Number of single exon mrna,4893.0
+Cucumber,before,mrna,mean mrnas per gene,1.0
+Cucumber,before,mrna,mean cdss per mrna,1.0
+Cucumber,before,mrna,mean exons per mrna,5.2
+Cucumber,before,mrna,mean five_prime_utrs per mrna,0.6
+Cucumber,before,mrna,mean three_prime_utrs per mrna,0.6
+Cucumber,before,mrna,mean exons per cds,5.0
+Cucumber,before,mrna,mean exons per five_prime_utr,1.2
+Cucumber,before,mrna,mean exons per three_prime_utr,1.1
+Cucumber,before,mrna,mean introns in cdss per mrna,4.0
+Cucumber,before,mrna,mean introns in exons per mrna,4.2
+Cucumber,before,mrna,mean introns in five_prime_utrs per mrna,0.2
+Cucumber,before,mrna,mean introns in three_prime_utrs per mrna,0.1
+Cucumber,before,mrna,Total gene length (bp),97294772.0
+Cucumber,before,mrna,Total mrna length (bp),97294772.0
+Cucumber,before,mrna,Total cds length (bp),27434670.0
+Cucumber,before,mrna,Total exon length (bp),41764751.0
+Cucumber,before,mrna,Total five_prime_utr length (bp),5363263.0
+Cucumber,before,mrna,Total three_prime_utr length (bp),8966818.0
+Cucumber,before,mrna,Total intron length per cds (bp),51590064.0
+Cucumber,before,mrna,Total intron length per exon (bp),55530021.0
+Cucumber,before,mrna,Total intron length per five_prime_utr (bp),2365716.0
+Cucumber,before,mrna,Total intron length per three_prime_utr (bp),1515524.0
+Cucumber,before,mrna,mean gene length (bp),4001.0
+Cucumber,before,mrna,mean mrna length (bp),4001.0
+Cucumber,before,mrna,mean cds length (bp),1128.0
+Cucumber,before,mrna,mean exon length (bp),329.0
+Cucumber,before,mrna,mean five_prime_utr length (bp),346.0
+Cucumber,before,mrna,mean three_prime_utr length (bp),580.0
+Cucumber,before,mrna,mean cds piece length (bp),227.0
+Cucumber,before,mrna,mean five_prime_utr piece length (bp),279.0
+Cucumber,before,mrna,mean three_prime_utr piece length (bp),509.0
+Cucumber,before,mrna,mean intron in cds length (bp),533.0
+Cucumber,before,mrna,mean intron in exon length (bp),540.0
+Cucumber,before,mrna,mean intron in five_prime_utr length (bp),628.0
+Cucumber,before,mrna,mean intron in three_prime_utr length (bp),701.0
+Cucumber,before,mrna,median gene length (bp),2883.0
+Cucumber,before,mrna,median mrna length (bp),2883.0
+Cucumber,before,mrna,median cds length (bp),131.0
+Cucumber,before,mrna,median exon length (bp),155.0
+Cucumber,before,mrna,median five_prime_utr length (bp),209.0
+Cucumber,before,mrna,median three_prime_utr length (bp),361.0
+Cucumber,before,mrna,median cds piece length (bp),131.0
+Cucumber,before,mrna,median five_prime_utr piece length (bp),209.0
+Cucumber,before,mrna,median three_prime_utr piece length (bp),361.0
+Cucumber,before,mrna,median intron in cds length (bp),194.0
+Cucumber,before,mrna,median intron in exon length (bp),201.0
+Cucumber,before,mrna,median intron in five_prime_utr length (bp),342.0
+Cucumber,before,mrna,median intron in three_prime_utr length (bp),299.0
+Cucumber,before,mrna,90 percentile gene length (bp),8126.0
+Cucumber,before,mrna,90 percentile mrna length (bp),8126.0
+Cucumber,before,mrna,90 percentile cds length (bp),471.0
+Cucumber,before,mrna,90 percentile exon length (bp),766.0
+Cucumber,before,mrna,90 percentile five_prime_utr length (bp),572.0
+Cucumber,before,mrna,90 percentile three_prime_utr length (bp),956.0
+Cucumber,before,mrna,90 percentile cds piece length (bp),471.0
+Cucumber,before,mrna,90 percentile five_prime_utr piece length (bp),572.0
+Cucumber,before,mrna,90 percentile three_prime_utr piece length (bp),956.0
+Cucumber,before,mrna,90 percentile intron in cds length (bp),1117.0
+Cucumber,before,mrna,90 percentile intron in exon length (bp),1137.0
+Cucumber,before,mrna,90 percentile intron in five_prime_utr length (bp),1345.0
+Cucumber,before,mrna,90 percentile intron in three_prime_utr length (bp),1495.0
+Cucumber,before,mrna,Longest gene (bp),192270.0
+Cucumber,before,mrna,Longest mrna (bp),192270.0
+Cucumber,before,mrna,Longest cds (bp),16284.0
+Cucumber,before,mrna,Longest exon (bp),12493.0
+Cucumber,before,mrna,Longest five_prime_utr (bp),6701.0
+Cucumber,before,mrna,Longest three_prime_utr (bp),12453.0
+Cucumber,before,mrna,Longest cds piece (bp),8010.0
+Cucumber,before,mrna,Longest five_prime_utr piece (bp),6280.0
+Cucumber,before,mrna,Longest three_prime_utr piece (bp),12453.0
+Cucumber,before,mrna,Longest intron into cds part (bp),192000.0
+Cucumber,before,mrna,Longest intron into exon part (bp),192000.0
+Cucumber,before,mrna,Longest intron into five_prime_utr part (bp),13472.0
+Cucumber,before,mrna,Longest intron into three_prime_utr part (bp),52231.0
+Cucumber,before,mrna,Shortest gene (bp),76.0
+Cucumber,before,mrna,Shortest mrna (bp),76.0
+Cucumber,before,mrna,Shortest cds piece (bp),1.0
+Cucumber,before,mrna,Shortest five_prime_utr piece (bp),1.0
+Cucumber,before,mrna,Shortest three_prime_utr piece (bp),1.0
+Cucumber,before,mrna,Shortest intron into cds part (bp),21.0
+Cucumber,before,mrna,Shortest intron into exon part (bp),20.0
+Cucumber,before,mrna,Shortest intron into five_prime_utr part (bp),24.0
+Cucumber,before,mrna,Shortest intron into three_prime_utr part (bp),20.0
+Cucumber,after,mrna,Number of gene,24145.0
+Cucumber,after,mrna,Number of mrna,24145.0
+Cucumber,after,mrna,Number of mrnas with utr both sides,20263.0
+Cucumber,after,mrna,Number of mrnas with at least one utr,21009.0
+Cucumber,after,mrna,Number of cds,24142.0
+Cucumber,after,mrna,Number of exon,127343.0
+Cucumber,after,mrna,Number of five_prime_utr,20636.0
+Cucumber,after,mrna,Number of three_prime_utr,20636.0
+Cucumber,after,mrna,Number of exon in cds,117602.0
+Cucumber,after,mrna,Number of exon in five_prime_utr,26718.0
+Cucumber,after,mrna,Number of exon in three_prime_utr,24162.0
+Cucumber,after,mrna,Number of intron in cds,93460.0
+Cucumber,after,mrna,Number of intron in exon,103198.0
+Cucumber,after,mrna,Number of intron in five_prime_utr,6082.0
+Cucumber,after,mrna,Number of intron in three_prime_utr,3526.0
+Cucumber,after,mrna,Number gene overlapping,1156.0
+Cucumber,after,mrna,Number of single exon gene,5299.0
+Cucumber,after,mrna,Number of single exon mrna,5299.0
+Cucumber,after,mrna,mean mrnas per gene,1.0
+Cucumber,after,mrna,mean cdss per mrna,1.0
+Cucumber,after,mrna,mean exons per mrna,5.3
+Cucumber,after,mrna,mean five_prime_utrs per mrna,0.9
+Cucumber,after,mrna,mean three_prime_utrs per mrna,0.9
+Cucumber,after,mrna,mean exons per cds,4.9
+Cucumber,after,mrna,mean exons per five_prime_utr,1.3
+Cucumber,after,mrna,mean exons per three_prime_utr,1.2
+Cucumber,after,mrna,mean introns in cdss per mrna,3.9
+Cucumber,after,mrna,mean introns in exons per mrna,4.3
+Cucumber,after,mrna,mean introns in five_prime_utrs per mrna,0.3
+Cucumber,after,mrna,mean introns in three_prime_utrs per mrna,0.1
+Cucumber,after,mrna,Total gene length (bp),99576153.0
+Cucumber,after,mrna,Total mrna length (bp),99576153.0
+Cucumber,after,mrna,Total cds length (bp),27284479.0
+Cucumber,after,mrna,Total exon length (bp),45020605.0
+Cucumber,after,mrna,Total five_prime_utr length (bp),7083206.0
+Cucumber,after,mrna,Total three_prime_utr length (bp),10650829.0
+Cucumber,after,mrna,Total intron length per cds (bp),47493736.0
+Cucumber,after,mrna,Total intron length per exon (bp),54555548.0
+Cucumber,after,mrna,Total intron length per five_prime_utr (bp),4385400.0
+Cucumber,after,mrna,Total intron length per three_prime_utr (bp),2580612.0
+Cucumber,after,mrna,mean gene length (bp),4124.0
+Cucumber,after,mrna,mean mrna length (bp),4124.0
+Cucumber,after,mrna,mean cds length (bp),1130.0
+Cucumber,after,mrna,mean exon length (bp),354.0
+Cucumber,after,mrna,mean five_prime_utr length (bp),343.0
+Cucumber,after,mrna,mean three_prime_utr length (bp),516.0
+Cucumber,after,mrna,mean cds piece length (bp),232.0
+Cucumber,after,mrna,mean five_prime_utr piece length (bp),265.0
+Cucumber,after,mrna,mean three_prime_utr piece length (bp),441.0
+Cucumber,after,mrna,mean intron in cds length (bp),508.0
+Cucumber,after,mrna,mean intron in exon length (bp),529.0
+Cucumber,after,mrna,mean intron in five_prime_utr length (bp),721.0
+Cucumber,after,mrna,mean intron in three_prime_utr length (bp),732.0
+Cucumber,after,mrna,median gene length (bp),3028.0
+Cucumber,after,mrna,median mrna length (bp),3028.0
+Cucumber,after,mrna,median cds length (bp),132.0
+Cucumber,after,mrna,median exon length (bp),166.0
+Cucumber,after,mrna,median five_prime_utr length (bp),196.0
+Cucumber,after,mrna,median three_prime_utr length (bp),333.0
+Cucumber,after,mrna,median cds piece length (bp),132.0
+Cucumber,after,mrna,median five_prime_utr piece length (bp),196.0
+Cucumber,after,mrna,median three_prime_utr piece length (bp),333.0
+Cucumber,after,mrna,median intron in cds length (bp),190.0
+Cucumber,after,mrna,median intron in exon length (bp),202.0
+Cucumber,after,mrna,median intron in five_prime_utr length (bp),372.0
+Cucumber,after,mrna,median intron in three_prime_utr length (bp),290.0
+Cucumber,after,mrna,90 percentile gene length (bp),8021.0
+Cucumber,after,mrna,90 percentile mrna length (bp),8021.0
+Cucumber,after,mrna,90 percentile cds length (bp),485.0
+Cucumber,after,mrna,90 percentile exon length (bp),827.0
+Cucumber,after,mrna,90 percentile five_prime_utr length (bp),547.0
+Cucumber,after,mrna,90 percentile three_prime_utr length (bp),796.0
+Cucumber,after,mrna,90 percentile cds piece length (bp),485.0
+Cucumber,after,mrna,90 percentile five_prime_utr piece length (bp),547.0
+Cucumber,after,mrna,90 percentile three_prime_utr piece length (bp),796.0
+Cucumber,after,mrna,90 percentile intron in cds length (bp),1074.0
+Cucumber,after,mrna,90 percentile intron in exon length (bp),1117.0
+Cucumber,after,mrna,90 percentile intron in five_prime_utr length (bp),1501.0
+Cucumber,after,mrna,90 percentile intron in three_prime_utr length (bp),1504.0
+Cucumber,after,mrna,Longest gene (bp),192270.0
+Cucumber,after,mrna,Longest mrna (bp),192270.0
+Cucumber,after,mrna,Longest cds (bp),16284.0
+Cucumber,after,mrna,Longest exon (bp),12493.0
+Cucumber,after,mrna,Longest five_prime_utr (bp),11800.0
+Cucumber,after,mrna,Longest three_prime_utr (bp),12453.0
+Cucumber,after,mrna,Longest cds piece (bp),8010.0
+Cucumber,after,mrna,Longest five_prime_utr piece (bp),10591.0
+Cucumber,after,mrna,Longest three_prime_utr piece (bp),12453.0
+Cucumber,after,mrna,Longest intron into cds part (bp),192000.0
+Cucumber,after,mrna,Longest intron into exon part (bp),192000.0
+Cucumber,after,mrna,Longest intron into five_prime_utr part (bp),41615.0
+Cucumber,after,mrna,Longest intron into three_prime_utr part (bp),56180.0
+Cucumber,after,mrna,Shortest gene (bp),83.0
+Cucumber,after,mrna,Shortest mrna (bp),83.0
+Cucumber,after,mrna,Shortest cds piece (bp),1.0
+Cucumber,after,mrna,Shortest five_prime_utr piece (bp),1.0
+Cucumber,after,mrna,Shortest three_prime_utr piece (bp),1.0
+Cucumber,after,mrna,Shortest intron into cds part (bp),2.0
+Cucumber,after,mrna,Shortest intron into exon part (bp),1.0
+Cucumber,after,mrna,Shortest intron into five_prime_utr part (bp),1.0
+Cucumber,after,mrna,Shortest intron into three_prime_utr part (bp),1.0
+Fragaria_ananassa,before,mrna,Number of gene,108087.0
+Fragaria_ananassa,before,mrna,Number of mrna,108087.0
+Fragaria_ananassa,before,mrna,Number of mrnas with utr both sides,42076.0
+Fragaria_ananassa,before,mrna,Number of mrnas with at least one utr,56753.0
+Fragaria_ananassa,before,mrna,Number of cds,108087.0
+Fragaria_ananassa,before,mrna,Number of exon,582088.0
+Fragaria_ananassa,before,mrna,Number of five_prime_utr,47356.0
+Fragaria_ananassa,before,mrna,Number of three_prime_utr,51473.0
+Fragaria_ananassa,before,mrna,Number of exon in cds,541311.0
+Fragaria_ananassa,before,mrna,Number of exon in five_prime_utr,68945.0
+Fragaria_ananassa,before,mrna,Number of exon in three_prime_utr,70206.0
+Fragaria_ananassa,before,mrna,Number of intron in cds,433224.0
+Fragaria_ananassa,before,mrna,Number of intron in exon,474001.0
+Fragaria_ananassa,before,mrna,Number of intron in five_prime_utr,21589.0
+Fragaria_ananassa,before,mrna,Number of intron in three_prime_utr,18733.0
+Fragaria_ananassa,before,mrna,Number gene overlapping,9485.0
+Fragaria_ananassa,before,mrna,Number of single exon gene,17715.0
+Fragaria_ananassa,before,mrna,Number of single exon mrna,17715.0
+Fragaria_ananassa,before,mrna,mean mrnas per gene,1.0
+Fragaria_ananassa,before,mrna,mean cdss per mrna,1.0
+Fragaria_ananassa,before,mrna,mean exons per mrna,5.4
+Fragaria_ananassa,before,mrna,mean five_prime_utrs per mrna,0.4
+Fragaria_ananassa,before,mrna,mean three_prime_utrs per mrna,0.5
+Fragaria_ananassa,before,mrna,mean exons per cds,5.0
+Fragaria_ananassa,before,mrna,mean exons per five_prime_utr,1.5
+Fragaria_ananassa,before,mrna,mean exons per three_prime_utr,1.4
+Fragaria_ananassa,before,mrna,mean introns in cdss per mrna,4.0
+Fragaria_ananassa,before,mrna,mean introns in exons per mrna,4.4
+Fragaria_ananassa,before,mrna,mean introns in five_prime_utrs per mrna,0.2
+Fragaria_ananassa,before,mrna,mean introns in three_prime_utrs per mrna,0.2
+Fragaria_ananassa,before,mrna,Total gene length (bp),341356694.0
+Fragaria_ananassa,before,mrna,Total mrna length (bp),341356694.0
+Fragaria_ananassa,before,mrna,Total cds length (bp),123648726.0
+Fragaria_ananassa,before,mrna,Total exon length (bp),169319342.0
+Fragaria_ananassa,before,mrna,Total five_prime_utr length (bp),15373020.0
+Fragaria_ananassa,before,mrna,Total three_prime_utr length (bp),30297596.0
+Fragaria_ananassa,before,mrna,Total intron length per cds (bp),155806271.0
+Fragaria_ananassa,before,mrna,Total intron length per exon (bp),172037352.0
+Fragaria_ananassa,before,mrna,Total intron length per five_prime_utr (bp),8763394.0
+Fragaria_ananassa,before,mrna,Total intron length per three_prime_utr (bp),7147071.0
+Fragaria_ananassa,before,mrna,mean gene length (bp),3158.0
+Fragaria_ananassa,before,mrna,mean mrna length (bp),3158.0
+Fragaria_ananassa,before,mrna,mean cds length (bp),1144.0
+Fragaria_ananassa,before,mrna,mean exon length (bp),291.0
+Fragaria_ananassa,before,mrna,mean five_prime_utr length (bp),325.0
+Fragaria_ananassa,before,mrna,mean three_prime_utr length (bp),589.0
+Fragaria_ananassa,before,mrna,mean cds piece length (bp),228.0
+Fragaria_ananassa,before,mrna,mean five_prime_utr piece length (bp),223.0
+Fragaria_ananassa,before,mrna,mean three_prime_utr piece length (bp),432.0
+Fragaria_ananassa,before,mrna,mean intron in cds length (bp),360.0
+Fragaria_ananassa,before,mrna,mean intron in exon length (bp),363.0
+Fragaria_ananassa,before,mrna,mean intron in five_prime_utr length (bp),406.0
+Fragaria_ananassa,before,mrna,mean intron in three_prime_utr length (bp),382.0
+Fragaria_ananassa,before,mrna,median gene length (bp),2275.0
+Fragaria_ananassa,before,mrna,median mrna length (bp),2275.0
+Fragaria_ananassa,before,mrna,median cds length (bp),132.0
+Fragaria_ananassa,before,mrna,median exon length (bp),152.0
+Fragaria_ananassa,before,mrna,median five_prime_utr length (bp),146.0
+Fragaria_ananassa,before,mrna,median three_prime_utr length (bp),310.0
+Fragaria_ananassa,before,mrna,median cds piece length (bp),132.0
+Fragaria_ananassa,before,mrna,median five_prime_utr piece length (bp),146.0
+Fragaria_ananassa,before,mrna,median three_prime_utr piece length (bp),310.0
+Fragaria_ananassa,before,mrna,median intron in cds length (bp),146.0
+Fragaria_ananassa,before,mrna,median intron in exon length (bp),149.0
+Fragaria_ananassa,before,mrna,median intron in five_prime_utr length (bp),196.0
+Fragaria_ananassa,before,mrna,median intron in three_prime_utr length (bp),160.0
+Fragaria_ananassa,before,mrna,90 percentile gene length (bp),6865.0
+Fragaria_ananassa,before,mrna,90 percentile mrna length (bp),6865.0
+Fragaria_ananassa,before,mrna,90 percentile cds length (bp),483.0
+Fragaria_ananassa,before,mrna,90 percentile exon length (bp),670.0
+Fragaria_ananassa,before,mrna,90 percentile five_prime_utr length (bp),454.0
+Fragaria_ananassa,before,mrna,90 percentile three_prime_utr length (bp),877.0
+Fragaria_ananassa,before,mrna,90 percentile cds piece length (bp),483.0
+Fragaria_ananassa,before,mrna,90 percentile five_prime_utr piece length (bp),454.0
+Fragaria_ananassa,before,mrna,90 percentile three_prime_utr piece length (bp),877.0
+Fragaria_ananassa,before,mrna,90 percentile intron in cds length (bp),777.0
+Fragaria_ananassa,before,mrna,90 percentile intron in exon length (bp),784.0
+Fragaria_ananassa,before,mrna,90 percentile intron in five_prime_utr length (bp),876.0
+Fragaria_ananassa,before,mrna,90 percentile intron in three_prime_utr length (bp),801.0
+Fragaria_ananassa,before,mrna,Longest gene (bp),88947.0
+Fragaria_ananassa,before,mrna,Longest mrna (bp),88947.0
+Fragaria_ananassa,before,mrna,Longest cds (bp),17325.0
+Fragaria_ananassa,before,mrna,Longest exon (bp),11125.0
+Fragaria_ananassa,before,mrna,Longest five_prime_utr (bp),12677.0
+Fragaria_ananassa,before,mrna,Longest three_prime_utr (bp),12064.0
+Fragaria_ananassa,before,mrna,Longest cds piece (bp),7941.0
+Fragaria_ananassa,before,mrna,Longest five_prime_utr piece (bp),11111.0
+Fragaria_ananassa,before,mrna,Longest three_prime_utr piece (bp),10238.0
+Fragaria_ananassa,before,mrna,Longest intron into cds part (bp),68918.0
+Fragaria_ananassa,before,mrna,Longest intron into exon part (bp),68918.0
+Fragaria_ananassa,before,mrna,Longest intron into five_prime_utr part (bp),9879.0
+Fragaria_ananassa,before,mrna,Longest intron into three_prime_utr part (bp),9862.0
+Fragaria_ananassa,before,mrna,Shortest gene (bp),175.0
+Fragaria_ananassa,before,mrna,Shortest mrna (bp),175.0
+Fragaria_ananassa,before,mrna,Shortest cds piece (bp),1.0
+Fragaria_ananassa,before,mrna,Shortest five_prime_utr piece (bp),1.0
+Fragaria_ananassa,before,mrna,Shortest three_prime_utr piece (bp),1.0
+Fragaria_ananassa,before,mrna,Shortest intron into cds part (bp),4.0
+Fragaria_ananassa,before,mrna,Shortest intron into exon part (bp),4.0
+Fragaria_ananassa,before,mrna,Shortest intron into five_prime_utr part (bp),5.0
+Fragaria_ananassa,before,mrna,Shortest intron into three_prime_utr part (bp),4.0
+Fragaria_ananassa,after,mrna,Number of gene,108447.0
+Fragaria_ananassa,after,mrna,Number of mrna,108447.0
+Fragaria_ananassa,after,mrna,Number of mrnas with utr both sides,60601.0
+Fragaria_ananassa,after,mrna,Number of mrnas with at least one utr,67371.0
+Fragaria_ananassa,after,mrna,Number of cds,108447.0
+Fragaria_ananassa,after,mrna,Number of exon,558292.0
+Fragaria_ananassa,after,mrna,Number of five_prime_utr,63020.0
+Fragaria_ananassa,after,mrna,Number of three_prime_utr,64952.0
+Fragaria_ananassa,after,mrna,Number of exon in cds,514002.0
+Fragaria_ananassa,after,mrna,Number of exon in five_prime_utr,90788.0
+Fragaria_ananassa,after,mrna,Number of exon in three_prime_utr,81025.0
+Fragaria_ananassa,after,mrna,Number of intron in cds,405555.0
+Fragaria_ananassa,after,mrna,Number of intron in exon,449845.0
+Fragaria_ananassa,after,mrna,Number of intron in five_prime_utr,27768.0
+Fragaria_ananassa,after,mrna,Number of intron in three_prime_utr,16073.0
+Fragaria_ananassa,after,mrna,Number gene overlapping,6768.0
+Fragaria_ananassa,after,mrna,Number of single exon gene,17526.0
+Fragaria_ananassa,after,mrna,Number of single exon mrna,17526.0
+Fragaria_ananassa,after,mrna,mean mrnas per gene,1.0
+Fragaria_ananassa,after,mrna,mean cdss per mrna,1.0
+Fragaria_ananassa,after,mrna,mean exons per mrna,5.1
+Fragaria_ananassa,after,mrna,mean five_prime_utrs per mrna,0.6
+Fragaria_ananassa,after,mrna,mean three_prime_utrs per mrna,0.6
+Fragaria_ananassa,after,mrna,mean exons per cds,4.7
+Fragaria_ananassa,after,mrna,mean exons per five_prime_utr,1.4
+Fragaria_ananassa,after,mrna,mean exons per three_prime_utr,1.2
+Fragaria_ananassa,after,mrna,mean introns in cdss per mrna,3.7
+Fragaria_ananassa,after,mrna,mean introns in exons per mrna,4.1
+Fragaria_ananassa,after,mrna,mean introns in five_prime_utrs per mrna,0.3
+Fragaria_ananassa,after,mrna,mean introns in three_prime_utrs per mrna,0.1
+Fragaria_ananassa,after,mrna,Total gene length (bp),324486114.0
+Fragaria_ananassa,after,mrna,Total mrna length (bp),324486114.0
+Fragaria_ananassa,after,mrna,Total cds length (bp),117833874.0
+Fragaria_ananassa,after,mrna,Total exon length (bp),168326323.0
+Fragaria_ananassa,after,mrna,Total five_prime_utr length (bp),20420871.0
+Fragaria_ananassa,after,mrna,Total three_prime_utr length (bp),30071578.0
+Fragaria_ananassa,after,mrna,Total intron length per cds (bp),135437984.0
+Fragaria_ananassa,after,mrna,Total intron length per exon (bp),156159791.0
+Fragaria_ananassa,after,mrna,Total intron length per five_prime_utr (bp),12857247.0
+Fragaria_ananassa,after,mrna,Total intron length per three_prime_utr (bp),7550083.0
+Fragaria_ananassa,after,mrna,mean gene length (bp),2992.0
+Fragaria_ananassa,after,mrna,mean mrna length (bp),2992.0
+Fragaria_ananassa,after,mrna,mean cds length (bp),1087.0
+Fragaria_ananassa,after,mrna,mean exon length (bp),302.0
+Fragaria_ananassa,after,mrna,mean five_prime_utr length (bp),324.0
+Fragaria_ananassa,after,mrna,mean three_prime_utr length (bp),463.0
+Fragaria_ananassa,after,mrna,mean cds piece length (bp),229.0
+Fragaria_ananassa,after,mrna,mean five_prime_utr piece length (bp),225.0
+Fragaria_ananassa,after,mrna,mean three_prime_utr piece length (bp),371.0
+Fragaria_ananassa,after,mrna,mean intron in cds length (bp),334.0
+Fragaria_ananassa,after,mrna,mean intron in exon length (bp),347.0
+Fragaria_ananassa,after,mrna,mean intron in five_prime_utr length (bp),463.0
+Fragaria_ananassa,after,mrna,mean intron in three_prime_utr length (bp),470.0
+Fragaria_ananassa,after,mrna,median gene length (bp),2359.0
+Fragaria_ananassa,after,mrna,median mrna length (bp),2359.0
+Fragaria_ananassa,after,mrna,median cds length (bp),130.0
+Fragaria_ananassa,after,mrna,median exon length (bp),154.0
+Fragaria_ananassa,after,mrna,median five_prime_utr length (bp),153.0
+Fragaria_ananassa,after,mrna,median three_prime_utr length (bp),294.0
+Fragaria_ananassa,after,mrna,median cds piece length (bp),130.0
+Fragaria_ananassa,after,mrna,median five_prime_utr piece length (bp),153.0
+Fragaria_ananassa,after,mrna,median three_prime_utr piece length (bp),294.0
+Fragaria_ananassa,after,mrna,median intron in cds length (bp),144.0
+Fragaria_ananassa,after,mrna,median intron in exon length (bp),148.0
+Fragaria_ananassa,after,mrna,median intron in five_prime_utr length (bp),230.0
+Fragaria_ananassa,after,mrna,median intron in three_prime_utr length (bp),181.0
+Fragaria_ananassa,after,mrna,90 percentile gene length (bp),6110.0
+Fragaria_ananassa,after,mrna,90 percentile mrna length (bp),6110.0
+Fragaria_ananassa,after,mrna,90 percentile cds length (bp),489.0
+Fragaria_ananassa,after,mrna,90 percentile exon length (bp),686.0
+Fragaria_ananassa,after,mrna,90 percentile five_prime_utr length (bp),465.0
+Fragaria_ananassa,after,mrna,90 percentile three_prime_utr length (bp),693.0
+Fragaria_ananassa,after,mrna,90 percentile cds piece length (bp),489.0
+Fragaria_ananassa,after,mrna,90 percentile five_prime_utr piece length (bp),465.0
+Fragaria_ananassa,after,mrna,90 percentile three_prime_utr piece length (bp),693.0
+Fragaria_ananassa,after,mrna,90 percentile intron in cds length (bp),725.0
+Fragaria_ananassa,after,mrna,90 percentile intron in exon length (bp),751.0
+Fragaria_ananassa,after,mrna,90 percentile intron in five_prime_utr length (bp),976.0
+Fragaria_ananassa,after,mrna,90 percentile intron in three_prime_utr length (bp),997.0
+Fragaria_ananassa,after,mrna,Longest gene (bp),69228.0
+Fragaria_ananassa,after,mrna,Longest mrna (bp),69228.0
+Fragaria_ananassa,after,mrna,Longest cds (bp),16347.0
+Fragaria_ananassa,after,mrna,Longest exon (bp),11210.0
+Fragaria_ananassa,after,mrna,Longest five_prime_utr (bp),12677.0
+Fragaria_ananassa,after,mrna,Longest three_prime_utr (bp),9521.0
+Fragaria_ananassa,after,mrna,Longest cds piece (bp),7941.0
+Fragaria_ananassa,after,mrna,Longest five_prime_utr piece (bp),11111.0
+Fragaria_ananassa,after,mrna,Longest three_prime_utr piece (bp),7961.0
+Fragaria_ananassa,after,mrna,Longest intron into cds part (bp),68918.0
+Fragaria_ananassa,after,mrna,Longest intron into exon part (bp),68918.0
+Fragaria_ananassa,after,mrna,Longest intron into five_prime_utr part (bp),44826.0
+Fragaria_ananassa,after,mrna,Longest intron into three_prime_utr part (bp),14162.0
+Fragaria_ananassa,after,mrna,Shortest gene (bp),175.0
+Fragaria_ananassa,after,mrna,Shortest mrna (bp),175.0
+Fragaria_ananassa,after,mrna,Shortest cds piece (bp),1.0
+Fragaria_ananassa,after,mrna,Shortest five_prime_utr piece (bp),1.0
+Fragaria_ananassa,after,mrna,Shortest three_prime_utr piece (bp),1.0
+Fragaria_ananassa,after,mrna,Shortest intron into cds part (bp),4.0
+Fragaria_ananassa,after,mrna,Shortest intron into exon part (bp),4.0
+Fragaria_ananassa,after,mrna,Shortest intron into five_prime_utr part (bp),8.0
+Fragaria_ananassa,after,mrna,Shortest intron into three_prime_utr part (bp),4.0
+Fragaria_vesca,before,mrna,Number of gene,28588.0
+Fragaria_vesca,before,mrna,Number of mrna,28588.0
+Fragaria_vesca,before,mrna,Number of mrnas with utr both sides,14657.0
+Fragaria_vesca,before,mrna,Number of mrnas with at least one utr,18607.0
+Fragaria_vesca,before,mrna,Number of cds,28588.0
+Fragaria_vesca,before,mrna,Number of exon,156498.0
+Fragaria_vesca,before,mrna,Number of five_prime_utr,16001.0
+Fragaria_vesca,before,mrna,Number of three_prime_utr,17263.0
+Fragaria_vesca,before,mrna,Number of exon in cds,142384.0
+Fragaria_vesca,before,mrna,Number of exon in five_prime_utr,22743.0
+Fragaria_vesca,before,mrna,Number of exon in three_prime_utr,24492.0
+Fragaria_vesca,before,mrna,Number of intron in cds,113796.0
+Fragaria_vesca,before,mrna,Number of intron in exon,127910.0
+Fragaria_vesca,before,mrna,Number of intron in five_prime_utr,6742.0
+Fragaria_vesca,before,mrna,Number of intron in three_prime_utr,7229.0
+Fragaria_vesca,before,mrna,Number gene overlapping,2090.0
+Fragaria_vesca,before,mrna,Number of single exon gene,5004.0
+Fragaria_vesca,before,mrna,Number of single exon mrna,5004.0
+Fragaria_vesca,before,mrna,mean mrnas per gene,1.0
+Fragaria_vesca,before,mrna,mean cdss per mrna,1.0
+Fragaria_vesca,before,mrna,mean exons per mrna,5.5
+Fragaria_vesca,before,mrna,mean five_prime_utrs per mrna,0.6
+Fragaria_vesca,before,mrna,mean three_prime_utrs per mrna,0.6
+Fragaria_vesca,before,mrna,mean exons per cds,5.0
+Fragaria_vesca,before,mrna,mean exons per five_prime_utr,1.4
+Fragaria_vesca,before,mrna,mean exons per three_prime_utr,1.4
+Fragaria_vesca,before,mrna,mean introns in cdss per mrna,4.0
+Fragaria_vesca,before,mrna,mean introns in exons per mrna,4.5
+Fragaria_vesca,before,mrna,mean introns in five_prime_utrs per mrna,0.2
+Fragaria_vesca,before,mrna,mean introns in three_prime_utrs per mrna,0.3
+Fragaria_vesca,before,mrna,Total gene length (bp),91881943.0
+Fragaria_vesca,before,mrna,Total mrna length (bp),91881943.0
+Fragaria_vesca,before,mrna,Total cds length (bp),33668625.0
+Fragaria_vesca,before,mrna,Total exon length (bp),46421443.0
+Fragaria_vesca,before,mrna,Total five_prime_utr length (bp),4502284.0
+Fragaria_vesca,before,mrna,Total three_prime_utr length (bp),8250534.0
+Fragaria_vesca,before,mrna,Total intron length per cds (bp),39822494.0
+Fragaria_vesca,before,mrna,Total intron length per exon (bp),45460500.0
+Fragaria_vesca,before,mrna,Total intron length per five_prime_utr (bp),2873064.0
+Fragaria_vesca,before,mrna,Total intron length per three_prime_utr (bp),2673695.0
+Fragaria_vesca,before,mrna,mean gene length (bp),3214.0
+Fragaria_vesca,before,mrna,mean mrna length (bp),3214.0
+Fragaria_vesca,before,mrna,mean cds length (bp),1178.0
+Fragaria_vesca,before,mrna,mean exon length (bp),297.0
+Fragaria_vesca,before,mrna,mean five_prime_utr length (bp),281.0
+Fragaria_vesca,before,mrna,mean three_prime_utr length (bp),478.0
+Fragaria_vesca,before,mrna,mean cds piece length (bp),236.0
+Fragaria_vesca,before,mrna,mean five_prime_utr piece length (bp),198.0
+Fragaria_vesca,before,mrna,mean three_prime_utr piece length (bp),337.0
+Fragaria_vesca,before,mrna,mean intron in cds length (bp),350.0
+Fragaria_vesca,before,mrna,mean intron in exon length (bp),355.0
+Fragaria_vesca,before,mrna,mean intron in five_prime_utr length (bp),426.0
+Fragaria_vesca,before,mrna,mean intron in three_prime_utr length (bp),370.0
+Fragaria_vesca,before,mrna,median gene length (bp),2406.0
+Fragaria_vesca,before,mrna,median mrna length (bp),2406.0
+Fragaria_vesca,before,mrna,median cds length (bp),131.0
+Fragaria_vesca,before,mrna,median exon length (bp),157.0
+Fragaria_vesca,before,mrna,median five_prime_utr length (bp),140.0
+Fragaria_vesca,before,mrna,median three_prime_utr length (bp),281.0
+Fragaria_vesca,before,mrna,median cds piece length (bp),131.0
+Fragaria_vesca,before,mrna,median five_prime_utr piece length (bp),140.0
+Fragaria_vesca,before,mrna,median three_prime_utr piece length (bp),281.0
+Fragaria_vesca,before,mrna,median intron in cds length (bp),150.0
+Fragaria_vesca,before,mrna,median intron in exon length (bp),152.0
+Fragaria_vesca,before,mrna,median intron in five_prime_utr length (bp),215.0
+Fragaria_vesca,before,mrna,median intron in three_prime_utr length (bp),150.0
+Fragaria_vesca,before,mrna,90 percentile gene length (bp),6675.0
+Fragaria_vesca,before,mrna,90 percentile mrna length (bp),6675.0
+Fragaria_vesca,before,mrna,90 percentile cds length (bp),509.0
+Fragaria_vesca,before,mrna,90 percentile exon length (bp),684.0
+Fragaria_vesca,before,mrna,90 percentile five_prime_utr length (bp),401.0
+Fragaria_vesca,before,mrna,90 percentile three_prime_utr length (bp),625.0
+Fragaria_vesca,before,mrna,90 percentile cds piece length (bp),509.0
+Fragaria_vesca,before,mrna,90 percentile five_prime_utr piece length (bp),401.0
+Fragaria_vesca,before,mrna,90 percentile three_prime_utr piece length (bp),625.0
+Fragaria_vesca,before,mrna,90 percentile intron in cds length (bp),758.0
+Fragaria_vesca,before,mrna,90 percentile intron in exon length (bp),770.0
+Fragaria_vesca,before,mrna,90 percentile intron in five_prime_utr length (bp),915.0
+Fragaria_vesca,before,mrna,90 percentile intron in three_prime_utr length (bp),786.0
+Fragaria_vesca,before,mrna,Longest gene (bp),47932.0
+Fragaria_vesca,before,mrna,Longest mrna (bp),47932.0
+Fragaria_vesca,before,mrna,Longest cds (bp),16179.0
+Fragaria_vesca,before,mrna,Longest exon (bp),7938.0
+Fragaria_vesca,before,mrna,Longest five_prime_utr (bp),7169.0
+Fragaria_vesca,before,mrna,Longest three_prime_utr (bp),6823.0
+Fragaria_vesca,before,mrna,Longest cds piece (bp),7938.0
+Fragaria_vesca,before,mrna,Longest five_prime_utr piece (bp),4308.0
+Fragaria_vesca,before,mrna,Longest three_prime_utr piece (bp),4162.0
+Fragaria_vesca,before,mrna,Longest intron into cds part (bp),25056.0
+Fragaria_vesca,before,mrna,Longest intron into exon part (bp),25056.0
+Fragaria_vesca,before,mrna,Longest intron into five_prime_utr part (bp),9899.0
+Fragaria_vesca,before,mrna,Longest intron into three_prime_utr part (bp),9939.0
+Fragaria_vesca,before,mrna,Shortest gene (bp),180.0
+Fragaria_vesca,before,mrna,Shortest mrna (bp),180.0
+Fragaria_vesca,before,mrna,Shortest cds piece (bp),1.0
+Fragaria_vesca,before,mrna,Shortest five_prime_utr piece (bp),1.0
+Fragaria_vesca,before,mrna,Shortest three_prime_utr piece (bp),1.0
+Fragaria_vesca,before,mrna,Shortest intron into cds part (bp),4.0
+Fragaria_vesca,before,mrna,Shortest intron into exon part (bp),4.0
+Fragaria_vesca,before,mrna,Shortest intron into five_prime_utr part (bp),14.0
+Fragaria_vesca,before,mrna,Shortest intron into three_prime_utr part (bp),8.0
+Fragaria_vesca,after,mrna,Number of gene,34006.0
+Fragaria_vesca,after,mrna,Number of mrna,34007.0
+Fragaria_vesca,after,mrna,Number of mrnas with utr both sides,18391.0
+Fragaria_vesca,after,mrna,Number of mrnas with at least one utr,20559.0
+Fragaria_vesca,after,mrna,Number of cds,34006.0
+Fragaria_vesca,after,mrna,Number of exon,164975.0
+Fragaria_vesca,after,mrna,Number of five_prime_utr,19239.0
+Fragaria_vesca,after,mrna,Number of three_prime_utr,19711.0
+Fragaria_vesca,after,mrna,Number of exon in cds,157193.0
+Fragaria_vesca,after,mrna,Number of exon in five_prime_utr,23997.0
+Fragaria_vesca,after,mrna,Number of exon in three_prime_utr,22606.0
+Fragaria_vesca,after,mrna,Number of intron in cds,123187.0
+Fragaria_vesca,after,mrna,Number of intron in exon,130969.0
+Fragaria_vesca,after,mrna,Number of intron in five_prime_utr,4758.0
+Fragaria_vesca,after,mrna,Number of intron in three_prime_utr,2895.0
+Fragaria_vesca,after,mrna,Number gene overlapping,1670.0
+Fragaria_vesca,after,mrna,Number of single exon gene,5481.0
+Fragaria_vesca,after,mrna,Number of single exon mrna,5481.0
+Fragaria_vesca,after,mrna,mean mrnas per gene,1.0
+Fragaria_vesca,after,mrna,mean cdss per mrna,1.0
+Fragaria_vesca,after,mrna,mean exons per mrna,4.9
+Fragaria_vesca,after,mrna,mean five_prime_utrs per mrna,0.6
+Fragaria_vesca,after,mrna,mean three_prime_utrs per mrna,0.6
+Fragaria_vesca,after,mrna,mean exons per cds,4.6
+Fragaria_vesca,after,mrna,mean exons per five_prime_utr,1.2
+Fragaria_vesca,after,mrna,mean exons per three_prime_utr,1.1
+Fragaria_vesca,after,mrna,mean introns in cdss per mrna,3.6
+Fragaria_vesca,after,mrna,mean introns in exons per mrna,3.9
+Fragaria_vesca,after,mrna,mean introns in five_prime_utrs per mrna,0.1
+Fragaria_vesca,after,mrna,mean introns in three_prime_utrs per mrna,0.1
+Fragaria_vesca,after,mrna,Total gene length (bp),97760575.0
+Fragaria_vesca,after,mrna,Total mrna length (bp),97761076.0
+Fragaria_vesca,after,mrna,Total cds length (bp),39273380.0
+Fragaria_vesca,after,mrna,Total exon length (bp),52802639.0
+Fragaria_vesca,after,mrna,Total five_prime_utr length (bp),4888456.0
+Fragaria_vesca,after,mrna,Total three_prime_utr length (bp),8638091.0
+Fragaria_vesca,after,mrna,Total intron length per cds (bp),40919117.0
+Fragaria_vesca,after,mrna,Total intron length per exon (bp),44957936.0
+Fragaria_vesca,after,mrna,Total intron length per five_prime_utr (bp),2385781.0
+Fragaria_vesca,after,mrna,Total intron length per three_prime_utr (bp),1574644.0
+Fragaria_vesca,after,mrna,mean gene length (bp),2875.0
+Fragaria_vesca,after,mrna,mean mrna length (bp),2875.0
+Fragaria_vesca,after,mrna,mean cds length (bp),1155.0
+Fragaria_vesca,after,mrna,mean exon length (bp),320.0
+Fragaria_vesca,after,mrna,mean five_prime_utr length (bp),254.0
+Fragaria_vesca,after,mrna,mean three_prime_utr length (bp),438.0
+Fragaria_vesca,after,mrna,mean cds piece length (bp),250.0
+Fragaria_vesca,after,mrna,mean five_prime_utr piece length (bp),204.0
+Fragaria_vesca,after,mrna,mean three_prime_utr piece length (bp),382.0
+Fragaria_vesca,after,mrna,mean intron in cds length (bp),332.0
+Fragaria_vesca,after,mrna,mean intron in exon length (bp),343.0
+Fragaria_vesca,after,mrna,mean intron in five_prime_utr length (bp),501.0
+Fragaria_vesca,after,mrna,mean intron in three_prime_utr length (bp),544.0
+Fragaria_vesca,after,mrna,median gene length (bp),2253.0
+Fragaria_vesca,after,mrna,median mrna length (bp),2253.0
+Fragaria_vesca,after,mrna,median cds length (bp),137.0
+Fragaria_vesca,after,mrna,median exon length (bp),161.0
+Fragaria_vesca,after,mrna,median five_prime_utr length (bp),151.0
+Fragaria_vesca,after,mrna,median three_prime_utr length (bp),319.0
+Fragaria_vesca,after,mrna,median cds piece length (bp),137.0
+Fragaria_vesca,after,mrna,median five_prime_utr piece length (bp),151.0
+Fragaria_vesca,after,mrna,median three_prime_utr piece length (bp),319.0
+Fragaria_vesca,after,mrna,median intron in cds length (bp),146.0
+Fragaria_vesca,after,mrna,median intron in exon length (bp),150.0
+Fragaria_vesca,after,mrna,median intron in five_prime_utr length (bp),291.0
+Fragaria_vesca,after,mrna,median intron in three_prime_utr length (bp),251.0
+Fragaria_vesca,after,mrna,90 percentile gene length (bp),5779.0
+Fragaria_vesca,after,mrna,90 percentile mrna length (bp),5779.0
+Fragaria_vesca,after,mrna,90 percentile cds length (bp),543.0
+Fragaria_vesca,after,mrna,90 percentile exon length (bp),758.0
+Fragaria_vesca,after,mrna,90 percentile five_prime_utr length (bp),418.0
+Fragaria_vesca,after,mrna,90 percentile three_prime_utr length (bp),711.0
+Fragaria_vesca,after,mrna,90 percentile cds piece length (bp),543.0
+Fragaria_vesca,after,mrna,90 percentile five_prime_utr piece length (bp),418.0
+Fragaria_vesca,after,mrna,90 percentile three_prime_utr piece length (bp),711.0
+Fragaria_vesca,after,mrna,90 percentile intron in cds length (bp),724.0
+Fragaria_vesca,after,mrna,90 percentile intron in exon length (bp),751.0
+Fragaria_vesca,after,mrna,90 percentile intron in five_prime_utr length (bp),1060.0
+Fragaria_vesca,after,mrna,90 percentile intron in three_prime_utr length (bp),1237.0
+Fragaria_vesca,after,mrna,Longest gene (bp),41652.0
+Fragaria_vesca,after,mrna,Longest mrna (bp),41652.0
+Fragaria_vesca,after,mrna,Longest cds (bp),16338.0
+Fragaria_vesca,after,mrna,Longest exon (bp),7938.0
+Fragaria_vesca,after,mrna,Longest five_prime_utr (bp),6968.0
+Fragaria_vesca,after,mrna,Longest three_prime_utr (bp),11442.0
+Fragaria_vesca,after,mrna,Longest cds piece (bp),7938.0
+Fragaria_vesca,after,mrna,Longest five_prime_utr piece (bp),5661.0
+Fragaria_vesca,after,mrna,Longest three_prime_utr piece (bp),6999.0
+Fragaria_vesca,after,mrna,Longest intron into cds part (bp),31552.0
+Fragaria_vesca,after,mrna,Longest intron into exon part (bp),31552.0
+Fragaria_vesca,after,mrna,Longest intron into five_prime_utr part (bp),9345.0
+Fragaria_vesca,after,mrna,Longest intron into three_prime_utr part (bp),12301.0
+Fragaria_vesca,after,mrna,Shortest gene (bp),176.0
+Fragaria_vesca,after,mrna,Shortest mrna (bp),176.0
+Fragaria_vesca,after,mrna,Shortest cds piece (bp),1.0
+Fragaria_vesca,after,mrna,Shortest five_prime_utr piece (bp),1.0
+Fragaria_vesca,after,mrna,Shortest three_prime_utr piece (bp),1.0
+Fragaria_vesca,after,mrna,Shortest intron into cds part (bp),14.0
+Fragaria_vesca,after,mrna,Shortest intron into exon part (bp),14.0
+Fragaria_vesca,after,mrna,Shortest intron into five_prime_utr part (bp),21.0
+Fragaria_vesca,after,mrna,Shortest intron into three_prime_utr part (bp),20.0
+Peach,before,mrna,Number of gene,30181.0
+Peach,before,mrna,Number of mrna,30181.0
+Peach,before,mrna,Number of mrnas with utr both sides,12299.0
+Peach,before,mrna,Number of mrnas with at least one utr,15203.0
+Peach,before,mrna,Number of cds,30181.0
+Peach,before,mrna,Number of exon,152350.0
+Peach,before,mrna,Number of five_prime_utr,13535.0
+Peach,before,mrna,Number of three_prime_utr,13967.0
+Peach,before,mrna,Number of exon in cds,143343.0
+Peach,before,mrna,Number of exon in five_prime_utr,19157.0
+Peach,before,mrna,Number of exon in three_prime_utr,17262.0
+Peach,before,mrna,Number of intron in cds,113162.0
+Peach,before,mrna,Number of intron in exon,122169.0
+Peach,before,mrna,Number of intron in five_prime_utr,5622.0
+Peach,before,mrna,Number of intron in three_prime_utr,3295.0
+Peach,before,mrna,Number gene overlapping,55.0
+Peach,before,mrna,Number of single exon gene,4212.0
+Peach,before,mrna,Number of single exon mrna,4212.0
+Peach,before,mrna,mean mrnas per gene,1.0
+Peach,before,mrna,mean cdss per mrna,1.0
+Peach,before,mrna,mean exons per mrna,5.0
+Peach,before,mrna,mean five_prime_utrs per mrna,0.4
+Peach,before,mrna,mean three_prime_utrs per mrna,0.5
+Peach,before,mrna,mean exons per cds,4.7
+Peach,before,mrna,mean exons per five_prime_utr,1.4
+Peach,before,mrna,mean exons per three_prime_utr,1.2
+Peach,before,mrna,mean introns in cdss per mrna,3.7
+Peach,before,mrna,mean introns in exons per mrna,4.0
+Peach,before,mrna,mean introns in five_prime_utrs per mrna,0.2
+Peach,before,mrna,mean introns in three_prime_utrs per mrna,0.1
+Peach,before,mrna,Total gene length (bp),88151424.0
+Peach,before,mrna,Total mrna length (bp),88151424.0
+Peach,before,mrna,Total cds length (bp),36543199.0
+Peach,before,mrna,Total exon length (bp),45050514.0
+Peach,before,mrna,Total five_prime_utr length (bp),3443252.0
+Peach,before,mrna,Total three_prime_utr length (bp),5064063.0
+Peach,before,mrna,Total intron length per cds (bp),38995366.0
+Peach,before,mrna,Total intron length per exon (bp),43100910.0
+Peach,before,mrna,Total intron length per five_prime_utr (bp),2700695.0
+Peach,before,mrna,Total intron length per three_prime_utr (bp),1359643.0
+Peach,before,mrna,mean gene length (bp),2921.0
+Peach,before,mrna,mean mrna length (bp),2921.0
+Peach,before,mrna,mean cds length (bp),1211.0
+Peach,before,mrna,mean exon length (bp),296.0
+Peach,before,mrna,mean five_prime_utr length (bp),254.0
+Peach,before,mrna,mean three_prime_utr length (bp),363.0
+Peach,before,mrna,mean cds piece length (bp),255.0
+Peach,before,mrna,mean five_prime_utr piece length (bp),180.0
+Peach,before,mrna,mean three_prime_utr piece length (bp),293.0
+Peach,before,mrna,mean intron in cds length (bp),345.0
+Peach,before,mrna,mean intron in exon length (bp),353.0
+Peach,before,mrna,mean intron in five_prime_utr length (bp),480.0
+Peach,before,mrna,mean intron in three_prime_utr length (bp),413.0
+Peach,before,mrna,median gene length (bp),2178.0
+Peach,before,mrna,median mrna length (bp),2178.0
+Peach,before,mrna,median cds length (bp),143.0
+Peach,before,mrna,median exon length (bp),163.0
+Peach,before,mrna,median five_prime_utr length (bp),117.0
+Peach,before,mrna,median three_prime_utr length (bp),245.0
+Peach,before,mrna,median cds piece length (bp),143.0
+Peach,before,mrna,median five_prime_utr piece length (bp),117.0
+Peach,before,mrna,median three_prime_utr piece length (bp),245.0
+Peach,before,mrna,median intron in cds length (bp),160.0
+Peach,before,mrna,median intron in exon length (bp),164.0
+Peach,before,mrna,median intron in five_prime_utr length (bp),281.0
+Peach,before,mrna,median intron in three_prime_utr length (bp),182.0
+Peach,before,mrna,90 percentile gene length (bp),6106.0
+Peach,before,mrna,90 percentile mrna length (bp),6106.0
+Peach,before,mrna,90 percentile cds length (bp),543.0
+Peach,before,mrna,90 percentile exon length (bp),641.0
+Peach,before,mrna,90 percentile five_prime_utr length (bp),393.0
+Peach,before,mrna,90 percentile three_prime_utr length (bp),522.0
+Peach,before,mrna,90 percentile cds piece length (bp),543.0
+Peach,before,mrna,90 percentile five_prime_utr piece length (bp),393.0
+Peach,before,mrna,90 percentile three_prime_utr piece length (bp),522.0
+Peach,before,mrna,90 percentile intron in cds length (bp),744.0
+Peach,before,mrna,90 percentile intron in exon length (bp),766.0
+Peach,before,mrna,90 percentile intron in five_prime_utr length (bp),1020.0
+Peach,before,mrna,90 percentile intron in three_prime_utr length (bp),945.0
+Peach,before,mrna,Longest gene (bp),36979.0
+Peach,before,mrna,Longest mrna (bp),36979.0
+Peach,before,mrna,Longest cds (bp),15309.0
+Peach,before,mrna,Longest exon (bp),8840.0
+Peach,before,mrna,Longest five_prime_utr (bp),4818.0
+Peach,before,mrna,Longest three_prime_utr (bp),7213.0
+Peach,before,mrna,Longest cds piece (bp),7929.0
+Peach,before,mrna,Longest five_prime_utr piece (bp),3797.0
+Peach,before,mrna,Longest three_prime_utr piece (bp),6632.0
+Peach,before,mrna,Longest intron into cds part (bp),9997.0
+Peach,before,mrna,Longest intron into exon part (bp),9997.0
+Peach,before,mrna,Longest intron into five_prime_utr part (bp),9879.0
+Peach,before,mrna,Longest intron into three_prime_utr part (bp),8816.0
+Peach,before,mrna,Shortest gene (bp),54.0
+Peach,before,mrna,Shortest mrna (bp),54.0
+Peach,before,mrna,Shortest cds piece (bp),1.0
+Peach,before,mrna,Shortest five_prime_utr piece (bp),1.0
+Peach,before,mrna,Shortest three_prime_utr piece (bp),1.0
+Peach,before,mrna,Shortest intron into cds part (bp),20.0
+Peach,before,mrna,Shortest intron into exon part (bp),20.0
+Peach,before,mrna,Shortest intron into five_prime_utr part (bp),20.0
+Peach,before,mrna,Shortest intron into three_prime_utr part (bp),20.0
+Peach,after,mrna,Number of gene,31751.0
+Peach,after,mrna,Number of mrna,31751.0
+Peach,after,mrna,Number of mrnas with utr both sides,15105.0
+Peach,after,mrna,Number of mrnas with at least one utr,18030.0
+Peach,after,mrna,Number of cds,31749.0
+Peach,after,mrna,Number of exon,156559.0
+Peach,after,mrna,Number of five_prime_utr,16309.0
+Peach,after,mrna,Number of three_prime_utr,16826.0
+Peach,after,mrna,Number of exon in cds,148768.0
+Peach,after,mrna,Number of exon in five_prime_utr,21435.0
+Peach,after,mrna,Number of exon in three_prime_utr,19382.0
+Peach,after,mrna,Number of intron in cds,117019.0
+Peach,after,mrna,Number of intron in exon,124809.0
+Peach,after,mrna,Number of intron in five_prime_utr,5126.0
+Peach,after,mrna,Number of intron in three_prime_utr,2556.0
+Peach,after,mrna,Number gene overlapping,601.0
+Peach,after,mrna,Number of single exon gene,5702.0
+Peach,after,mrna,Number of single exon mrna,5701.0
+Peach,after,mrna,mean mrnas per gene,1.0
+Peach,after,mrna,mean cdss per mrna,1.0
+Peach,after,mrna,mean exons per mrna,4.9
+Peach,after,mrna,mean five_prime_utrs per mrna,0.5
+Peach,after,mrna,mean three_prime_utrs per mrna,0.5
+Peach,after,mrna,mean exons per cds,4.7
+Peach,after,mrna,mean exons per five_prime_utr,1.3
+Peach,after,mrna,mean exons per three_prime_utr,1.2
+Peach,after,mrna,mean introns in cdss per mrna,3.7
+Peach,after,mrna,mean introns in exons per mrna,3.9
+Peach,after,mrna,mean introns in five_prime_utrs per mrna,0.2
+Peach,after,mrna,mean introns in three_prime_utrs per mrna,0.1
+Peach,after,mrna,Total gene length (bp),91505171.0
+Peach,after,mrna,Total mrna length (bp),91505171.0
+Peach,after,mrna,Total cds length (bp),38743958.0
+Peach,after,mrna,Total exon length (bp),48203425.0
+Peach,after,mrna,Total five_prime_utr length (bp),3895130.0
+Peach,after,mrna,Total three_prime_utr length (bp),5562544.0
+Peach,after,mrna,Total intron length per cds (bp),39535371.0
+Peach,after,mrna,Total intron length per exon (bp),43301725.0
+Peach,after,mrna,Total intron length per five_prime_utr (bp),2592313.0
+Peach,after,mrna,Total intron length per three_prime_utr (bp),1108204.0
+Peach,after,mrna,mean gene length (bp),2882.0
+Peach,after,mrna,mean mrna length (bp),2882.0
+Peach,after,mrna,mean cds length (bp),1220.0
+Peach,after,mrna,mean exon length (bp),308.0
+Peach,after,mrna,mean five_prime_utr length (bp),239.0
+Peach,after,mrna,mean three_prime_utr length (bp),331.0
+Peach,after,mrna,mean cds piece length (bp),260.0
+Peach,after,mrna,mean five_prime_utr piece length (bp),182.0
+Peach,after,mrna,mean three_prime_utr piece length (bp),287.0
+Peach,after,mrna,mean intron in cds length (bp),338.0
+Peach,after,mrna,mean intron in exon length (bp),347.0
+Peach,after,mrna,mean intron in five_prime_utr length (bp),506.0
+Peach,after,mrna,mean intron in three_prime_utr length (bp),434.0
+Peach,after,mrna,median gene length (bp),2224.0
+Peach,after,mrna,median mrna length (bp),2224.0
+Peach,after,mrna,median cds length (bp),141.0
+Peach,after,mrna,median exon length (bp),164.0
+Peach,after,mrna,median five_prime_utr length (bp),122.0
+Peach,after,mrna,median three_prime_utr length (bp),250.0
+Peach,after,mrna,median cds piece length (bp),141.0
+Peach,after,mrna,median five_prime_utr piece length (bp),122.0
+Peach,after,mrna,median three_prime_utr piece length (bp),250.0
+Peach,after,mrna,median intron in cds length (bp),162.0
+Peach,after,mrna,median intron in exon length (bp),167.0
+Peach,after,mrna,median intron in five_prime_utr length (bp),325.0
+Peach,after,mrna,median intron in three_prime_utr length (bp),208.0
+Peach,after,mrna,90 percentile gene length (bp),5865.0
+Peach,after,mrna,90 percentile mrna length (bp),5865.0
+Peach,after,mrna,90 percentile cds length (bp),553.0
+Peach,after,mrna,90 percentile exon length (bp),672.0
+Peach,after,mrna,90 percentile five_prime_utr length (bp),404.0
+Peach,after,mrna,90 percentile three_prime_utr length (bp),518.0
+Peach,after,mrna,90 percentile cds piece length (bp),553.0
+Peach,after,mrna,90 percentile five_prime_utr piece length (bp),404.0
+Peach,after,mrna,90 percentile three_prime_utr piece length (bp),518.0
+Peach,after,mrna,90 percentile intron in cds length (bp),744.0
+Peach,after,mrna,90 percentile intron in exon length (bp),770.0
+Peach,after,mrna,90 percentile intron in five_prime_utr length (bp),1100.0
+Peach,after,mrna,90 percentile intron in three_prime_utr length (bp),1005.0
+Peach,after,mrna,Longest gene (bp),36289.0
+Peach,after,mrna,Longest mrna (bp),36289.0
+Peach,after,mrna,Longest cds (bp),15309.0
+Peach,after,mrna,Longest exon (bp),8840.0
+Peach,after,mrna,Longest five_prime_utr (bp),4637.0
+Peach,after,mrna,Longest three_prime_utr (bp),4221.0
+Peach,after,mrna,Longest cds piece (bp),7929.0
+Peach,after,mrna,Longest five_prime_utr piece (bp),4637.0
+Peach,after,mrna,Longest three_prime_utr piece (bp),3411.0
+Peach,after,mrna,Longest intron into cds part (bp),9997.0
+Peach,after,mrna,Longest intron into exon part (bp),9997.0
+Peach,after,mrna,Longest intron into five_prime_utr part (bp),8347.0
+Peach,after,mrna,Longest intron into three_prime_utr part (bp),8250.0
+Peach,after,mrna,Shortest gene (bp),21.0
+Peach,after,mrna,Shortest mrna (bp),21.0
+Peach,after,mrna,Shortest cds piece (bp),1.0
+Peach,after,mrna,Shortest five_prime_utr piece (bp),1.0
+Peach,after,mrna,Shortest three_prime_utr piece (bp),1.0
+Peach,after,mrna,Shortest intron into cds part (bp),1.0
+Peach,after,mrna,Shortest intron into exon part (bp),1.0
+Peach,after,mrna,Shortest intron into five_prime_utr part (bp),1.0
+Peach,after,mrna,Shortest intron into three_prime_utr part (bp),5.0
+Pineapple,before,mrna,Number of gene,26162.0
+Pineapple,before,mrna,Number of mrna,26162.0
+Pineapple,before,mrna,Number of mrnas with utr both sides,11497.0
+Pineapple,before,mrna,Number of mrnas with at least one utr,12719.0
+Pineapple,before,mrna,Number of cds,26162.0
+Pineapple,before,mrna,Number of exon,131045.0
+Pineapple,before,mrna,Number of five_prime_utr,11845.0
+Pineapple,before,mrna,Number of three_prime_utr,12371.0
+Pineapple,before,mrna,Number of exon in cds,131045.0
+Pineapple,before,mrna,Number of exon in five_prime_utr,11845.0
+Pineapple,before,mrna,Number of exon in three_prime_utr,12371.0
+Pineapple,before,mrna,Number of intron in cds,104883.0
+Pineapple,before,mrna,Number of intron in exon,104883.0
+Pineapple,before,mrna,Number gene overlapping,1107.0
+Pineapple,before,mrna,Number of single exon gene,5603.0
+Pineapple,before,mrna,Number of single exon mrna,5603.0
+Pineapple,before,mrna,mean mrnas per gene,1.0
+Pineapple,before,mrna,mean cdss per mrna,1.0
+Pineapple,before,mrna,mean exons per mrna,5.0
+Pineapple,before,mrna,mean five_prime_utrs per mrna,0.5
+Pineapple,before,mrna,mean three_prime_utrs per mrna,0.5
+Pineapple,before,mrna,mean exons per cds,5.0
+Pineapple,before,mrna,mean exons per five_prime_utr,1.0
+Pineapple,before,mrna,mean exons per three_prime_utr,1.0
+Pineapple,before,mrna,mean introns in cdss per mrna,4.0
+Pineapple,before,mrna,mean introns in exons per mrna,4.0
+Pineapple,before,mrna,Total gene length (bp),111025987.0
+Pineapple,before,mrna,Total mrna length (bp),111025987.0
+Pineapple,before,mrna,Total cds length (bp),30163255.0
+Pineapple,before,mrna,Total exon length (bp),43133755.0
+Pineapple,before,mrna,Total five_prime_utr length (bp),5384608.0
+Pineapple,before,mrna,Total three_prime_utr length (bp),7585892.0
+Pineapple,before,mrna,Total intron length per cds (bp),67892232.0
+Pineapple,before,mrna,Total intron length per exon (bp),67892232.0
+Pineapple,before,mrna,mean gene length (bp),4244.0
+Pineapple,before,mrna,mean mrna length (bp),4244.0
+Pineapple,before,mrna,mean cds length (bp),1153.0
+Pineapple,before,mrna,mean exon length (bp),329.0
+Pineapple,before,mrna,mean five_prime_utr length (bp),455.0
+Pineapple,before,mrna,mean three_prime_utr length (bp),613.0
+Pineapple,before,mrna,mean cds piece length (bp),230.0
+Pineapple,before,mrna,mean five_prime_utr piece length (bp),455.0
+Pineapple,before,mrna,mean three_prime_utr piece length (bp),613.0
+Pineapple,before,mrna,mean intron in cds length (bp),647.0
+Pineapple,before,mrna,mean intron in exon length (bp),647.0
+Pineapple,before,mrna,median gene length (bp),2894.0
+Pineapple,before,mrna,median mrna length (bp),2894.0
+Pineapple,before,mrna,median cds length (bp),129.0
+Pineapple,before,mrna,median exon length (bp),145.0
+Pineapple,before,mrna,median five_prime_utr length (bp),170.0
+Pineapple,before,mrna,median three_prime_utr length (bp),351.0
+Pineapple,before,mrna,median cds piece length (bp),129.0
+Pineapple,before,mrna,median five_prime_utr piece length (bp),170.0
+Pineapple,before,mrna,median three_prime_utr piece length (bp),351.0
+Pineapple,before,mrna,median intron in cds length (bp),256.0
+Pineapple,before,mrna,median intron in exon length (bp),256.0
+Pineapple,before,mrna,90 percentile gene length (bp),8985.0
+Pineapple,before,mrna,90 percentile mrna length (bp),8985.0
+Pineapple,before,mrna,90 percentile cds length (bp),471.0
+Pineapple,before,mrna,90 percentile exon length (bp),704.0
+Pineapple,before,mrna,90 percentile five_prime_utr length (bp),1051.0
+Pineapple,before,mrna,90 percentile three_prime_utr length (bp),1150.0
+Pineapple,before,mrna,90 percentile cds piece length (bp),471.0
+Pineapple,before,mrna,90 percentile five_prime_utr piece length (bp),1051.0
+Pineapple,before,mrna,90 percentile three_prime_utr piece length (bp),1150.0
+Pineapple,before,mrna,90 percentile intron in cds length (bp),1301.0
+Pineapple,before,mrna,90 percentile intron in exon length (bp),1301.0
+Pineapple,before,mrna,Longest gene (bp),117847.0
+Pineapple,before,mrna,Longest mrna (bp),117847.0
+Pineapple,before,mrna,Longest cds (bp),16035.0
+Pineapple,before,mrna,Longest exon (bp),26779.0
+Pineapple,before,mrna,Longest five_prime_utr (bp),20628.0
+Pineapple,before,mrna,Longest three_prime_utr (bp),20034.0
+Pineapple,before,mrna,Longest cds piece (bp),7746.0
+Pineapple,before,mrna,Longest five_prime_utr piece (bp),20628.0
+Pineapple,before,mrna,Longest three_prime_utr piece (bp),20034.0
+Pineapple,before,mrna,Longest intron into cds part (bp),108477.0
+Pineapple,before,mrna,Longest intron into exon part (bp),108477.0
+Pineapple,before,mrna,Shortest gene (bp),150.0
+Pineapple,before,mrna,Shortest mrna (bp),150.0
+Pineapple,before,mrna,Shortest cds piece (bp),1.0
+Pineapple,before,mrna,Shortest five_prime_utr piece (bp),1.0
+Pineapple,before,mrna,Shortest three_prime_utr piece (bp),1.0
+Pineapple,before,mrna,Shortest intron into cds part (bp),21.0
+Pineapple,before,mrna,Shortest intron into exon part (bp),21.0
+Pineapple,after,mrna,Number of gene,26657.0
+Pineapple,after,mrna,Number of mrna,26657.0
+Pineapple,after,mrna,Number of mrnas with utr both sides,16027.0
+Pineapple,after,mrna,Number of mrnas with at least one utr,17823.0
+Pineapple,after,mrna,Number of cds,26582.0
+Pineapple,after,mrna,Number of exon,137990.0
+Pineapple,after,mrna,Number of five_prime_utr,16668.0
+Pineapple,after,mrna,Number of three_prime_utr,17182.0
+Pineapple,after,mrna,Number of exon in cds,131645.0
+Pineapple,after,mrna,Number of exon in five_prime_utr,20384.0
+Pineapple,after,mrna,Number of exon in three_prime_utr,19558.0
+Pineapple,after,mrna,Number of intron in cds,105063.0
+Pineapple,after,mrna,Number of intron in exon,111365.0
+Pineapple,after,mrna,Number of intron in five_prime_utr,3716.0
+Pineapple,after,mrna,Number of intron in three_prime_utr,2376.0
+Pineapple,after,mrna,Number gene overlapping,975.0
+Pineapple,after,mrna,Number of single exon gene,5183.0
+Pineapple,after,mrna,Number of single exon mrna,5151.0
+Pineapple,after,mrna,mean mrnas per gene,1.0
+Pineapple,after,mrna,mean cdss per mrna,1.0
+Pineapple,after,mrna,mean exons per mrna,5.2
+Pineapple,after,mrna,mean five_prime_utrs per mrna,0.6
+Pineapple,after,mrna,mean three_prime_utrs per mrna,0.6
+Pineapple,after,mrna,mean exons per cds,5.0
+Pineapple,after,mrna,mean exons per five_prime_utr,1.2
+Pineapple,after,mrna,mean exons per three_prime_utr,1.1
+Pineapple,after,mrna,mean introns in cdss per mrna,3.9
+Pineapple,after,mrna,mean introns in exons per mrna,4.2
+Pineapple,after,mrna,mean introns in five_prime_utrs per mrna,0.1
+Pineapple,after,mrna,mean introns in three_prime_utrs per mrna,0.1
+Pineapple,after,mrna,Total gene length (bp),117077824.0
+Pineapple,after,mrna,Total mrna length (bp),117077824.0
+Pineapple,after,mrna,Total cds length (bp),30473404.0
+Pineapple,after,mrna,Total exon length (bp),40031753.0
+Pineapple,after,mrna,Total five_prime_utr length (bp),3510035.0
+Pineapple,after,mrna,Total three_prime_utr length (bp),6000349.0
+Pineapple,after,mrna,Total intron length per cds (bp),69107974.0
+Pineapple,after,mrna,Total intron length per exon (bp),75304701.0
+Pineapple,after,mrna,Total intron length per five_prime_utr (bp),3867171.0
+Pineapple,after,mrna,Total intron length per three_prime_utr (bp),2087357.0
+Pineapple,after,mrna,mean gene length (bp),4392.0
+Pineapple,after,mrna,mean mrna length (bp),4392.0
+Pineapple,after,mrna,mean cds length (bp),1146.0
+Pineapple,after,mrna,mean exon length (bp),290.0
+Pineapple,after,mrna,mean five_prime_utr length (bp),211.0
+Pineapple,after,mrna,mean three_prime_utr length (bp),349.0
+Pineapple,after,mrna,mean cds piece length (bp),231.0
+Pineapple,after,mrna,mean five_prime_utr piece length (bp),172.0
+Pineapple,after,mrna,mean three_prime_utr piece length (bp),307.0
+Pineapple,after,mrna,mean intron in cds length (bp),658.0
+Pineapple,after,mrna,mean intron in exon length (bp),676.0
+Pineapple,after,mrna,mean intron in five_prime_utr length (bp),1041.0
+Pineapple,after,mrna,mean intron in three_prime_utr length (bp),879.0
+Pineapple,after,mrna,median gene length (bp),2986.0
+Pineapple,after,mrna,median mrna length (bp),2986.0
+Pineapple,after,mrna,median cds length (bp),129.0
+Pineapple,after,mrna,median exon length (bp),152.0
+Pineapple,after,mrna,median five_prime_utr length (bp),118.0
+Pineapple,after,mrna,median three_prime_utr length (bp),266.0
+Pineapple,after,mrna,median cds piece length (bp),129.0
+Pineapple,after,mrna,median five_prime_utr piece length (bp),118.0
+Pineapple,after,mrna,median three_prime_utr piece length (bp),266.0
+Pineapple,after,mrna,median intron in cds length (bp),258.0
+Pineapple,after,mrna,median intron in exon length (bp),267.0
+Pineapple,after,mrna,median intron in five_prime_utr length (bp),551.0
+Pineapple,after,mrna,median intron in three_prime_utr length (bp),348.0
+Pineapple,after,mrna,90 percentile gene length (bp),8735.0
+Pineapple,after,mrna,90 percentile mrna length (bp),8735.0
+Pineapple,after,mrna,90 percentile cds length (bp),474.0
+Pineapple,after,mrna,90 percentile exon length (bp),638.0
+Pineapple,after,mrna,90 percentile five_prime_utr length (bp),347.0
+Pineapple,after,mrna,90 percentile three_prime_utr length (bp),550.0
+Pineapple,after,mrna,90 percentile cds piece length (bp),474.0
+Pineapple,after,mrna,90 percentile five_prime_utr piece length (bp),347.0
+Pineapple,after,mrna,90 percentile three_prime_utr piece length (bp),550.0
+Pineapple,after,mrna,90 percentile intron in cds length (bp),1287.0
+Pineapple,after,mrna,90 percentile intron in exon length (bp),1336.0
+Pineapple,after,mrna,90 percentile intron in five_prime_utr length (bp),2094.0
+Pineapple,after,mrna,90 percentile intron in three_prime_utr length (bp),2000.0
+Pineapple,after,mrna,Longest gene (bp),1615059.0
+Pineapple,after,mrna,Longest mrna (bp),1615059.0
+Pineapple,after,mrna,Longest cds (bp),16035.0
+Pineapple,after,mrna,Longest exon (bp),23097.0
+Pineapple,after,mrna,Longest five_prime_utr (bp),18850.0
+Pineapple,after,mrna,Longest three_prime_utr (bp),17803.0
+Pineapple,after,mrna,Longest cds piece (bp),7746.0
+Pineapple,after,mrna,Longest five_prime_utr piece (bp),18850.0
+Pineapple,after,mrna,Longest three_prime_utr piece (bp),17803.0
+Pineapple,after,mrna,Longest intron into cds part (bp),108477.0
+Pineapple,after,mrna,Longest intron into exon part (bp),108477.0
+Pineapple,after,mrna,Longest intron into five_prime_utr part (bp),36173.0
+Pineapple,after,mrna,Longest intron into three_prime_utr part (bp),39501.0
+Pineapple,after,mrna,Shortest gene (bp),89.0
+Pineapple,after,mrna,Shortest mrna (bp),89.0
+Pineapple,after,mrna,Shortest cds piece (bp),1.0
+Pineapple,after,mrna,Shortest five_prime_utr piece (bp),1.0
+Pineapple,after,mrna,Shortest three_prime_utr piece (bp),1.0
+Pineapple,after,mrna,Shortest intron into cds part (bp),20.0
+Pineapple,after,mrna,Shortest intron into exon part (bp),1.0
+Pineapple,after,mrna,Shortest intron into five_prime_utr part (bp),1.0
+Pineapple,after,mrna,Shortest intron into three_prime_utr part (bp),1.0
+Rice,before,mrna,Number of gene,39406.0
+Rice,before,mrna,Number of mrna,39406.0
+Rice,before,mrna,Number of mrnas with utr both sides,14149.0
+Rice,before,mrna,Number of mrnas with at least one utr,20242.0
+Rice,before,mrna,Number of cds,39406.0
+Rice,before,mrna,Number of exon,180582.0
+Rice,before,mrna,Number of five_prime_utr,16156.0
+Rice,before,mrna,Number of three_prime_utr,18235.0
+Rice,before,mrna,Number of exon in cds,172892.0
+Rice,before,mrna,Number of exon in five_prime_utr,19598.0
+Rice,before,mrna,Number of exon in three_prime_utr,22377.0
+Rice,before,mrna,Number of intron in cds,133486.0
+Rice,before,mrna,Number of intron in exon,141176.0
+Rice,before,mrna,Number of intron in five_prime_utr,3442.0
+Rice,before,mrna,Number of intron in three_prime_utr,4142.0
+Rice,before,mrna,Number gene overlapping,2375.0
+Rice,before,mrna,Number of single exon gene,8888.0
+Rice,before,mrna,Number of single exon mrna,8888.0
+Rice,before,mrna,mean mrnas per gene,1.0
+Rice,before,mrna,mean cdss per mrna,1.0
+Rice,before,mrna,mean exons per mrna,4.6
+Rice,before,mrna,mean five_prime_utrs per mrna,0.4
+Rice,before,mrna,mean three_prime_utrs per mrna,0.5
+Rice,before,mrna,mean exons per cds,4.4
+Rice,before,mrna,mean exons per five_prime_utr,1.2
+Rice,before,mrna,mean exons per three_prime_utr,1.2
+Rice,before,mrna,mean introns in cdss per mrna,3.4
+Rice,before,mrna,mean introns in exons per mrna,3.6
+Rice,before,mrna,mean introns in five_prime_utrs per mrna,0.1
+Rice,before,mrna,mean introns in three_prime_utrs per mrna,0.1
+Rice,before,mrna,Total gene length (bp),123416177.0
+Rice,before,mrna,Total mrna length (bp),123416177.0
+Rice,before,mrna,Total cds length (bp),43051055.0
+Rice,before,mrna,Total exon length (bp),57368210.0
+Rice,before,mrna,Total five_prime_utr length (bp),4442021.0
+Rice,before,mrna,Total three_prime_utr length (bp),9875134.0
+Rice,before,mrna,Total intron length per cds (bp),61992128.0
+Rice,before,mrna,Total intron length per exon (bp),66047967.0
+Rice,before,mrna,Total intron length per five_prime_utr (bp),1941875.0
+Rice,before,mrna,Total intron length per three_prime_utr (bp),2036140.0
+Rice,before,mrna,mean gene length (bp),3132.0
+Rice,before,mrna,mean mrna length (bp),3132.0
+Rice,before,mrna,mean cds length (bp),1093.0
+Rice,before,mrna,mean exon length (bp),318.0
+Rice,before,mrna,mean five_prime_utr length (bp),275.0
+Rice,before,mrna,mean three_prime_utr length (bp),542.0
+Rice,before,mrna,mean cds piece length (bp),249.0
+Rice,before,mrna,mean five_prime_utr piece length (bp),227.0
+Rice,before,mrna,mean three_prime_utr piece length (bp),441.0
+Rice,before,mrna,mean intron in cds length (bp),464.0
+Rice,before,mrna,mean intron in exon length (bp),468.0
+Rice,before,mrna,mean intron in five_prime_utr length (bp),564.0
+Rice,before,mrna,mean intron in three_prime_utr length (bp),492.0
+Rice,before,mrna,median gene length (bp),2046.0
+Rice,before,mrna,median mrna length (bp),2046.0
+Rice,before,mrna,median cds length (bp),140.0
+Rice,before,mrna,median exon length (bp),160.0
+Rice,before,mrna,median five_prime_utr length (bp),159.0
+Rice,before,mrna,median three_prime_utr length (bp),365.0
+Rice,before,mrna,median cds piece length (bp),140.0
+Rice,before,mrna,median five_prime_utr piece length (bp),159.0
+Rice,before,mrna,median three_prime_utr piece length (bp),365.0
+Rice,before,mrna,median intron in cds length (bp),169.0
+Rice,before,mrna,median intron in exon length (bp),170.0
+Rice,before,mrna,median intron in five_prime_utr length (bp),248.0
+Rice,before,mrna,median intron in three_prime_utr length (bp),164.0
+Rice,before,mrna,90 percentile gene length (bp),6934.0
+Rice,before,mrna,90 percentile mrna length (bp),6934.0
+Rice,before,mrna,90 percentile cds length (bp),540.0
+Rice,before,mrna,90 percentile exon length (bp),746.0
+Rice,before,mrna,90 percentile five_prime_utr length (bp),443.0
+Rice,before,mrna,90 percentile three_prime_utr length (bp),795.0
+Rice,before,mrna,90 percentile cds piece length (bp),540.0
+Rice,before,mrna,90 percentile five_prime_utr piece length (bp),443.0
+Rice,before,mrna,90 percentile three_prime_utr piece length (bp),795.0
+Rice,before,mrna,90 percentile intron in cds length (bp),1079.0
+Rice,before,mrna,90 percentile intron in exon length (bp),1090.0
+Rice,before,mrna,90 percentile intron in five_prime_utr length (bp),1297.0
+Rice,before,mrna,90 percentile intron in three_prime_utr length (bp),1211.0
+Rice,before,mrna,Longest gene (bp),49685.0
+Rice,before,mrna,Longest mrna (bp),49685.0
+Rice,before,mrna,Longest cds (bp),16311.0
+Rice,before,mrna,Longest exon (bp),15363.0
+Rice,before,mrna,Longest five_prime_utr (bp),11511.0
+Rice,before,mrna,Longest three_prime_utr (bp),7424.0
+Rice,before,mrna,Longest cds piece (bp),15363.0
+Rice,before,mrna,Longest five_prime_utr piece (bp),4762.0
+Rice,before,mrna,Longest three_prime_utr piece (bp),7424.0
+Rice,before,mrna,Longest intron into cds part (bp),47485.0
+Rice,before,mrna,Longest intron into exon part (bp),47485.0
+Rice,before,mrna,Longest intron into five_prime_utr part (bp),9501.0
+Rice,before,mrna,Longest intron into three_prime_utr part (bp),10533.0
+Rice,before,mrna,Shortest gene (bp),150.0
+Rice,before,mrna,Shortest mrna (bp),150.0
+Rice,before,mrna,Shortest cds piece (bp),1.0
+Rice,before,mrna,Shortest five_prime_utr piece (bp),1.0
+Rice,before,mrna,Shortest three_prime_utr piece (bp),1.0
+Rice,before,mrna,Shortest intron into cds part (bp),4.0
+Rice,before,mrna,Shortest intron into exon part (bp),3.0
+Rice,before,mrna,Shortest intron into five_prime_utr part (bp),4.0
+Rice,before,mrna,Shortest intron into three_prime_utr part (bp),3.0
+Rice,after,mrna,Number of gene,40326.0
+Rice,after,mrna,Number of mrna,40331.0
+Rice,after,mrna,Number of mrnas with utr both sides,25621.0
+Rice,after,mrna,Number of mrnas with at least one utr,29186.0
+Rice,after,mrna,Number of cds,40140.0
+Rice,after,mrna,Number of exon,182652.0
+Rice,after,mrna,Number of five_prime_utr,26844.0
+Rice,after,mrna,Number of three_prime_utr,27963.0
+Rice,after,mrna,Number of exon in cds,167649.0
+Rice,after,mrna,Number of exon in five_prime_utr,34542.0
+Rice,after,mrna,Number of exon in three_prime_utr,34555.0
+Rice,after,mrna,Number of intron in cds,127509.0
+Rice,after,mrna,Number of intron in exon,142323.0
+Rice,after,mrna,Number of intron in five_prime_utr,7698.0
+Rice,after,mrna,Number of intron in three_prime_utr,6592.0
+Rice,after,mrna,Number gene overlapping,1274.0
+Rice,after,mrna,Number of single exon gene,9362.0
+Rice,after,mrna,Number of single exon mrna,9363.0
+Rice,after,mrna,mean mrnas per gene,1.0
+Rice,after,mrna,mean cdss per mrna,1.0
+Rice,after,mrna,mean exons per mrna,4.5
+Rice,after,mrna,mean five_prime_utrs per mrna,0.7
+Rice,after,mrna,mean three_prime_utrs per mrna,0.7
+Rice,after,mrna,mean exons per cds,4.2
+Rice,after,mrna,mean exons per five_prime_utr,1.3
+Rice,after,mrna,mean exons per three_prime_utr,1.2
+Rice,after,mrna,mean introns in cdss per mrna,3.2
+Rice,after,mrna,mean introns in exons per mrna,3.5
+Rice,after,mrna,mean introns in five_prime_utrs per mrna,0.2
+Rice,after,mrna,mean introns in three_prime_utrs per mrna,0.2
+Rice,after,mrna,Total gene length (bp),125153059.0
+Rice,after,mrna,Total mrna length (bp),125168616.0
+Rice,after,mrna,Total cds length (bp),42709205.0
+Rice,after,mrna,Total exon length (bp),62706227.0
+Rice,after,mrna,Total five_prime_utr length (bp),7228438.0
+Rice,after,mrna,Total three_prime_utr length (bp),12571945.0
+Rice,after,mrna,Total intron length per cds (bp),53170027.0
+Rice,after,mrna,Total intron length per exon (bp),62457467.0
+Rice,after,mrna,Total intron length per five_prime_utr (bp),5114355.0
+Rice,after,mrna,Total intron length per three_prime_utr (bp),3719929.0
+Rice,after,mrna,mean gene length (bp),3104.0
+Rice,after,mrna,mean mrna length (bp),3104.0
+Rice,after,mrna,mean cds length (bp),1064.0
+Rice,after,mrna,mean exon length (bp),343.0
+Rice,after,mrna,mean five_prime_utr length (bp),269.0
+Rice,after,mrna,mean three_prime_utr length (bp),450.0
+Rice,after,mrna,mean cds piece length (bp),255.0
+Rice,after,mrna,mean five_prime_utr piece length (bp),209.0
+Rice,after,mrna,mean three_prime_utr piece length (bp),364.0
+Rice,after,mrna,mean intron in cds length (bp),417.0
+Rice,after,mrna,mean intron in exon length (bp),439.0
+Rice,after,mrna,mean intron in five_prime_utr length (bp),664.0
+Rice,after,mrna,mean intron in three_prime_utr length (bp),564.0
+Rice,after,mrna,median gene length (bp),2357.0
+Rice,after,mrna,median mrna length (bp),2357.0
+Rice,after,mrna,median cds length (bp),139.0
+Rice,after,mrna,median exon length (bp),174.0
+Rice,after,mrna,median five_prime_utr length (bp),136.0
+Rice,after,mrna,median three_prime_utr length (bp),297.0
+Rice,after,mrna,median cds piece length (bp),139.0
+Rice,after,mrna,median five_prime_utr piece length (bp),136.0
+Rice,after,mrna,median three_prime_utr piece length (bp),297.0
+Rice,after,mrna,median intron in cds length (bp),155.0
+Rice,after,mrna,median intron in exon length (bp),162.0
+Rice,after,mrna,median intron in five_prime_utr length (bp),316.0
+Rice,after,mrna,median intron in three_prime_utr length (bp),208.0
+Rice,after,mrna,90 percentile gene length (bp),6495.0
+Rice,after,mrna,90 percentile mrna length (bp),6495.0
+Rice,after,mrna,90 percentile cds length (bp),556.0
+Rice,after,mrna,90 percentile exon length (bp),793.0
+Rice,after,mrna,90 percentile five_prime_utr length (bp),417.0
+Rice,after,mrna,90 percentile three_prime_utr length (bp),656.0
+Rice,after,mrna,90 percentile cds piece length (bp),556.0
+Rice,after,mrna,90 percentile five_prime_utr piece length (bp),417.0
+Rice,after,mrna,90 percentile three_prime_utr piece length (bp),656.0
+Rice,after,mrna,90 percentile intron in cds length (bp),970.0
+Rice,after,mrna,90 percentile intron in exon length (bp),1025.0
+Rice,after,mrna,90 percentile intron in five_prime_utr length (bp),1465.0
+Rice,after,mrna,90 percentile intron in three_prime_utr length (bp),1332.0
+Rice,after,mrna,Longest gene (bp),45923.0
+Rice,after,mrna,Longest mrna (bp),45923.0
+Rice,after,mrna,Longest cds (bp),16473.0
+Rice,after,mrna,Longest exon (bp),15363.0
+Rice,after,mrna,Longest five_prime_utr (bp),9159.0
+Rice,after,mrna,Longest three_prime_utr (bp),7948.0
+Rice,after,mrna,Longest cds piece (bp),15363.0
+Rice,after,mrna,Longest five_prime_utr piece (bp),9159.0
+Rice,after,mrna,Longest three_prime_utr piece (bp),5979.0
+Rice,after,mrna,Longest intron into cds part (bp),20065.0
+Rice,after,mrna,Longest intron into exon part (bp),20065.0
+Rice,after,mrna,Longest intron into five_prime_utr part (bp),15953.0
+Rice,after,mrna,Longest intron into three_prime_utr part (bp),14803.0
+Rice,after,mrna,Shortest gene (bp),125.0
+Rice,after,mrna,Shortest mrna (bp),125.0
+Rice,after,mrna,Shortest cds piece (bp),1.0
+Rice,after,mrna,Shortest five_prime_utr piece (bp),1.0
+Rice,after,mrna,Shortest three_prime_utr piece (bp),1.0
+Rice,after,mrna,Shortest intron into cds part (bp),1.0
+Rice,after,mrna,Shortest intron into exon part (bp),1.0
+Rice,after,mrna,Shortest intron into five_prime_utr part (bp),10.0
+Rice,after,mrna,Shortest intron into three_prime_utr part (bp),3.0

@@ -1,0 +1,8 @@
+species,aed_mean_before,aed_median_before,maninfo_after,aed_mean_after,aed_median_after
+Artemisia_annua,,,,,
+Cucumber,,,,,
+Fragaria_ananassa,0.2364,0.19,,,
+Fragaria_vesca,0.2502,0.19,,,
+Peach,,,,,
+Pineapple,,,659 low_qual | 528 no_data_support | 252 uORF | 152 mess_up | 96 low_exp | 37 abnorml_orf | 25 non_coding | 18 homo_evidence_only | 2 hign_qual | 1 in_intron,,
+Rice,0.2636,0.26,13259 TBD | 7945 EVD:RNA/UTR TBD | 7913 EVD:ISO/EVD:RNA/REF:Nipp/UTR TBD | 5677 EVD:RNA/TBD | 5375 EVD:RNA/REF:Nipp/UTR TBD | 4163 PTBD | 3597 EVD:ISO/EVD:RNA/UTR TBD | 2568 EVD:RNA/EVD:ISO/REF:Nipp/UTR TBD | 2302 PRD:Softberry/TBD | 2241 EVD:ISO/UTR TBD,0.2463,0.24

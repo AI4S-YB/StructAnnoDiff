@@ -1,0 +1,12 @@
+species,feature_path,removed,added,concordant,split,fusion,complex,total_before,total_after
+Artemisia_annua,gene@mrna@cds,16446,3402,34168,29,1686,4,54347,39322
+Artemisia_annua,gene@ncrna@exon,1743,0,0,0,0,0,1743,0
+Artemisia_annua,gene@trna,1092,0,0,0,0,0,1092,0
+Artemisia_annua,ncrna_gene@ncrna@exon,0,3601,0,0,0,0,0,3601
+Cucumber,gene@mrna@cds,2827,2395,20880,360,119,5,24317,24145
+Fragaria_ananassa,gene@mrna@cds,6941,4884,97620,2543,443,35,108087,108447
+Fragaria_vesca,gene@mrna@cds,3581,8043,23336,1039,307,2,28588,34006
+Peach,gene@mrna@cds,110,1031,29429,586,27,1,30181,31751
+Pineapple,gene@mrna@cds,712,1005,25042,251,60,15,26162,26656
+Pineapple,gene@mrna@exon,0,1,0,0,0,0,0,1
+Rice,gene@mrna@cds,4840,4869,32519,963,357,178,39406,40326

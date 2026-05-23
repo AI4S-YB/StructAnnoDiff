@@ -1,0 +1,8 @@
+Species,Overlap_mode,Overlap_threshold,Candidate_pairs,Same_strand_overlaps,Containment_pairs_filtered_by_reciprocal
+A. annua,reciprocal,0.5,33531,39529,5710
+Cucumber,reciprocal,0.5,19975,23190,2956
+F. ananassa,reciprocal,0.5,95154,108333,12010
+F. vesca,reciprocal,0.5,21493,27865,5732
+Peach,reciprocal,0.5,29665,31034,1333
+Pineapple,reciprocal,0.5,24680,27074,1692
+Rice,reciprocal,0.5,32350,37744,4907

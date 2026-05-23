@@ -1,0 +1,12 @@
+figure,layer,metric,metric_type,before,after,delta,pct_change
+A,Global annotation quantity,Genes,count,54347.0,39322.0,-15025.0,-27.64642022558743
+A,Global annotation quantity,mRNAs,count,54347.0,39322.0,-15025.0,-27.64642022558743
+A,Global annotation quantity,Exons,count,226160.0,203145.0,-23015.0,-10.176423770781748
+A,Global annotation quantity,CDS features,count,54347.0,39322.0,-15025.0,-27.64642022558743
+A,Global annotation quantity,5' UTR features,count,45872.0,34818.0,-11054.0,-24.097488664108823
+A,Global annotation quantity,3' UTR features,count,46516.0,35459.0,-11057.0,-23.77031559033451
+A,Global annotation quantity,Single-exon genes,count,17013.0,7932.0,-9081.0,-53.37682948333627
+A,Global annotation quantity,Mean exons per mRNA,mean,4.2,5.2,1.0,23.809523809523807
+A,Global annotation quantity,Mean CDS length (bp),mean,975.0,1253.0,278.0,28.512820512820515
+A,Global annotation quantity,Mean gene length (bp),mean,3485.0,4240.0,755.0,21.664275466284074
+A,Global annotation quantity,Median gene length (bp),median,2676.0,3284.0,608.0,22.720478325859492

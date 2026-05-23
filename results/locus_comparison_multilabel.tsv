@@ -1,0 +1,8 @@
+Species	Syntenic	Exact	Boundary_refined	Any_gene_boundary_changed	Any_UTR_added	Any_UTR_lost	Any_UTR_exon_gained	Any_UTR_exon_removed	Any_UTR_refined	Any_coding_exon_gain	Any_coding_exon_loss	Any_exon_boundary_refined	Any_CDS_change	Any_CDS_boundary_refined	Any_isoform_change
+A. annua	33,523	18,953	4	11,296	1,552	364	1,535	951	11,816	1,983	438	9,012	3,545	113	4,136
+Cucumber	19,965	15,508	912	4,285	1,940	2	1,206	770	1,778	320	1,076	762	1,792	36	0
+F. ananassa	93,658	50,847	0	40,143	10,402	882	6,239	4,215	34,093	3,881	9,697	25,216	20,402	723	8,812
+F. vesca	21,425	2,918	0	17,473	3,617	1,750	1,062	1,692	13,088	1,516	2,382	13,037	6,979	179	8,797
+Peach	28,986	26,562	0	1,695	1,247	42	110	556	802	438	1,112	387	1,982	259	567
+Pineapple	24,639	15,053	58	6,995	3,850	353	3,865	0	5,507	180	806	5,120	1,912	718	0
+Rice	32,163	17,711	3	10,394	5,156	65	2,002	885	6,565	702	3,209	6,339	5,846	56	6,927
