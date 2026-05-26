@@ -1,8 +1,8 @@
-Species	Before	After	Syntenic	Exact	Boundary_refined_only	UTR_added	UTR_lost	UTR_exon_gained	UTR_exon_removed	UTR_refined	Coding_exon_gain	Coding_exon_loss	Exon_boundary_refined	CDS_change_only	CDS_boundary_refined	Isoform_change	Split_events	Merge_events	Complex_events	Unresolved_overlap_after_genes	Unresolved_overlap_before_genes	Novel_genes	Deleted_genes
-A. annua	54,347	39,322	33,523	18,953	4	0	0	905	345	0	1,837	375	6,668	269	31	4,136	4	0	0	2,688	5,364	3,103	15,456
-Cucumber	24,317	24,145	19,965	15,508	912	0	0	744	643	0	320	1,076	742	0	20	0	4	1	0	2,092	2,300	2,079	2,046
-F. ananassa	108,087	108,447	93,658	50,847	0	0	0	1,051	1,652	0	3,042	6,553	21,097	0	604	8,812	747	0	0	10,825	7,322	2,468	6,360
-F. vesca	28,588	34,006	21,425	2,918	0	0	0	191	446	0	889	1,317	6,809	0	58	8,797	34	0	0	5,312	3,691	7,201	3,438
-Peach	30,181	31,751	28,986	26,562	0	0	0	35	102	0	407	961	233	0	119	567	322	0	0	1,294	784	792	89
-Pineapple	26,162	26,657	24,639	15,053	58	0	0	3,394	0	0	180	806	4,826	2	320	0	16	1	2	1,051	1,103	930	398
-Rice	39,406	40,326	32,163	17,711	3	0	1	286	228	2	375	1,650	4,868	81	31	6,927	13	60	11	3,673	3,135	4,382	3,953
+Species	Before	After	Syntenic	Exact	Boundary_refined_only	UTR_added	UTR_lost	UTR_exon_gained	UTR_exon_removed	UTR_refined	Coding_exon_gain	Coding_exon_loss	Exon_boundary_refined	CDS_change_only	CDS_boundary_refined	Isoform_change	Split_events	Merge_events	Complex_events	Unresolved_overlap_after_genes	Unresolved_overlap_before_genes	Strict_unmatched_after_genes	Strict_unmatched_before_genes
+A. annua	54,347	39,322	32,118	18,788	4	0	0	760	323	0	1,163	333	6,504	267	27	3,949	57	2,018	244	1,445	1,445	3,103	15,456
+Cucumber	24,317	24,145	19,179	15,357	904	0	0	463	596	0	263	865	730	0	1	0	468	675	57	1,064	1,064	2,079	2,046
+F. ananassa	108,087	108,447	90,847	50,415	0	0	0	995	1,541	0	2,720	5,779	21,105	0	108	8,184	4,119	415	607	4,563	4,563	2,468	6,360
+F. vesca	28,588	34,006	20,538	2,821	0	0	0	184	404	0	789	1,092	6,761	0	11	8,476	1,580	331	55	2,227	2,227	7,201	3,438
+Peach	30,181	31,751	28,732	26,558	0	0	0	35	42	0	380	925	311	0	1	480	774	32	6	510	510	792	89
+Pineapple	26,162	26,657	23,797	14,778	58	0	0	3,179	0	0	145	655	4,979	2	1	0	253	296	261	548	548	930	398
+Rice	39,406	40,326	30,753	17,341	3	0	1	245	219	1	356	1,486	4,725	79	4	6,293	812	531	523	1,617	1,617	4,382	3,953

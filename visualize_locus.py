@@ -45,9 +45,19 @@ EVENT_COLORS = {
     'Merge':   '#E67E22',
     'Complex': '#95A5A6',
     'Unresolved': '#7F8C8D',
-    'Novel':   '#3498DB',
-    'Deleted': '#E74C3C',
+    'Strict unmatched after': '#3498DB',
+    'Strict unmatched before': '#E74C3C',
 }
+
+
+def _strict_unmatched_after(row):
+    """Read the conservative display column, with legacy summary compatibility."""
+    return row.get("Strict_unmatched_after_genes", row.get("Novel_genes", 0))
+
+
+def _strict_unmatched_before(row):
+    """Read the conservative display column, with legacy summary compatibility."""
+    return row.get("Strict_unmatched_before_genes", row.get("Deleted_genes", 0))
 
 
 def load_data():
@@ -113,8 +123,8 @@ def load_data():
             "complex_events": int(row["Complex_events"]),
             "unresolved_after": int(row.get("Unresolved_overlap_after_genes", 0)),
             "unresolved_before": int(row.get("Unresolved_overlap_before_genes", 0)),
-            "novel_genes": int(row["Novel_genes"]),
-            "deleted_genes": int(row["Deleted_genes"]),
+            "strict_unmatched_after": int(_strict_unmatched_after(row)),
+            "strict_unmatched_before": int(_strict_unmatched_before(row)),
         })
     return pd.DataFrame(rows)
 
@@ -164,7 +174,7 @@ def plot_syntenic_subtypes(df):
 
 
 def plot_event_summary(df):
-    """Grouped bar chart: split, merge, complex, novel, deleted events."""
+    """Grouped bar chart: split, merge, complex, and strictly unmatched genes."""
     fig, axes = plt.subplots(1, 2, figsize=(16, 6.5))
 
     x = np.arange(N)
@@ -185,19 +195,21 @@ def plot_event_summary(df):
     ax.legend(fontsize=8)
     ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f'{v/1000:.1f}K' if v >= 1000 else f'{v:.0f}'))
 
-    # Panel B: unresolved weak-overlap / novel / deleted genes
+    # Panel B: unresolved weak-overlap and strictly unmatched genes
     ax = axes[1]
     narrow = 0.18
     ax.bar(x - 1.5 * narrow, df['unresolved_after'], narrow, label='Unresolved after',
            color=EVENT_COLORS['Unresolved'], alpha=0.75)
     ax.bar(x - 0.5 * narrow, df['unresolved_before'], narrow, label='Unresolved before',
            color='#AAB2B6', alpha=0.75)
-    ax.bar(x + 0.5 * narrow, df['novel_genes'], narrow, label='Novel genes',
-                color=EVENT_COLORS['Novel'], alpha=0.85)
-    ax.bar(x + 1.5 * narrow, df['deleted_genes'], narrow, label='Deleted genes',
-                color=EVENT_COLORS['Deleted'], alpha=0.85)
+    ax.bar(x + 0.5 * narrow, df['strict_unmatched_after'], narrow,
+           label='Strict unmatched after',
+           color=EVENT_COLORS['Strict unmatched after'], alpha=0.85)
+    ax.bar(x + 1.5 * narrow, df['strict_unmatched_before'], narrow,
+           label='Strict unmatched before',
+           color=EVENT_COLORS['Strict unmatched before'], alpha=0.85)
     ax.set_ylabel('Gene count')
-    ax.set_title('B. Unresolved weak-overlap, novel, and deleted genes')
+    ax.set_title('B. Unresolved weak-overlap and strict unmatched genes')
     ax.set_xticks(x)
     ax.set_xticklabels(SPECIES_LABELS, rotation=25, ha='right', fontsize=9)
     ax.legend(fontsize=8)
@@ -217,13 +229,14 @@ def plot_heatmap(df):
             'exon_gain_cds', 'exon_loss_cds', 'exon_boundary',
             'cds_only', 'cds_boundary', 'isoform',
             'split_events', 'merge_events', 'unresolved_after', 'unresolved_before',
-            'novel_genes', 'deleted_genes']
+            'strict_unmatched_after', 'strict_unmatched_before']
     labels = ['Exact', 'Boundary\nrefined', 'UTR\nadded', 'UTR\nlost',
               'UTR exon\ngained', 'UTR exon\nremoved', 'UTR\nrefined',
               'Coding exon\ngain+CDS', 'Coding exon\nloss+CDS',
               'Exon boundary\nrefined', 'CDS change\nonly',
               'CDS boundary\nrefined', 'Isoform\nchange', 'Split\nevents', 'Merge\nevents',
-              'Unresolved\nafter', 'Unresolved\nbefore', 'Novel\ngenes', 'Deleted\ngenes']
+              'Unresolved\nafter', 'Unresolved\nbefore',
+              'Strict unmatched\nafter', 'Strict unmatched\nbefore']
 
     data = np.zeros((N, len(cats)))
     for i in range(N):

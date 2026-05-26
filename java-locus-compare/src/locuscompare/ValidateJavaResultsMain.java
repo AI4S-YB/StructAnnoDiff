@@ -56,6 +56,12 @@ public final class ValidateJavaResultsMain {
                 "locus_diagnostics.csv",
                 issues
         );
+        compareCsvTable(
+                pythonResults.resolve("curation_core_metrics.csv"),
+                javaResults.resolve("curation_core_metrics.csv"),
+                "curation_core_metrics.csv",
+                issues
+        );
 
         assertNoExcludedOutputs(javaResults, issues);
 

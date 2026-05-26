@@ -24,7 +24,7 @@ B,Locus fate,Split,34,0.12,68,0.20
 B,Locus fate,Merge,0,0,0,0
 B,Locus fate,Complex,0,0,0,0
 B,Locus fate,Unresolved weak-overlap,"3,691",12.91,"5,312",15.62
-B,Locus fate,Strict deleted / novel,"3,438",12.03,"7,201",21.18
+B,Locus fate,Strict unmatched,"3,438",12.03,"7,201",21.18
 
 
 ## Figure C table: 1:1 structural attributes

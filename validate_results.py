@@ -51,6 +51,10 @@ def _as_int(value) -> int:
     return int(float(value)) if pd.notna(value) else 0
 
 
+def _as_float(value) -> float:
+    return float(value) if pd.notna(value) else 0.0
+
+
 def _locus_with_species_ids(locus_df: pd.DataFrame) -> pd.DataFrame:
     if locus_df.empty:
         return locus_df
@@ -154,6 +158,18 @@ def run_integrity_checks(results_dir: Path = RESULTS_DIR) -> list[str]:
                     f"!= Syntenic {syntenic}"
                 )
 
+    curation_core = _read_csv(results_dir / "curation_core_metrics.csv")
+    if curation_core.empty:
+        issues.append("curation_core_metrics.csv: missing or empty")
+    else:
+        observed_ids = curation_core.get("species_id", pd.Series(dtype=str)).tolist()
+        expected_ids = [sp.id for sp in SPECIES]
+        if observed_ids != expected_ids:
+            issues.append(
+                "curation_core_metrics.csv: species order/content mismatch "
+                f"{observed_ids} != {expected_ids}"
+            )
+
     multilabel = _read_csv(results_dir / "locus_comparison_multilabel.csv")
     if multilabel.empty:
         issues.append("locus_comparison_multilabel.csv: missing or empty")
@@ -202,6 +218,114 @@ def run_integrity_checks(results_dir: Path = RESULTS_DIR) -> list[str]:
             issues.append(f"{sp.id}: before locus accounting does not close")
         if after_accounted != _as_int(row["total_after_genes"]):
             issues.append(f"{sp.id}: after locus accounting does not close")
+
+        expected_changed_before = (
+            _as_int(row["total_before_genes"]) - _as_int(row["one_to_one_exact"])
+        )
+        expected_changed_after = (
+            _as_int(row["total_after_genes"]) - _as_int(row["one_to_one_exact"])
+        )
+        if _as_int(row.get("changed_before_genes", 0)) != expected_changed_before:
+            issues.append(f"{sp.id}: changed_before_genes does not match exact 1:1 complement")
+        if _as_int(row.get("changed_after_genes", 0)) != expected_changed_after:
+            issues.append(f"{sp.id}: changed_after_genes does not match exact 1:1 complement")
+        if _as_int(row.get("no_overlap_after_loci", 0)) > _as_int(row["total_after_genes"]):
+            issues.append(f"{sp.id}: no_overlap_after_loci exceeds total_after_genes")
+        if _as_int(row.get("no_overlap_before_loci", 0)) > _as_int(row["total_before_genes"]):
+            issues.append(f"{sp.id}: no_overlap_before_loci exceeds total_before_genes")
+        rep_pairs = _as_int(row.get("rep_transcript_pairs", 0))
+        rep_structural_changed = _as_int(row.get("rep_structural_changed", 0))
+        if rep_structural_changed > rep_pairs:
+            issues.append(f"{sp.id}: representative structural changes exceed pair count")
+        expected_rep_structural_pct = (
+            rep_structural_changed / rep_pairs * 100 if rep_pairs else 0.0
+        )
+        if abs(
+            _as_float(row.get("rep_structural_changed_pct", 0.0))
+            - expected_rep_structural_pct
+        ) > 1e-9:
+            issues.append(f"{sp.id}: representative structural change percent mismatch")
+        if (
+            _as_int(row.get("rep_exon_count_changed", 0))
+            + _as_int(row.get("rep_exon_boundary_changed_same_count", 0))
+            > rep_pairs
+        ):
+            issues.append(f"{sp.id}: representative exon change categories exceed pair count")
+        rep_exon_changed = (
+            _as_int(row.get("rep_exon_count_changed", 0))
+            + _as_int(row.get("rep_exon_boundary_changed_same_count", 0))
+        )
+        rep_cds_changed = (
+            _as_int(row.get("rep_cds_count_changed", 0))
+            + _as_int(row.get("rep_cds_boundary_changed_same_count", 0))
+        )
+        if (
+            rep_cds_changed > rep_pairs
+        ):
+            issues.append(f"{sp.id}: representative CDS change categories exceed pair count")
+        if rep_structural_changed < max(rep_exon_changed, rep_cds_changed):
+            issues.append(f"{sp.id}: representative structural changes undercount exon/CDS changes")
+        if rep_structural_changed > rep_exon_changed + rep_cds_changed:
+            issues.append(f"{sp.id}: representative structural changes exceed exon/CDS change union")
+
+        if not curation_core.empty:
+            core_row = curation_core[curation_core["species_id"] == sp.id]
+            if not core_row.empty:
+                core_row = core_row.iloc[0]
+                core_to_summary = {
+                    "total_before_genes": "total_before_genes",
+                    "total_after_genes": "total_after_genes",
+                    "changed_before_genes": "changed_before_genes",
+                    "changed_after_genes": "changed_after_genes",
+                    "new_loci_no_overlap": "no_overlap_after_loci",
+                    "deleted_loci_no_overlap": "no_overlap_before_loci",
+                    "split_events": "split_events",
+                    "merge_events": "merge_events",
+                    "rep_transcript_pairs": "rep_transcript_pairs",
+                    "rep_structural_changed": "rep_structural_changed",
+                    "rep_exon_count_changed": "rep_exon_count_changed",
+                    "rep_exon_boundary_changed_same_count": "rep_exon_boundary_changed_same_count",
+                    "rep_cds_count_changed": "rep_cds_count_changed",
+                    "rep_cds_boundary_changed_same_count": "rep_cds_boundary_changed_same_count",
+                }
+                for core_col, summary_col in core_to_summary.items():
+                    if core_col not in core_row.index:
+                        issues.append(f"{sp.id}: curation_core_metrics missing {core_col}")
+                        continue
+                    if _as_int(core_row[core_col]) != _as_int(row[summary_col]):
+                        issues.append(
+                            f"{sp.id}: curation_core_metrics {core_col} "
+                            f"!= {summary_col}"
+                        )
+                if "rep_exon_changed" not in core_row.index:
+                    issues.append(f"{sp.id}: curation_core_metrics missing rep_exon_changed")
+                elif _as_int(core_row["rep_exon_changed"]) != rep_exon_changed:
+                    issues.append(f"{sp.id}: curation_core_metrics rep_exon_changed mismatch")
+                pct_checks = {
+                    "rep_exon_changed_before_pct": (
+                        rep_exon_changed / _as_int(row["total_before_genes"]) * 100
+                        if _as_int(row["total_before_genes"]) else 0.0
+                    ),
+                    "rep_exon_changed_after_pct": (
+                        rep_exon_changed / _as_int(row["total_after_genes"]) * 100
+                        if _as_int(row["total_after_genes"]) else 0.0
+                    ),
+                }
+                for core_col, expected_value in pct_checks.items():
+                    if core_col not in core_row.index:
+                        issues.append(f"{sp.id}: curation_core_metrics missing {core_col}")
+                    elif abs(_as_float(core_row[core_col]) - expected_value) > 1e-9:
+                        issues.append(f"{sp.id}: curation_core_metrics {core_col} mismatch")
+                if "rep_structural_changed_pct" not in core_row.index:
+                    issues.append(f"{sp.id}: curation_core_metrics missing rep_structural_changed_pct")
+                elif abs(
+                    _as_float(core_row["rep_structural_changed_pct"])
+                    - _as_float(row["rep_structural_changed_pct"])
+                ) > 1e-9:
+                    issues.append(
+                        f"{sp.id}: curation_core_metrics rep_structural_changed_pct "
+                        "!= rep_structural_changed_pct"
+                    )
 
     if not multilabel.empty:
         for _, ml_row in multilabel.iterrows():

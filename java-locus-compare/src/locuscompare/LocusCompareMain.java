@@ -19,7 +19,7 @@ public final class LocusCompareMain {
         double cdsPct = Double.parseDouble(opts.getOrDefault("--cds-change-pct", "0.1"));
         double utrPct = Double.parseDouble(opts.getOrDefault("--utr-change-pct", "0.1"));
         String geneScope = opts.getOrDefault("--gene-scope", "mrna");
-        String overlapMode = opts.getOrDefault("--overlap-mode", "reciprocal");
+        String overlapMode = opts.getOrDefault("--overlap-mode", "hybrid");
 
         System.out.println("============================================================");
         System.out.println("Species: " + name);

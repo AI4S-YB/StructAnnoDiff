@@ -23,7 +23,10 @@ public final class CoreTests {
         testSameIdsAreDistinctGraphNodes();
         testPrimaryMrnaTieUsesFileOrder();
         testUtrDerivationWithoutExons();
+        testPhaseOnlyCdsDifferenceIsIgnored();
         testUtrExonGainIsNotCodingGainWhenCdsBoundaryChanges();
+        testNoOverlapLociIgnoreStrand();
+        testRepresentativeTranscriptChangeSummary();
         testNoCommonSeqidsReturnsNull();
         testWeakContainmentOverlapIsNotCountedAsNovelDeleted();
         System.out.println("CoreTests: OK");
@@ -133,6 +136,28 @@ public final class CoreTests {
         assertEquals("1:300", Core.exonSignature(mrna), "derived exon");
     }
 
+    private static void testPhaseOnlyCdsDifferenceIsIgnored() {
+        Core.GeneModel before = geneWithMrnas("before", List.of(
+                mrna("b1", new int[][]{{1, 100}}, new Object[][]{{10, 90, "0"}}, null)
+        ));
+        Core.GeneModel after = geneWithMrnas("after", List.of(
+                mrna("a1", new int[][]{{1, 100}}, new Object[][]{{10, 90, "2"}}, null)
+        ));
+
+        String subtype = Core.classifySyntenicChange(before, after, 10, 0.1, 0.1);
+        Map<String, Boolean> attrs = Core.computeSyntenicAttributes(before, after, 10, 0.1, 0.1);
+        LinkedHashMap<String, Integer> summary = Core.summarizeRepresentativeTranscriptChanges(
+                List.of(new Core.GenePair(before, after))
+        );
+
+        assertEquals("exact", subtype, "phase-only subtype");
+        assertTrue(attrs.get("exact"), "phase-only exact");
+        assertTrue(!attrs.get("cds_change"), "phase-only not cds change");
+        assertEquals(0, summary.get("rep_structural_changed").intValue(), "phase-only not structural");
+        assertEquals(0, summary.get("rep_cds_boundary_changed_same_count").intValue(),
+                "phase-only not cds boundary");
+    }
+
     private static void testUtrExonGainIsNotCodingGainWhenCdsBoundaryChanges() {
         Core.GeneModel before = geneWithMrnas("before", List.of(
                 mrna("b1", new int[][]{{20, 80}}, new Object[][]{{20, 80, "0"}}, null)
@@ -148,6 +173,64 @@ public final class CoreTests {
         assertTrue(subtype.contains("utr_exon_added"), "subtype has utr exon");
         assertTrue(subtype.contains("cds_extended"), "subtype has cds extended");
         assertTrue(!subtype.contains("exon_gain"), "subtype lacks exon gain");
+    }
+
+    private static void testNoOverlapLociIgnoreStrand() {
+        Core.GeneModel beforeOverlap = gene("before_overlap", 100, 200);
+        Core.GeneModel beforeDeleted = gene("before_deleted", 300, 400);
+        Core.GeneModel afterOverlap = new Core.GeneModel(
+                "after_overlap", "chr1", 150, 250, "-", "test", 150, 250);
+        Core.GeneModel afterNew = gene("after_new", 500, 600);
+        LinkedHashMap<String, Core.GeneModel> before = new LinkedHashMap<>();
+        before.put(beforeOverlap.geneId, beforeOverlap);
+        before.put(beforeDeleted.geneId, beforeDeleted);
+        LinkedHashMap<String, Core.GeneModel> after = new LinkedHashMap<>();
+        after.put(afterOverlap.geneId, afterOverlap);
+        after.put(afterNew.geneId, afterNew);
+
+        LinkedHashMap<String, Integer> counts = Core.countNoOverlapLoci(before, after);
+
+        assertEquals(1, counts.get("no_overlap_after_loci").intValue(), "no-overlap after");
+        assertEquals(1, counts.get("no_overlap_before_loci").intValue(), "no-overlap before");
+    }
+
+    private static void testRepresentativeTranscriptChangeSummary() {
+        Core.GeneModel pairExonCountBefore = geneWithMrnas("b_exon_count", List.of(
+                mrna("bt1", new int[][]{{1, 50}, {101, 150}},
+                        new Object[][]{{10, 40, "0"}, {110, 140, "0"}}, null)
+        ));
+        Core.GeneModel pairExonCountAfter = geneWithMrnas("a_exon_count", List.of(
+                mrna("at1", new int[][]{{1, 50}, {101, 150}, {201, 250}},
+                        new Object[][]{{10, 40, "0"}, {110, 140, "0"}}, null)
+        ));
+        Core.GeneModel pairBoundaryBefore = geneWithMrnas("b_boundary", List.of(
+                mrna("bt2", new int[][]{{1, 50}, {101, 150}},
+                        new Object[][]{{10, 40, "0"}, {110, 140, "0"}}, null)
+        ));
+        Core.GeneModel pairBoundaryAfter = geneWithMrnas("a_boundary", List.of(
+                mrna("at2", new int[][]{{1, 60}, {101, 150}},
+                        new Object[][]{{10, 40, "0"}, {110, 145, "0"}}, null)
+        ));
+        Core.GeneModel pairCdsCountBefore = geneWithMrnas("b_cds_count", List.of(
+                mrna("bt3", new int[][]{{1, 200}}, new Object[][]{{10, 40, "0"}}, null)
+        ));
+        Core.GeneModel pairCdsCountAfter = geneWithMrnas("a_cds_count", List.of(
+                mrna("at3", new int[][]{{1, 200}},
+                        new Object[][]{{10, 40, "0"}, {110, 140, "0"}}, null)
+        ));
+
+        LinkedHashMap<String, Integer> summary = Core.summarizeRepresentativeTranscriptChanges(List.of(
+                new Core.GenePair(pairExonCountBefore, pairExonCountAfter),
+                new Core.GenePair(pairBoundaryBefore, pairBoundaryAfter),
+                new Core.GenePair(pairCdsCountBefore, pairCdsCountAfter)
+        ));
+
+        assertEquals(3, summary.get("rep_transcript_pairs").intValue(), "rep pairs");
+        assertEquals(3, summary.get("rep_structural_changed").intValue(), "rep structural changed");
+        assertEquals(1, summary.get("rep_exon_count_changed").intValue(), "rep exon count");
+        assertEquals(1, summary.get("rep_exon_boundary_changed_same_count").intValue(), "rep exon boundary");
+        assertEquals(1, summary.get("rep_cds_count_changed").intValue(), "rep cds count");
+        assertEquals(1, summary.get("rep_cds_boundary_changed_same_count").intValue(), "rep cds boundary");
     }
 
     private static void testNoCommonSeqidsReturnsNull() throws Exception {

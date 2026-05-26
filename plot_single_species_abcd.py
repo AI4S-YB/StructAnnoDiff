@@ -126,7 +126,7 @@ def build_figure_b_table(sp_id: str) -> pd.DataFrame:
             "unresolved_overlap_before_genes",
             "unresolved_overlap_after_genes",
         ),
-        ("Strict deleted / novel", "deleted_genes", "novel_genes"),
+        ("Strict unmatched", "deleted_genes", "novel_genes"),
     ]
     rows = []
     for label, before_col, after_col in specs:
@@ -306,7 +306,7 @@ def plot_abcd(sp_label: str, table_a: pd.DataFrame, table_b: pd.DataFrame,
         "Merge": "#8A60B0",
         "Complex": "#8C8C8C",
         "Unresolved weak-overlap": "#EDC948",
-        "Strict deleted / novel": "#E15759",
+        "Strict unmatched": "#E15759",
     }
     before_pct = table_b["before_pct"].to_numpy()
     after_pct = table_b["after_pct"].to_numpy()

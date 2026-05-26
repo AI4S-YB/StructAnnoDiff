@@ -162,8 +162,8 @@ def build_master_table():
             'Complex_events': int(row['complex_events']),
             'Unresolved_overlap_after_genes': int(row.get('unresolved_overlap_after_genes', 0)),
             'Unresolved_overlap_before_genes': int(row.get('unresolved_overlap_before_genes', 0)),
-            'Novel_genes': int(row['novel_genes']),
-            'Deleted_genes': int(row['deleted_genes']),
+            'Strict_unmatched_after_genes': int(row['novel_genes']),
+            'Strict_unmatched_before_genes': int(row['deleted_genes']),
         })
     return pd.DataFrame(rows)
 
@@ -231,6 +231,56 @@ def build_locus_diagnostics_table():
     return pd.DataFrame(rows)
 
 
+def build_curation_core_metrics_table():
+    """Build compact curation impact metrics used by the publication figure."""
+    rows = []
+    for sp in SPECIES_ORDER:
+        fpath = LOCUS_DIR / f"{sp}_change_summary.csv"
+        if not fpath.exists():
+            continue
+        row = pd.read_csv(fpath).iloc[0]
+        rows.append({
+            'species_id': sp,
+            'Species': SPECIES_SHORT[sp],
+            'total_before_genes': int(row['total_before_genes']),
+            'total_after_genes': int(row['total_after_genes']),
+            'changed_before_genes': int(row['changed_before_genes']),
+            'changed_before_pct': float(row['changed_before_pct']),
+            'changed_after_genes': int(row['changed_after_genes']),
+            'changed_after_pct': float(row['changed_after_pct']),
+            'new_loci_no_overlap': int(row['no_overlap_after_loci']),
+            'deleted_loci_no_overlap': int(row['no_overlap_before_loci']),
+            'split_events': int(row['split_events']),
+            'merge_events': int(row['merge_events']),
+            'rep_transcript_pairs': int(row['rep_transcript_pairs']),
+            'rep_structural_changed': int(row['rep_structural_changed']),
+            'rep_structural_changed_pct': float(row['rep_structural_changed_pct']),
+            'rep_exon_changed': (
+                int(row['rep_exon_count_changed'])
+                + int(row['rep_exon_boundary_changed_same_count'])
+            ),
+            'rep_exon_changed_before_pct': (
+                (
+                    int(row['rep_exon_count_changed'])
+                    + int(row['rep_exon_boundary_changed_same_count'])
+                ) / int(row['total_before_genes']) * 100
+                if int(row['total_before_genes']) else 0.0
+            ),
+            'rep_exon_changed_after_pct': (
+                (
+                    int(row['rep_exon_count_changed'])
+                    + int(row['rep_exon_boundary_changed_same_count'])
+                ) / int(row['total_after_genes']) * 100
+                if int(row['total_after_genes']) else 0.0
+            ),
+            'rep_exon_count_changed': int(row['rep_exon_count_changed']),
+            'rep_exon_boundary_changed_same_count': int(row['rep_exon_boundary_changed_same_count']),
+            'rep_cds_count_changed': int(row['rep_cds_count_changed']),
+            'rep_cds_boundary_changed_same_count': int(row['rep_cds_boundary_changed_same_count']),
+        })
+    return pd.DataFrame(rows)
+
+
 def write_tsv(df, filepath):
     """Write DataFrame as formatted TSV with aligned numbers."""
     cols = df.columns.tolist()
@@ -245,6 +295,18 @@ def write_tsv(df, filepath):
                 else:
                     vals.append(str(v))
             f.write('\t'.join(vals) + '\n')
+
+
+def write_tsv_or_fallback(df, filepath):
+    """Write a TSV, falling back when Windows-side tools lock the target file."""
+    try:
+        write_tsv(df, filepath)
+        return filepath
+    except PermissionError:
+        fallback = filepath.with_name(filepath.name + '.new')
+        write_tsv(df, fallback)
+        print(f"  WARNING: {filepath} is locked; saved fallback: {fallback}")
+        return fallback
 
 
 def write_detailed_subtypes():
@@ -267,8 +329,8 @@ def write_detailed_subtypes():
                      f"Complex: {int(row['complex_events'])}  "
                      f"Unresolved after: {int(row.get('unresolved_overlap_after_genes', 0))}  "
                      f"Unresolved before: {int(row.get('unresolved_overlap_before_genes', 0))}  "
-                     f"Novel: {int(row['novel_genes'])}  "
-                     f"Deleted: {int(row['deleted_genes'])}")
+                     f"Strict unmatched after: {int(row['novel_genes'])}  "
+                     f"Strict unmatched before: {int(row['deleted_genes'])}")
         lines.append(f"  Syntenic subtypes:")
 
         subtypes = []
@@ -311,6 +373,14 @@ def main():
     write_tsv(diagnostics_df, diagnostics_tsv)
     print(f"  Saved: {diagnostics_csv}")
     print(f"  Saved: {diagnostics_tsv}")
+
+    curation_core_df = build_curation_core_metrics_table()
+    curation_core_csv = RESULTS_DIR / "curation_core_metrics.csv"
+    curation_core_tsv = RESULTS_DIR / "curation_core_metrics.tsv"
+    curation_core_df.to_csv(curation_core_csv, index=False)
+    curation_core_tsv_written = write_tsv_or_fallback(curation_core_df, curation_core_tsv)
+    print(f"  Saved: {curation_core_csv}")
+    print(f"  Saved: {curation_core_tsv_written}")
 
     # Write detailed subtypes
     detail_text = write_detailed_subtypes()

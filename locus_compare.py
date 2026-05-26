@@ -10,9 +10,10 @@ manual curation.
 Algorithm:
   1. Parse GFF3, build gene→mRNA→exon/CDS/UTR models
   2. Per seqid×strand: find overlapping gene pairs via two-pointer sweep
-  3. Filter by reciprocal overlap >= threshold (default 0.5)
+  3. Filter by overlap threshold (default hybrid mode: reciprocal for strict
+     1:1, containment for split/merge/complex events)
   4. Resolve bipartite graph: 1:1, 1:N, N:1, M:N, novel, deleted
-  5. For 1:1 matches: subclassify structural change type
+  5. For strict 1:1 matches: subclassify structural change type
   6. Handle containment, opposite-strand overlaps, gene fragments
 """
 
@@ -159,8 +160,12 @@ def exon_signature(mrna):
 
 
 def cds_signature(mrna):
-    """Canonical CDS coordinate/phase signature for one transcript."""
-    return tuple(sorted((c.start, c.end, c.phase) for c in mrna.cds))
+    """Canonical CDS coordinate signature for one transcript.
+
+    CDS phase is intentionally ignored: phase-only differences are not treated
+    as structural annotation changes in this analysis.
+    """
+    return tuple(sorted((c.start, c.end) for c in mrna.cds))
 
 
 def utr_signature(mrna):
@@ -586,6 +591,82 @@ def find_overlapping_pairs(before_genes, after_genes, min_reciprocal=0.5,
     return pairs
 
 
+def count_no_overlap_loci(before_genes, after_genes):
+    """Count genes with no coordinate overlap on the same seqid, ignoring strand."""
+    before_by_seq = defaultdict(list)
+    after_by_seq = defaultdict(list)
+    for gene in before_genes.values():
+        before_by_seq[gene.seqid].append(gene)
+    for gene in after_genes.values():
+        after_by_seq[gene.seqid].append(gene)
+    for genes in before_by_seq.values():
+        genes.sort(key=lambda g: (g.start, g.end, g.gene_id))
+    for genes in after_by_seq.values():
+        genes.sort(key=lambda g: (g.start, g.end, g.gene_id))
+
+    def count_without_overlap(query_by_seq, target_by_seq):
+        count = 0
+        for seqid, query_genes in query_by_seq.items():
+            target_genes = target_by_seq.get(seqid, [])
+            active = []
+            i = 0
+            for q in query_genes:
+                active = [t for t in active if t.end >= q.start]
+                while i < len(target_genes) and target_genes[i].start <= q.end:
+                    active.append(target_genes[i])
+                    i += 1
+                if not any(overlap_len(q.start, q.end, t.start, t.end) > 0 for t in active):
+                    count += 1
+        return count
+
+    return {
+        'no_overlap_after_loci': count_without_overlap(after_by_seq, before_by_seq),
+        'no_overlap_before_loci': count_without_overlap(before_by_seq, after_by_seq),
+    }
+
+
+def summarize_representative_transcript_changes(syntenic_pairs):
+    """Summarize exon/CDS changes for representative transcript pairs in 1:1 genes."""
+    summary = {
+        'rep_transcript_pairs': 0,
+        'rep_structural_changed': 0,
+        'rep_structural_changed_pct': 0.0,
+        'rep_exon_count_changed': 0,
+        'rep_exon_boundary_changed_same_count': 0,
+        'rep_cds_count_changed': 0,
+        'rep_cds_boundary_changed_same_count': 0,
+    }
+    for bg, ag in syntenic_pairs:
+        bm, am = select_representative_mrna_pair(bg, ag)
+        if bm is None or am is None:
+            continue
+        summary['rep_transcript_pairs'] += 1
+
+        exon_changed = False
+        cds_changed = False
+        if bm.exon_count != am.exon_count:
+            summary['rep_exon_count_changed'] += 1
+            exon_changed = True
+        elif exon_signature(bm) != exon_signature(am):
+            summary['rep_exon_boundary_changed_same_count'] += 1
+            exon_changed = True
+
+        if len(bm.cds) != len(am.cds):
+            summary['rep_cds_count_changed'] += 1
+            cds_changed = True
+        elif cds_signature(bm) != cds_signature(am):
+            summary['rep_cds_boundary_changed_same_count'] += 1
+            cds_changed = True
+
+        if exon_changed or cds_changed:
+            summary['rep_structural_changed'] += 1
+    if summary['rep_transcript_pairs']:
+        summary['rep_structural_changed_pct'] = (
+            summary['rep_structural_changed'] / summary['rep_transcript_pairs'] * 100
+        )
+    return summary
+
+
 # ---------------------------------------------------------------------------
 # Locus-based resolution (connected components)
 # ---------------------------------------------------------------------------
@@ -595,7 +676,7 @@ def resolve_matches(pairs, before_genes, after_genes):
 
     Uses connected components in the overlap graph rather than greedy 1:1
     matching. This correctly identifies split and merge events that greedy
-    approaches misclassify as multiple 1:1 matches plus novel/deleted genes.
+    approaches misclassify as multiple 1:1 matches plus strictly unmatched genes.
 
     Returns dict with keys:
       syntenic: list of (before_gene, after_gene) for 1:1 loci
@@ -1036,7 +1117,7 @@ def make_change_log_row(bg, ag, match_type, change_subtype):
 def compare_annotations(before_gff, after_gff, min_reciprocal=0.5,
                         boundary_tol=10, cds_change_pct=0.1, utr_change_pct=0.1,
                         small_threshold=300, gene_scope='mrna',
-                        overlap_mode='reciprocal'):
+                        overlap_mode='hybrid'):
     """Main entry point: compare two GFF3 annotation files.
 
     Returns dict with summary counts and detailed log.
@@ -1079,8 +1160,14 @@ def compare_annotations(before_gff, after_gff, min_reciprocal=0.5,
 
     print(f"  Common seqids: {len(common_seqs)}")
 
-    # Find all overlapping pairs per locus group
-    all_pairs = []
+    if overlap_mode not in ('reciprocal', 'containment', 'hybrid'):
+        raise ValueError(f"Unsupported overlap_mode: {overlap_mode}")
+
+    # Find all overlapping pairs per locus group. Hybrid mode uses strict
+    # reciprocal pairs for 1:1 structural comparison, but containment pairs for
+    # split/merge/complex event resolution so contained fragments are not lost.
+    reciprocal_pairs = []
+    containment_pairs = []
     overlap_diagnostics = defaultdict(int)
     weak_rejected = {'before': set(), 'after': set()}
     for seqid, strand in before_groups:
@@ -1094,38 +1181,80 @@ def compare_annotations(before_gff, after_gff, min_reciprocal=0.5,
             bg_list,
             ag_list,
             min_reciprocal,
-            overlap_mode=overlap_mode,
+            overlap_mode='reciprocal' if overlap_mode == 'hybrid' else overlap_mode,
             diagnostics=overlap_diagnostics,
             weak_rejected=weak_rejected,
         )
-        all_pairs.extend(pairs)
+        if overlap_mode == 'hybrid':
+            reciprocal_pairs.extend(pairs)
+            containment_pairs.extend(find_overlapping_pairs(
+                bg_list,
+                ag_list,
+                min_reciprocal,
+                overlap_mode='containment',
+            ))
+        else:
+            reciprocal_pairs.extend(pairs)
 
-    print(f"  Found {len(all_pairs)} candidate matching pairs")
-    if overlap_mode == 'reciprocal':
+    if overlap_mode == 'hybrid':
+        graph_pairs = containment_pairs
+        reciprocal_pair_keys = {
+            (bg.gene_id, ag.gene_id) for bg, ag, _ro, _jc in reciprocal_pairs
+        }
+        print(f"  Found {len(reciprocal_pairs)} strict reciprocal candidate pairs")
+        print(f"  Found {len(containment_pairs)} containment candidate pairs")
+    else:
+        graph_pairs = reciprocal_pairs
+        reciprocal_pair_keys = None
+        print(f"  Found {len(graph_pairs)} candidate matching pairs")
+    if overlap_mode in ('reciprocal', 'hybrid'):
         print("  Containment-style pairs filtered by reciprocal threshold: "
               f"{overlap_diagnostics['containment_pairs_filtered_by_reciprocal']}")
 
     # Resolve matches
     print("Resolving bipartite matches...")
-    results = resolve_matches(all_pairs, before_genes, after_genes)
-    unresolved_overlap_deleted = [
-        bg for bg in results['deleted'] if bg.gene_id in weak_rejected['before']
-    ]
-    unresolved_overlap_novel = [
-        ag for ag in results['novel'] if ag.gene_id in weak_rejected['after']
-    ]
-    strict_deleted = [
-        bg for bg in results['deleted'] if bg.gene_id not in weak_rejected['before']
-    ]
-    strict_novel = [
-        ag for ag in results['novel'] if ag.gene_id not in weak_rejected['after']
-    ]
+    graph_results = resolve_matches(graph_pairs, before_genes, after_genes)
+    if overlap_mode == 'hybrid':
+        strict_syntenic = []
+        weak_one_to_one = []
+        for bg, ag in graph_results['syntenic']:
+            if (bg.gene_id, ag.gene_id) in reciprocal_pair_keys:
+                strict_syntenic.append((bg, ag))
+            else:
+                weak_one_to_one.append((bg, ag))
+        results = {
+            **graph_results,
+            'syntenic': strict_syntenic,
+            'weak_one_to_one': weak_one_to_one,
+        }
+    else:
+        results = {**graph_results, 'weak_one_to_one': []}
+    no_overlap_counts = count_no_overlap_loci(before_genes, after_genes)
+    if overlap_mode == 'hybrid':
+        unresolved_overlap_deleted = [bg for bg, _ag in results['weak_one_to_one']]
+        unresolved_overlap_novel = [ag for _bg, ag in results['weak_one_to_one']]
+        strict_deleted = results['deleted']
+        strict_novel = results['novel']
+    else:
+        unresolved_overlap_deleted = [
+            bg for bg in results['deleted'] if bg.gene_id in weak_rejected['before']
+        ]
+        unresolved_overlap_novel = [
+            ag for ag in results['novel'] if ag.gene_id in weak_rejected['after']
+        ]
+        strict_deleted = [
+            bg for bg in results['deleted'] if bg.gene_id not in weak_rejected['before']
+        ]
+        strict_novel = [
+            ag for ag in results['novel'] if ag.gene_id not in weak_rejected['after']
+        ]
 
     # Classify syntenic changes
     print("Classifying change types...")
     change_log = []
     syntenic_by_subtype = defaultdict(int)
     syntenic_attribute_counts = defaultdict(int)
+    representative_counts = summarize_representative_transcript_changes(results['syntenic'])
 
     for bg, ag in results['syntenic']:
         subtype = classify_syntenic_change(bg, ag, boundary_tol, cds_change_pct,
@@ -1177,12 +1306,25 @@ def compare_annotations(before_gff, after_gff, min_reciprocal=0.5,
         'boundary_tolerance_bp': boundary_tol,
         'cds_change_threshold': cds_change_pct,
         'utr_change_threshold': utr_change_pct,
-        'candidate_pairs': len(all_pairs),
+        'candidate_pairs': len(reciprocal_pairs) if overlap_mode == 'hybrid' else len(graph_pairs),
         'same_strand_overlaps': overlap_diagnostics['same_strand_overlaps'],
         'containment_pairs_filtered_by_reciprocal': overlap_diagnostics['containment_pairs_filtered_by_reciprocal'],
+        'containment_candidate_pairs': len(containment_pairs) if overlap_mode == 'hybrid' else '',
         'total_before_genes': len(before_genes),
         'total_after_genes': len(after_genes),
         'syntenic_total': len(results['syntenic']),
+        'changed_before_genes': len(before_genes) - syntenic_attribute_counts['exact'],
+        'changed_before_pct': (
+            (len(before_genes) - syntenic_attribute_counts['exact']) / len(before_genes) * 100
+            if before_genes else 0.0
+        ),
+        'changed_after_genes': len(after_genes) - syntenic_attribute_counts['exact'],
+        'changed_after_pct': (
+            (len(after_genes) - syntenic_attribute_counts['exact']) / len(after_genes) * 100
+            if after_genes else 0.0
+        ),
+        **no_overlap_counts,
+        **representative_counts,
         'split_events': len(results['split']),
         'merge_events': len(results['merge']),
         'complex_events': len(results['complex']),
@@ -1227,8 +1369,8 @@ def main():
                        help='UTR length change threshold for refinement (default: 0.1)')
     parser.add_argument('--gene-scope', choices=('mrna', 'coding', 'all'), default='mrna',
                        help='Gene models to compare: mrna (default), coding with CDS, or all gene features')
-    parser.add_argument('--overlap-mode', choices=('reciprocal', 'containment'), default='reciprocal',
-                       help='Overlap score for candidate matching: reciprocal (strict, default) or containment (legacy)')
+    parser.add_argument('--overlap-mode', choices=('reciprocal', 'containment', 'hybrid'), default='hybrid',
+                       help='Overlap score for candidate matching: hybrid (default), reciprocal, or containment')
     parser.add_argument('--name', default='', help='Species name for output files')
     args = parser.parse_args()
 
@@ -1283,8 +1425,8 @@ def main():
     print(f"Complex (M:N):     {summary['complex_events']} events ({summary['before_in_complex']} before, {summary['after_in_complex']} after)")
     print(f"Unresolved weak-overlap after genes:  {summary['unresolved_overlap_after_genes']}")
     print(f"Unresolved weak-overlap before genes: {summary['unresolved_overlap_before_genes']}")
-    print(f"Novel genes:       {summary['novel_genes']}")
-    print(f"Deleted genes:     {summary['deleted_genes']}")
+    print(f"Strict unmatched after genes:  {summary['novel_genes']}")
+    print(f"Strict unmatched before genes: {summary['deleted_genes']}")
 
     # Verify accounting
     accounted_before = (summary['syntenic_total']

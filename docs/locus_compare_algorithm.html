@@ -352,7 +352,7 @@
       </div>
       <div class="step s4">
         <b>基因座归类</b>
-        <p>对候选对构建二部图连通分量，区分 1:1、split、merge、complex、弱重叠未决、严格 novel/deleted。</p>
+        <p>对候选对构建二部图连通分量，区分 1:1、split、merge、complex、弱重叠未决、严格未匹配 before/after 基因。</p>
       </div>
       <div class="step s5">
         <b>结构评估</b>
@@ -544,7 +544,7 @@ MRNAModel
       <div class="box">
         <h3>结构签名</h3>
         <pre>exon_signature = sorted((start, end))
-cds_signature  = sorted((start, end, phase))
+cds_signature  = sorted((start, end))
 utr_signature  = sorted((start, end, utr_type))
 
 transcript_signature = (
@@ -624,10 +624,10 @@ gene_structure_signature =
       后续再由连通分量决定是 1:1、拆分、合并还是复杂事件。
     </p>
     <div class="note warn">
-      <p class="callout-title">Novel/Deleted 的保守口径</p>
+      <p class="callout-title">Strict unmatched 的保守口径</p>
       <p>
         如果一个基因未进入 reciprocal overlap 候选对，但存在 <code>overlap / min(length_before, length_after) >= 0.5</code>
-        的 containment 风格重叠，当前不会把它计为严格 <code>novel</code> 或 <code>deleted</code>。
+        的 containment 风格重叠，当前不会把它计为严格未匹配 before/after 基因。
         这类基因单独输出为 <code>unresolved_overlap_after</code> 或 <code>unresolved_overlap_before</code>，
         表示坐标上有关联但一一对应关系不足以确认。
       </p>
@@ -644,8 +644,8 @@ gene_structure_signature =
         <tr><td>N before : 1 after</td><td><span class="tag purple">merge</span></td><td>多个原基因被合并成一个校准后基因。</td></tr>
         <tr><td>M before : N after</td><td><span class="tag red">complex</span></td><td>复杂重排，无法简化为单个拆分或合并。</td></tr>
         <tr><td>弱 containment 重叠但未达 reciprocal 阈值</td><td><span class="tag orange">unresolved_overlap</span></td><td>坐标上存在较强包含式重叠，但不能确认一一对应；不计入严格新增或删除。</td></tr>
-        <tr><td>0 before : 1 after，且无弱 containment 重叠</td><td><span class="tag blue">novel</span></td><td>严格校准后新增基因。</td></tr>
-        <tr><td>1 before : 0 after，且无弱 containment 重叠</td><td><span class="tag cyan">deleted</span></td><td>严格校准后删除的原基因。</td></tr>
+        <tr><td>0 before : 1 after，且无弱 containment 重叠</td><td><span class="tag blue">strict_unmatched_after</span></td><td>严格规则下未能匹配到 before 基因的 after 基因；不直接等同于生物学新基因。</td></tr>
+        <tr><td>1 before : 0 after，且无弱 containment 重叠</td><td><span class="tag cyan">strict_unmatched_before</span></td><td>严格规则下未能匹配到 after 基因的 before 基因；不直接等同于生物学删除基因。</td></tr>
       </tbody>
     </table>
     <p>
@@ -667,7 +667,7 @@ gene_structure_signature =
       </thead>
       <tbody>
         <tr><td><code>--boundary-tol</code></td><td class="num">10 bp</td><td>原始 gene 起止坐标差异超过该值时，记为 gene boundary changed。</td></tr>
-        <tr><td><code>--cds-change-pct</code></td><td class="num">0.1</td><td>CDS 长度相对变化达到 10% 时，记为 CDS 显著变化；CDS 坐标或 phase 改变也会触发 CDS change。</td></tr>
+        <tr><td><code>--cds-change-pct</code></td><td class="num">0.1</td><td>CDS 长度相对变化达到 10% 时，记为 CDS 显著变化；CDS 坐标改变也会触发 CDS change。phase 字段不参与结构变化判断。</td></tr>
         <tr><td><code>--utr-change-pct</code></td><td class="num">0.1</td><td>同一侧 UTR 在前后均存在且长度变化达到 10% 时，记为 UTR refined；UTR 坐标变动也会纳入。</td></tr>
       </tbody>
     </table>
@@ -688,8 +688,8 @@ gene_structure_signature =
         <tr><td><code>one_to_one_coding_exon_gain</code></td><td>代表转录本中与 CDS 重叠的 exon 数增加。</td></tr>
         <tr><td><code>one_to_one_coding_exon_loss</code></td><td>代表转录本中与 CDS 重叠的 exon 数减少。</td></tr>
         <tr><td><code>one_to_one_exon_boundary_refined</code></td><td>coding exon 和 UTR-only exon 数均不变，但 exon 坐标发生改变。</td></tr>
-        <tr><td><code>one_to_one_cds_change</code></td><td>CDS 长度达到阈值变化，或 CDS 坐标/phase 签名改变。</td></tr>
-        <tr><td><code>one_to_one_cds_boundary_refined</code></td><td>CDS 被判定变化，但总 CDS 长度不变，主要体现为边界或 phase 调整。</td></tr>
+        <tr><td><code>one_to_one_cds_change</code></td><td>CDS 长度达到阈值变化，或 CDS 坐标签名改变；phase 字段被完全忽略。</td></tr>
+        <tr><td><code>one_to_one_cds_boundary_refined</code></td><td>CDS 被判定变化，但总 CDS 长度不变，主要体现为坐标边界调整。</td></tr>
         <tr><td><code>one_to_one_isoform_change</code></td><td>mRNA 数量改变，或非代表转录本层面的 exon/CDS/UTR 结构发生额外变化。</td></tr>
       </tbody>
     </table>
@@ -779,7 +779,7 @@ Isoform_change</pre>
         <tr>
           <td><code>results/locus_comparison_summary.csv</code></td>
           <td><code>generate_tables.py</code></td>
-          <td>面向总览和图形的互斥 1:1 结构变化汇总，以及 split/merge/complex、弱重叠未决、严格 novel/deleted。</td>
+          <td>面向总览和图形的互斥 1:1 结构变化汇总，以及 split/merge/complex、弱重叠未决、严格未匹配 before/after 基因。</td>
         </tr>
         <tr>
           <td><code>results/locus_comparison_multilabel.csv</code></td>
@@ -791,11 +791,16 @@ Isoform_change</pre>
           <td><code>generate_tables.py</code></td>
           <td>重叠模式、候选对数量、同链重叠数量、被 reciprocal 阈值过滤的 containment 风格候选数。</td>
         </tr>
+        <tr>
+          <td><code>results/curation_core_metrics.csv</code></td>
+          <td><code>generate_tables.py</code></td>
+          <td>面向跨物种核心评估图的精简表：无重叠新增/删除基因座、split/merge 事件，以及严格 1:1 基因中代表性转录本 exon 变化分别占校准前/后总基因数的比例。任一结构变化和 CDS 子项作为审计列保留。</td>
+        </tr>
       </tbody>
     </table>
 
-    <h3>两个目标图</h3>
-    <div class="grid">
+    <h3>主要图和核心评估图</h3>
+    <div class="grid three">
       <div class="box">
         <h3>图 1：数量变化</h3>
         <p>
@@ -817,6 +822,15 @@ Isoform_change</pre>
           主热图展示各非互斥结构属性占 1:1 基因的百分比；底部柱图展示 1:1 基因占校准前基因的比例。
         </p>
       </div>
+      <div class="box">
+        <h3>核心评估图：跨物种 A/B/C</h3>
+        <p>
+          输出：<code>figures/curation_core_metrics_publication.png</code>
+        </p>
+        <p>
+          Panel A 为无重叠新增/删除基因座；Panel B 为基因座层面的 split/merge 事件；Panel C 只在严格 1:1 基因对中判断代表性转录本 exon 是否改变，并把同一批改变基因分别除以校准前总基因数和校准后总基因数，得到 before-reference 与 after-reference 两个比例。
+        </p>
+      </div>
     </div>
 
     <h3>当前汇总结果快照</h3>
@@ -829,17 +843,17 @@ Isoform_change</pre>
         <tr>
           <th>物种</th><th class="num">Before</th><th class="num">After</th><th class="num">Syntenic</th>
           <th class="num">Exact</th><th class="num">Unresolved after</th><th class="num">Unresolved before</th>
-          <th class="num">Novel</th><th class="num">Deleted</th>
+          <th class="num">Strict unmatched after</th><th class="num">Strict unmatched before</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>A. annua</td><td class="num">54,347</td><td class="num">39,322</td><td class="num">33,523</td><td class="num">18,953</td><td class="num">2,688</td><td class="num">5,364</td><td class="num">3,103</td><td class="num">15,456</td></tr>
-        <tr><td>Cucumber</td><td class="num">24,317</td><td class="num">24,145</td><td class="num">19,965</td><td class="num">15,508</td><td class="num">2,092</td><td class="num">2,300</td><td class="num">2,079</td><td class="num">2,046</td></tr>
-        <tr><td>F. ananassa</td><td class="num">108,087</td><td class="num">108,447</td><td class="num">93,658</td><td class="num">50,847</td><td class="num">10,825</td><td class="num">7,322</td><td class="num">2,468</td><td class="num">6,360</td></tr>
-        <tr><td>F. vesca</td><td class="num">28,588</td><td class="num">34,006</td><td class="num">21,425</td><td class="num">2,918</td><td class="num">5,312</td><td class="num">3,691</td><td class="num">7,201</td><td class="num">3,438</td></tr>
-        <tr><td>Peach</td><td class="num">30,181</td><td class="num">31,751</td><td class="num">28,986</td><td class="num">26,562</td><td class="num">1,294</td><td class="num">784</td><td class="num">792</td><td class="num">89</td></tr>
-        <tr><td>Pineapple</td><td class="num">26,162</td><td class="num">26,657</td><td class="num">24,639</td><td class="num">15,053</td><td class="num">1,051</td><td class="num">1,103</td><td class="num">930</td><td class="num">398</td></tr>
-        <tr><td>Rice</td><td class="num">39,406</td><td class="num">40,326</td><td class="num">32,163</td><td class="num">17,711</td><td class="num">3,673</td><td class="num">3,135</td><td class="num">4,382</td><td class="num">3,953</td></tr>
+        <tr><td>A. annua</td><td class="num">54,347</td><td class="num">39,322</td><td class="num">32,118</td><td class="num">18,788</td><td class="num">1,445</td><td class="num">1,445</td><td class="num">3,103</td><td class="num">15,456</td></tr>
+        <tr><td>Cucumber</td><td class="num">24,317</td><td class="num">24,145</td><td class="num">19,179</td><td class="num">15,357</td><td class="num">1,064</td><td class="num">1,064</td><td class="num">2,079</td><td class="num">2,046</td></tr>
+        <tr><td>F. ananassa</td><td class="num">108,087</td><td class="num">108,447</td><td class="num">90,847</td><td class="num">50,415</td><td class="num">4,563</td><td class="num">4,563</td><td class="num">2,468</td><td class="num">6,360</td></tr>
+        <tr><td>F. vesca</td><td class="num">28,588</td><td class="num">34,006</td><td class="num">20,538</td><td class="num">2,821</td><td class="num">2,227</td><td class="num">2,227</td><td class="num">7,201</td><td class="num">3,438</td></tr>
+        <tr><td>Peach</td><td class="num">30,181</td><td class="num">31,751</td><td class="num">28,732</td><td class="num">26,558</td><td class="num">510</td><td class="num">510</td><td class="num">792</td><td class="num">89</td></tr>
+        <tr><td>Pineapple</td><td class="num">26,162</td><td class="num">26,657</td><td class="num">23,797</td><td class="num">14,778</td><td class="num">548</td><td class="num">548</td><td class="num">930</td><td class="num">398</td></tr>
+        <tr><td>Rice</td><td class="num">39,406</td><td class="num">40,326</td><td class="num">30,753</td><td class="num">17,341</td><td class="num">1,617</td><td class="num">1,617</td><td class="num">4,382</td><td class="num">3,953</td></tr>
       </tbody>
     </table>
   </section>
@@ -869,7 +883,7 @@ Isoform_change</pre>
         </tr>
         <tr>
           <td>before/after 基因核算</td>
-          <td>syntenic、split、merge、complex、弱重叠未决、deleted/novel 必须完整覆盖校准前后基因集合。</td>
+          <td>syntenic、split、merge、complex、弱重叠未决、strict unmatched before/after 必须完整覆盖校准前后基因集合。</td>
         </tr>
         <tr>
           <td>多标签直接映射</td>

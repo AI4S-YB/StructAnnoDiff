@@ -36,9 +36,9 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--overlap-mode",
-        choices=("reciprocal", "containment"),
-        default="reciprocal",
-        help="Overlap score for candidate matching. Defaults to strict reciprocal; containment preserves the legacy behavior.",
+        choices=("reciprocal", "containment", "hybrid"),
+        default="hybrid",
+        help="Overlap score for candidate matching. Defaults to hybrid: reciprocal for strict 1:1 and containment for split/merge events.",
     )
     parser.add_argument(
         "--reciprocal-overlap",

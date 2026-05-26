@@ -16,8 +16,8 @@ species before and after manual curation:
 - **A. Quantity changes**: global annotation counts, including genes, transcripts,
   exons, and CDS features.
 - **B. Locus fate**: before/after gene accounting after reciprocal-overlap locus
-  matching, including confirmed 1:1 pairs, split/merged loci, novel genes, and
-  deleted genes.
+  matching, including confirmed 1:1 pairs, split/merged loci, unresolved weak
+  overlaps, and strict unmatched before/after genes.
 - **C. 1:1 structural attributes**: structural changes among genes with confirmed
   before/after one-to-one correspondence.
 - **D. Paired change magnitude**: per-pair delta distributions for gene span,
@@ -175,6 +175,7 @@ Important result tables:
 - `comparison_matrix_all_gene_types.csv`: broad AGAT comparison across all feature paths.
 - `locus_comparison_summary.csv`: mutually exclusive locus subtype summary; one syntenic gene contributes to one broad category.
 - `locus_comparison_multilabel.csv`: non-exclusive locus subtype attributes; one syntenic gene can count in multiple columns.
+- `curation_core_metrics.csv`: compact per-species table for the publication figure. The main metrics are no-overlap new/deleted loci, split/merge events, and the fraction of before/after genes whose strict 1:1 representative transcript has an exon change; representative-transcript union and CDS subcounts are retained as audit columns.
 - `locus_diagnostics.csv`: overlap-mode diagnostics, including candidate pairs and containment-style pairs filtered by strict reciprocal overlap.
 - `validation_report.csv` / `.md`: consistency checks across summary, compare, and locus outputs.
 
@@ -187,7 +188,13 @@ Primary figures:
 
 - `figure1_quantity_changes.png`: before/after quantity changes, including gene counts.
 - `figure2_syntenic_structure_changes.png`: non-exclusive structural attributes for confirmed one-to-one gene pairs.
+- `curation_core_metrics_publication.png`: three-panel cross-species summary of locus gain/loss, split/merge events, and representative-transcript exon changes as fractions of before/after annotations.
 - `{Species}_ABCD_single_species.png`: per-species four-panel summary covering global quantities, locus fate, 1:1 structural attributes, and paired change magnitude.
+
+Documentation:
+
+- `docs/locus_compare_algorithm.html`: full locus-comparison algorithm notes.
+- `docs/curation_core_metrics_figure_algorithm.html`: focused explanation of the current A/B/C core figure.
 
 ## Java implementation
 

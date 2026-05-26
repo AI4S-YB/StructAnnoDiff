@@ -10,10 +10,10 @@ summarize = "python summarize.py"
 locus = "python run_locus_comparisons.py"
 tables = "python generate_tables.py"
 figures = "python visualize.py && python visualize_locus.py"
-target-figures = "python plot_target_figures.py"
+target-figures = "python plot_target_figures.py && python plot_curation_core_figure.py"
 validate = "python validate_results.py"
-report = "python summarize.py && python generate_tables.py && python visualize.py && python visualize_locus.py && python plot_target_figures.py && python validate_results.py"
-full = "bash run_analyses.sh && python summarize.py && python run_locus_comparisons.py && python generate_tables.py && python visualize.py && python visualize_locus.py && python plot_target_figures.py && python validate_results.py"
+report = "python summarize.py && python generate_tables.py && python visualize.py && python visualize_locus.py && python plot_target_figures.py && python plot_curation_core_figure.py && python validate_results.py"
+full = "bash run_analyses.sh && python summarize.py && python run_locus_comparisons.py && python generate_tables.py && python visualize.py && python visualize_locus.py && python plot_target_figures.py && python plot_curation_core_figure.py && python validate_results.py"
 test = "python -m unittest discover -s tests"
 
 [dependencies]

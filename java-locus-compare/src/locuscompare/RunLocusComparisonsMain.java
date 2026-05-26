@@ -21,7 +21,7 @@ public final class RunLocusComparisonsMain {
         double cdsPct = Double.parseDouble(opts.getOrDefault("--cds-change-pct", "0.1"));
         double utrPct = Double.parseDouble(opts.getOrDefault("--utr-change-pct", "0.1"));
         String geneScope = opts.getOrDefault("--gene-scope", "mrna");
-        String overlapMode = opts.getOrDefault("--overlap-mode", "reciprocal");
+        String overlapMode = opts.getOrDefault("--overlap-mode", "hybrid");
 
         List<Core.Species> species = Core.readSpecies(analysisDir.resolve("species.json"));
         List<String> requested = parseSpeciesArg(opts.get("--species"));

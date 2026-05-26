@@ -781,6 +781,57 @@ public final class Core {
         return pairs;
     }
 
+    public static LinkedHashMap<String, Integer> countNoOverlapLoci(LinkedHashMap<String, GeneModel> beforeGenes,
+                                                                    LinkedHashMap<String, GeneModel> afterGenes) {
+        Map<String, List<GeneModel>> beforeBySeq = groupBySeqid(beforeGenes);
+        Map<String, List<GeneModel>> afterBySeq = groupBySeqid(afterGenes);
+        LinkedHashMap<String, Integer> counts = new LinkedHashMap<>();
+        counts.put("no_overlap_after_loci", countWithoutOverlap(afterBySeq, beforeBySeq));
+        counts.put("no_overlap_before_loci", countWithoutOverlap(beforeBySeq, afterBySeq));
+        return counts;
+    }
+
+    private static Map<String, List<GeneModel>> groupBySeqid(LinkedHashMap<String, GeneModel> genes) {
+        Map<String, List<GeneModel>> groups = new LinkedHashMap<>();
+        for (GeneModel gene : genes.values()) {
+            groups.computeIfAbsent(gene.seqid, k -> new ArrayList<>()).add(gene);
+        }
+        for (List<GeneModel> group : groups.values()) {
+            group.sort(Comparator.comparingInt((GeneModel g) -> g.start)
+                    .thenComparingInt(g -> g.end)
+                    .thenComparing(g -> g.geneId));
+        }
+        return groups;
+    }
+
+    private static int countWithoutOverlap(Map<String, List<GeneModel>> queryBySeq,
+                                           Map<String, List<GeneModel>> targetBySeq) {
+        int count = 0;
+        for (Map.Entry<String, List<GeneModel>> entry : queryBySeq.entrySet()) {
+            List<GeneModel> targetGenes = targetBySeq.getOrDefault(entry.getKey(), Collections.emptyList());
+            List<GeneModel> active = new ArrayList<>();
+            int i = 0;
+            for (GeneModel query : entry.getValue()) {
+                active.removeIf(target -> target.end < query.start);
+                while (i < targetGenes.size() && targetGenes.get(i).start <= query.end) {
+                    active.add(targetGenes.get(i));
+                    i++;
+                }
+                boolean hasOverlap = false;
+                for (GeneModel target : active) {
+                    if (overlapLen(query.start, query.end, target.start, target.end) > 0) {
+                        hasOverlap = true;
+                        break;
+                    }
+                }
+                if (!hasOverlap) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     public static ResolvedMatches resolveMatches(List<Pair> pairs,
                                                  LinkedHashMap<String, GeneModel> beforeGenes,
                                                  LinkedHashMap<String, GeneModel> afterGenes) {
@@ -909,7 +960,8 @@ public final class Core {
     public static String cdsSignature(MRNAModel mrna) {
         List<String> parts = new ArrayList<>();
         for (CDSFeature c : mrna.cds) {
-            parts.add(c.start + ":" + c.end + ":" + c.phase);
+            // Phase-only differences are ignored for structural comparison.
+            parts.add(c.start + ":" + c.end);
         }
         Collections.sort(parts);
         return String.join("|", parts);
@@ -987,6 +1039,45 @@ public final class Core {
             }
         }
         return new MRNAModel[]{before, best};
+    }
+
+    public static LinkedHashMap<String, Integer> summarizeRepresentativeTranscriptChanges(List<GenePair> syntenicPairs) {
+        LinkedHashMap<String, Integer> summary = new LinkedHashMap<>();
+        summary.put("rep_transcript_pairs", 0);
+        summary.put("rep_structural_changed", 0);
+        summary.put("rep_exon_count_changed", 0);
+        summary.put("rep_exon_boundary_changed_same_count", 0);
+        summary.put("rep_cds_count_changed", 0);
+        summary.put("rep_cds_boundary_changed_same_count", 0);
+        for (GenePair pair : syntenicPairs) {
+            MRNAModel[] mrnas = selectRepresentativeMrnaPair(pair.before, pair.after);
+            MRNAModel before = mrnas[0];
+            MRNAModel after = mrnas[1];
+            if (before == null || after == null) {
+                continue;
+            }
+            summary.merge("rep_transcript_pairs", 1, Integer::sum);
+            boolean exonChanged = false;
+            boolean cdsChanged = false;
+            if (before.exonCount() != after.exonCount()) {
+                summary.merge("rep_exon_count_changed", 1, Integer::sum);
+                exonChanged = true;
+            } else if (!exonSignature(before).equals(exonSignature(after))) {
+                summary.merge("rep_exon_boundary_changed_same_count", 1, Integer::sum);
+                exonChanged = true;
+            }
+            if (before.cds.size() != after.cds.size()) {
+                summary.merge("rep_cds_count_changed", 1, Integer::sum);
+                cdsChanged = true;
+            } else if (!cdsSignature(before).equals(cdsSignature(after))) {
+                summary.merge("rep_cds_boundary_changed_same_count", 1, Integer::sum);
+                cdsChanged = true;
+            }
+            if (exonChanged || cdsChanged) {
+                summary.merge("rep_structural_changed", 1, Integer::sum);
+            }
+        }
+        return summary;
     }
 
     private static TranscriptScore transcriptMatchScore(MRNAModel before, MRNAModel after) {
@@ -1293,6 +1384,11 @@ public final class Core {
                                                       double minReciprocal, int boundaryTol,
                                                       double cdsChangePct, double utrChangePct,
                                                       String geneScope, String overlapMode) throws IOException {
+        if (!"reciprocal".equals(overlapMode)
+                && !"containment".equals(overlapMode)
+                && !"hybrid".equals(overlapMode)) {
+            throw new IllegalArgumentException("Unsupported overlap_mode: " + overlapMode);
+        }
         System.out.println("Parsing before: " + beforeGff);
         LinkedHashMap<String, GeneModel> beforeGenes = parseGff3ToModels(beforeGff, geneScope);
         System.out.println("  Found " + beforeGenes.size() + " gene models");
@@ -1312,7 +1408,8 @@ public final class Core {
         }
         System.out.println("  Common seqids: " + commonSeqs.size());
 
-        List<Pair> allPairs = new ArrayList<>();
+        List<Pair> reciprocalPairs = new ArrayList<>();
+        List<Pair> containmentPairs = new ArrayList<>();
         Map<String, Integer> diagnostics = new HashMap<>();
         Map<String, Set<String>> weakRejected = new HashMap<>();
         weakRejected.put("before", new HashSet<>());
@@ -1327,30 +1424,79 @@ public final class Core {
             if (entry.getValue().isEmpty() || afterList.isEmpty()) {
                 continue;
             }
-            allPairs.addAll(findOverlappingPairs(
-                    entry.getValue(), afterList, minReciprocal, overlapMode, diagnostics, weakRejected));
+            List<Pair> pairs = findOverlappingPairs(
+                    entry.getValue(), afterList, minReciprocal,
+                    "hybrid".equals(overlapMode) ? "reciprocal" : overlapMode,
+                    diagnostics, weakRejected);
+            if ("hybrid".equals(overlapMode)) {
+                reciprocalPairs.addAll(pairs);
+                containmentPairs.addAll(findOverlappingPairs(
+                        entry.getValue(), afterList, minReciprocal, "containment", null, null));
+            } else {
+                reciprocalPairs.addAll(pairs);
+            }
         }
-        System.out.println("  Found " + allPairs.size() + " candidate matching pairs");
+        List<Pair> graphPairs;
+        Set<String> reciprocalPairKeys = new HashSet<>();
+        if ("hybrid".equals(overlapMode)) {
+            graphPairs = containmentPairs;
+            for (Pair pair : reciprocalPairs) {
+                reciprocalPairKeys.add(pair.before.geneId + "\u0000" + pair.after.geneId);
+            }
+            System.out.println("  Found " + reciprocalPairs.size() + " strict reciprocal candidate pairs");
+            System.out.println("  Found " + containmentPairs.size() + " containment candidate pairs");
+        } else {
+            graphPairs = reciprocalPairs;
+            System.out.println("  Found " + graphPairs.size() + " candidate matching pairs");
+        }
 
-        ResolvedMatches resolved = resolveMatches(allPairs, beforeGenes, afterGenes);
+        ResolvedMatches graphResolved = resolveMatches(graphPairs, beforeGenes, afterGenes);
+        ResolvedMatches resolved = graphResolved;
+        List<GenePair> weakOneToOne = new ArrayList<>();
+        if ("hybrid".equals(overlapMode)) {
+            resolved = new ResolvedMatches();
+            for (GenePair pair : graphResolved.syntenic) {
+                String key = pair.before.geneId + "\u0000" + pair.after.geneId;
+                if (reciprocalPairKeys.contains(key)) {
+                    resolved.syntenic.add(pair);
+                } else {
+                    weakOneToOne.add(pair);
+                }
+            }
+            resolved.split.addAll(graphResolved.split);
+            resolved.merge.addAll(graphResolved.merge);
+            resolved.complex.addAll(graphResolved.complex);
+            resolved.novel.addAll(graphResolved.novel);
+            resolved.deleted.addAll(graphResolved.deleted);
+        }
+        LinkedHashMap<String, Integer> noOverlapCounts = countNoOverlapLoci(beforeGenes, afterGenes);
         List<GeneModel> strictNovel = new ArrayList<>();
         List<GeneModel> strictDeleted = new ArrayList<>();
         List<GeneModel> unresolvedNovel = new ArrayList<>();
         List<GeneModel> unresolvedDeleted = new ArrayList<>();
-        Set<String> weakBefore = weakRejected.getOrDefault("before", Collections.emptySet());
-        Set<String> weakAfter = weakRejected.getOrDefault("after", Collections.emptySet());
-        for (GeneModel after : resolved.novel) {
-            if (weakAfter.contains(after.geneId)) {
-                unresolvedNovel.add(after);
-            } else {
-                strictNovel.add(after);
+        if ("hybrid".equals(overlapMode)) {
+            strictNovel.addAll(resolved.novel);
+            strictDeleted.addAll(resolved.deleted);
+            for (GenePair pair : weakOneToOne) {
+                unresolvedDeleted.add(pair.before);
+                unresolvedNovel.add(pair.after);
             }
-        }
-        for (GeneModel before : resolved.deleted) {
-            if (weakBefore.contains(before.geneId)) {
-                unresolvedDeleted.add(before);
-            } else {
-                strictDeleted.add(before);
+        } else {
+            Set<String> weakBefore = weakRejected.getOrDefault("before", Collections.emptySet());
+            Set<String> weakAfter = weakRejected.getOrDefault("after", Collections.emptySet());
+            for (GeneModel after : resolved.novel) {
+                if (weakAfter.contains(after.geneId)) {
+                    unresolvedNovel.add(after);
+                } else {
+                    strictNovel.add(after);
+                }
+            }
+            for (GeneModel before : resolved.deleted) {
+                if (weakBefore.contains(before.geneId)) {
+                    unresolvedDeleted.add(before);
+                } else {
+                    strictDeleted.add(before);
+                }
             }
         }
         List<LinkedHashMap<String, Object>> changeLog = new ArrayList<>();
@@ -1359,6 +1505,8 @@ public final class Core {
         for (String key : SYNTENIC_ATTRIBUTE_KEYS) {
             attributeCounts.put(key, 0);
         }
+        LinkedHashMap<String, Integer> representativeCounts =
+                summarizeRepresentativeTranscriptChanges(resolved.syntenic);
 
         for (GenePair pair : resolved.syntenic) {
             String subtype = classifySyntenicChange(pair.before, pair.after, boundaryTol, cdsChangePct, utrChangePct);
@@ -1410,13 +1558,31 @@ public final class Core {
         summary.put("boundary_tolerance_bp", boundaryTol);
         summary.put("cds_change_threshold", cdsChangePct);
         summary.put("utr_change_threshold", utrChangePct);
-        summary.put("candidate_pairs", allPairs.size());
+        summary.put("candidate_pairs", "hybrid".equals(overlapMode) ? reciprocalPairs.size() : graphPairs.size());
         summary.put("same_strand_overlaps", diagnostics.getOrDefault("same_strand_overlaps", 0));
         summary.put("containment_pairs_filtered_by_reciprocal",
                 diagnostics.getOrDefault("containment_pairs_filtered_by_reciprocal", 0));
+        summary.put("containment_candidate_pairs", "hybrid".equals(overlapMode) ? containmentPairs.size() : "");
         summary.put("total_before_genes", beforeGenes.size());
         summary.put("total_after_genes", afterGenes.size());
         summary.put("syntenic_total", resolved.syntenic.size());
+        int exact = attributeCounts.getOrDefault("exact", 0);
+        summary.put("changed_before_genes", beforeGenes.size() - exact);
+        summary.put("changed_before_pct",
+                beforeGenes.isEmpty() ? 0.0 : (beforeGenes.size() - exact) / (double) beforeGenes.size() * 100.0);
+        summary.put("changed_after_genes", afterGenes.size() - exact);
+        summary.put("changed_after_pct",
+                afterGenes.isEmpty() ? 0.0 : (afterGenes.size() - exact) / (double) afterGenes.size() * 100.0);
+        for (Map.Entry<String, Integer> entry : noOverlapCounts.entrySet()) {
+            summary.put(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, Integer> entry : representativeCounts.entrySet()) {
+            summary.put(entry.getKey(), entry.getValue());
+        }
+        int repPairs = representativeCounts.getOrDefault("rep_transcript_pairs", 0);
+        int repStructuralChanged = representativeCounts.getOrDefault("rep_structural_changed", 0);
+        summary.put("rep_structural_changed_pct",
+                repPairs == 0 ? 0.0 : repStructuralChanged / (double) repPairs * 100.0);
         summary.put("split_events", resolved.split.size());
         summary.put("merge_events", resolved.merge.size());
         summary.put("complex_events", resolved.complex.size());

@@ -1,8 +1,8 @@
-Species,Before,After,Syntenic,Exact,Boundary_refined_only,UTR_added,UTR_lost,UTR_exon_gained,UTR_exon_removed,UTR_refined,Coding_exon_gain,Coding_exon_loss,Exon_boundary_refined,CDS_change_only,CDS_boundary_refined,Isoform_change,Split_events,Merge_events,Complex_events,Unresolved_overlap_after_genes,Unresolved_overlap_before_genes,Novel_genes,Deleted_genes
-A. annua,54347,39322,33523,18953,4,0,0,905,345,0,1837,375,6668,269,31,4136,4,0,0,2688,5364,3103,15456
-Cucumber,24317,24145,19965,15508,912,0,0,744,643,0,320,1076,742,0,20,0,4,1,0,2092,2300,2079,2046
-F. ananassa,108087,108447,93658,50847,0,0,0,1051,1652,0,3042,6553,21097,0,604,8812,747,0,0,10825,7322,2468,6360
-F. vesca,28588,34006,21425,2918,0,0,0,191,446,0,889,1317,6809,0,58,8797,34,0,0,5312,3691,7201,3438
-Peach,30181,31751,28986,26562,0,0,0,35,102,0,407,961,233,0,119,567,322,0,0,1294,784,792,89
-Pineapple,26162,26657,24639,15053,58,0,0,3394,0,0,180,806,4826,2,320,0,16,1,2,1051,1103,930,398
-Rice,39406,40326,32163,17711,3,0,1,286,228,2,375,1650,4868,81,31,6927,13,60,11,3673,3135,4382,3953
+Species,Before,After,Syntenic,Exact,Boundary_refined_only,UTR_added,UTR_lost,UTR_exon_gained,UTR_exon_removed,UTR_refined,Coding_exon_gain,Coding_exon_loss,Exon_boundary_refined,CDS_change_only,CDS_boundary_refined,Isoform_change,Split_events,Merge_events,Complex_events,Unresolved_overlap_after_genes,Unresolved_overlap_before_genes,Strict_unmatched_after_genes,Strict_unmatched_before_genes
+A. annua,54347,39322,32118,18788,4,0,0,760,323,0,1163,333,6504,267,27,3949,57,2018,244,1445,1445,3103,15456
+Cucumber,24317,24145,19179,15357,904,0,0,463,596,0,263,865,730,0,1,0,468,675,57,1064,1064,2079,2046
+F. ananassa,108087,108447,90847,50415,0,0,0,995,1541,0,2720,5779,21105,0,108,8184,4119,415,607,4563,4563,2468,6360
+F. vesca,28588,34006,20538,2821,0,0,0,184,404,0,789,1092,6761,0,11,8476,1580,331,55,2227,2227,7201,3438
+Peach,30181,31751,28732,26558,0,0,0,35,42,0,380,925,311,0,1,480,774,32,6,510,510,792,89
+Pineapple,26162,26657,23797,14778,58,0,0,3179,0,0,145,655,4979,2,1,0,253,296,261,548,548,930,398
+Rice,39406,40326,30753,17341,3,0,1,245,219,1,356,1486,4725,79,4,6293,812,531,523,1617,1617,4382,3953

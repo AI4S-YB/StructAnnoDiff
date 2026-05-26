@@ -15,7 +15,20 @@ public final class GenerateTablesMain {
             "Coding_exon_gain", "Coding_exon_loss", "Exon_boundary_refined", "CDS_change_only",
             "CDS_boundary_refined", "Isoform_change", "Split_events", "Merge_events",
             "Complex_events", "Unresolved_overlap_after_genes", "Unresolved_overlap_before_genes",
-            "Novel_genes", "Deleted_genes"
+            "Strict_unmatched_after_genes", "Strict_unmatched_before_genes"
+    );
+
+    private static final List<String> CURATION_CORE_COLUMNS = Arrays.asList(
+            "species_id", "Species",
+            "total_before_genes", "total_after_genes",
+            "changed_before_genes", "changed_before_pct",
+            "changed_after_genes", "changed_after_pct",
+            "new_loci_no_overlap", "deleted_loci_no_overlap",
+            "split_events", "merge_events",
+            "rep_transcript_pairs", "rep_structural_changed", "rep_structural_changed_pct",
+            "rep_exon_changed", "rep_exon_changed_before_pct", "rep_exon_changed_after_pct",
+            "rep_exon_count_changed", "rep_exon_boundary_changed_same_count",
+            "rep_cds_count_changed", "rep_cds_boundary_changed_same_count"
     );
 
     private static final LinkedHashMap<String, String> DIRECT_COUNTS = new LinkedHashMap<>();
@@ -56,9 +69,13 @@ public final class GenerateTablesMain {
         List<LinkedHashMap<String, Object>> diagnosticsRows = buildDiagnosticsTable(species, locusDir);
         Core.writeCsv(javaResults.resolve("locus_diagnostics.csv"), diagnosticsColumns(), diagnosticsRows);
 
+        List<LinkedHashMap<String, Object>> curationCoreRows = buildCurationCoreMetricsTable(species, locusDir);
+        Core.writeCsv(javaResults.resolve("curation_core_metrics.csv"), CURATION_CORE_COLUMNS, curationCoreRows);
+
         System.out.println("Saved: " + javaResults.resolve("locus_comparison_summary.csv"));
         System.out.println("Saved: " + javaResults.resolve("locus_comparison_multilabel.csv"));
         System.out.println("Saved: " + javaResults.resolve("locus_diagnostics.csv"));
+        System.out.println("Saved: " + javaResults.resolve("curation_core_metrics.csv"));
     }
 
     static List<LinkedHashMap<String, Object>> buildMasterTable(List<Core.Species> species, Path locusDir) throws Exception {
@@ -99,8 +116,8 @@ public final class GenerateTablesMain {
             out.put("Complex_events", Core.intValue(row, "complex_events"));
             out.put("Unresolved_overlap_after_genes", Core.intValue(row, "unresolved_overlap_after_genes"));
             out.put("Unresolved_overlap_before_genes", Core.intValue(row, "unresolved_overlap_before_genes"));
-            out.put("Novel_genes", Core.intValue(row, "novel_genes"));
-            out.put("Deleted_genes", Core.intValue(row, "deleted_genes"));
+            out.put("Strict_unmatched_after_genes", Core.intValue(row, "novel_genes"));
+            out.put("Strict_unmatched_before_genes", Core.intValue(row, "deleted_genes"));
             rows.add(out);
         }
         return rows;
@@ -236,6 +253,55 @@ public final class GenerateTablesMain {
             out.put("Same_strand_overlaps", row.getOrDefault("same_strand_overlaps", ""));
             out.put("Containment_pairs_filtered_by_reciprocal",
                     row.getOrDefault("containment_pairs_filtered_by_reciprocal", ""));
+            rows.add(out);
+        }
+        return rows;
+    }
+
+    static List<LinkedHashMap<String, Object>> buildCurationCoreMetricsTable(List<Core.Species> species,
+                                                                             Path locusDir) throws Exception {
+        List<LinkedHashMap<String, Object>> rows = new ArrayList<>();
+        for (Core.Species sp : species) {
+            Path path = locusDir.resolve(sp.id + "_change_summary.csv");
+            if (!Files.exists(path)) {
+                continue;
+            }
+            Map<String, String> row = Core.readCsv(path).get(0);
+            LinkedHashMap<String, Object> out = new LinkedHashMap<>();
+            out.put("species_id", sp.id);
+            out.put("Species", sp.label);
+            int totalBefore = Core.intValue(row, "total_before_genes");
+            int totalAfter = Core.intValue(row, "total_after_genes");
+            int repExonChanged = Core.intValue(row, "rep_exon_count_changed")
+                    + Core.intValue(row, "rep_exon_boundary_changed_same_count");
+            out.put("total_before_genes", totalBefore);
+            out.put("total_after_genes", totalAfter);
+            out.put("changed_before_genes", Core.intValue(row, "changed_before_genes"));
+            out.put("changed_before_pct", row.getOrDefault("changed_before_pct", "0"));
+            out.put("changed_after_genes", Core.intValue(row, "changed_after_genes"));
+            out.put("changed_after_pct", row.getOrDefault("changed_after_pct", "0"));
+            out.put("new_loci_no_overlap", Core.intValue(row, "no_overlap_after_loci"));
+            out.put("deleted_loci_no_overlap", Core.intValue(row, "no_overlap_before_loci"));
+            out.put("split_events", Core.intValue(row, "split_events"));
+            out.put("merge_events", Core.intValue(row, "merge_events"));
+            out.put("rep_transcript_pairs", Core.intValue(row, "rep_transcript_pairs"));
+            out.put("rep_structural_changed", Core.intValue(row, "rep_structural_changed"));
+            out.put("rep_structural_changed_pct", row.getOrDefault("rep_structural_changed_pct", "0"));
+            out.put("rep_exon_changed", repExonChanged);
+            out.put("rep_exon_changed_before_pct",
+                    totalBefore == 0 ? 0.0 : repExonChanged / (double) totalBefore * 100.0);
+            out.put("rep_exon_changed_after_pct",
+                    totalAfter == 0 ? 0.0 : repExonChanged / (double) totalAfter * 100.0);
+            out.put("rep_exon_count_changed", Core.intValue(row, "rep_exon_count_changed"));
+            out.put(
+                    "rep_exon_boundary_changed_same_count",
+                    Core.intValue(row, "rep_exon_boundary_changed_same_count")
+            );
+            out.put("rep_cds_count_changed", Core.intValue(row, "rep_cds_count_changed"));
+            out.put(
+                    "rep_cds_boundary_changed_same_count",
+                    Core.intValue(row, "rep_cds_boundary_changed_same_count")
+            );
             rows.add(out);
         }
         return rows;

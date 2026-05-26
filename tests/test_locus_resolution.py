@@ -13,10 +13,12 @@ from locus_compare import (
     compare_annotations,
     compute_syntenic_attributes,
     containment_overlap,
+    count_no_overlap_loci,
     find_overlapping_pairs,
     parse_gff3_to_models,
     reciprocal_overlap,
     resolve_matches,
+    summarize_representative_transcript_changes,
 )
 
 
@@ -91,6 +93,35 @@ class LocusResolutionTests(unittest.TestCase):
         self.assertEqual(strict_pairs, [])
         self.assertEqual(len(legacy_pairs), 1)
 
+    def test_hybrid_mode_counts_contained_fragments_as_split_events(self):
+        before = {"large": self._gene("large", 1, 1000)}
+        after = {
+            "left": self._gene("left", 1, 400),
+            "right": self._gene("right", 601, 1000),
+        }
+        reciprocal_pairs = []
+        containment_pairs = []
+        for ag in after.values():
+            reciprocal_pairs.extend(find_overlapping_pairs(
+                list(before.values()),
+                [ag],
+                min_reciprocal=0.5,
+                overlap_mode="reciprocal",
+            ))
+            containment_pairs.extend(find_overlapping_pairs(
+                list(before.values()),
+                [ag],
+                min_reciprocal=0.5,
+                overlap_mode="containment",
+            ))
+
+        strict_result = resolve_matches(reciprocal_pairs, before, after)
+        hybrid_event_result = resolve_matches(containment_pairs, before, after)
+
+        self.assertEqual(len(strict_result["split"]), 0)
+        self.assertEqual(len(hybrid_event_result["split"]), 1)
+        self.assertEqual(len(hybrid_event_result["split"][0][1]), 2)
+
     def test_overlap_diagnostics_count_only_real_overlaps(self):
         before = [
             self._gene("non_overlap", 1, 10),
@@ -148,6 +179,27 @@ class LocusResolutionTests(unittest.TestCase):
 
         self.assertNotEqual(subtype, "exact")
         self.assertIn("cds_boundary_refined", subtype)
+
+    def test_phase_only_cds_difference_is_ignored(self):
+        before = self._gene_with_mrnas(
+            "before",
+            [self._mrna("b1", [(1, 100)], [(10, 90, "0")])],
+        )
+        after = self._gene_with_mrnas(
+            "after",
+            [self._mrna("a1", [(1, 100)], [(10, 90, "2")])],
+        )
+
+        subtype = classify_syntenic_change(before, after)
+        attrs = compute_syntenic_attributes(before, after)
+        summary = summarize_representative_transcript_changes([(before, after)])
+
+        self.assertEqual(subtype, "exact")
+        self.assertTrue(attrs["exact"])
+        self.assertFalse(attrs["cds_change"])
+        self.assertEqual(summary["rep_structural_changed"], 0)
+        self.assertEqual(summary["rep_structural_changed_pct"], 0.0)
+        self.assertEqual(summary["rep_cds_boundary_changed_same_count"], 0)
 
     def test_boundary_refinement_uses_raw_gene_boundaries(self):
         before = self._gene_with_mrnas(
@@ -408,6 +460,67 @@ class LocusResolutionTests(unittest.TestCase):
             {row["match_type"] for row in change_log},
             {"unresolved_overlap_after", "unresolved_overlap_before"},
         )
+
+    def test_no_overlap_loci_ignore_strand(self):
+        before_overlap = self._gene("before_overlap", 100, 200)
+        before_deleted = self._gene("before_deleted", 300, 400)
+        after_overlap = self._gene("after_overlap", 150, 250)
+        after_overlap.strand = "-"
+        after_new = self._gene("after_new", 500, 600)
+
+        counts = count_no_overlap_loci(
+            {
+                before_overlap.gene_id: before_overlap,
+                before_deleted.gene_id: before_deleted,
+            },
+            {
+                after_overlap.gene_id: after_overlap,
+                after_new.gene_id: after_new,
+            },
+        )
+
+        self.assertEqual(counts["no_overlap_after_loci"], 1)
+        self.assertEqual(counts["no_overlap_before_loci"], 1)
+
+    def test_representative_transcript_exon_and_cds_change_summary(self):
+        pair_exon_count_before = self._gene_with_mrnas(
+            "b_exon_count",
+            [self._mrna("bt1", [(1, 50), (101, 150)], [(10, 40, "0"), (110, 140, "0")])],
+        )
+        pair_exon_count_after = self._gene_with_mrnas(
+            "a_exon_count",
+            [self._mrna("at1", [(1, 50), (101, 150), (201, 250)], [(10, 40, "0"), (110, 140, "0")])],
+        )
+        pair_boundary_before = self._gene_with_mrnas(
+            "b_boundary",
+            [self._mrna("bt2", [(1, 50), (101, 150)], [(10, 40, "0"), (110, 140, "0")])],
+        )
+        pair_boundary_after = self._gene_with_mrnas(
+            "a_boundary",
+            [self._mrna("at2", [(1, 60), (101, 150)], [(10, 40, "0"), (110, 145, "0")])],
+        )
+        pair_cds_count_before = self._gene_with_mrnas(
+            "b_cds_count",
+            [self._mrna("bt3", [(1, 200)], [(10, 40, "0")])],
+        )
+        pair_cds_count_after = self._gene_with_mrnas(
+            "a_cds_count",
+            [self._mrna("at3", [(1, 200)], [(10, 40, "0"), (110, 140, "0")])],
+        )
+
+        summary = summarize_representative_transcript_changes([
+            (pair_exon_count_before, pair_exon_count_after),
+            (pair_boundary_before, pair_boundary_after),
+            (pair_cds_count_before, pair_cds_count_after),
+        ])
+
+        self.assertEqual(summary["rep_transcript_pairs"], 3)
+        self.assertEqual(summary["rep_structural_changed"], 3)
+        self.assertEqual(summary["rep_structural_changed_pct"], 100.0)
+        self.assertEqual(summary["rep_exon_count_changed"], 1)
+        self.assertEqual(summary["rep_exon_boundary_changed_same_count"], 1)
+        self.assertEqual(summary["rep_cds_count_changed"], 1)
+        self.assertEqual(summary["rep_cds_boundary_changed_same_count"], 1)
 
 
 if __name__ == "__main__":
