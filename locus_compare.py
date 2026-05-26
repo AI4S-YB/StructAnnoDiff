@@ -56,6 +56,8 @@ class MRNAModel:
     utrs: list = field(default_factory=list)
     raw_start: int | None = None
     raw_end: int | None = None
+    has_explicit_exon: bool = False
+    exons_are_inferred: bool = False
 
     @property
     def exon_count(self):
@@ -128,23 +130,48 @@ class GeneModel:
         return max(self.mrnas, key=lambda m: (m.cds_length, m.exon_count))
 
 
+def mrna_has_overlap_evidence(mrna):
+    """Return True when a transcript has exon/CDS evidence from the input.
+
+    Raw mRNA spans and standalone UTR annotations can be over-expanded or
+    incomplete in curated inputs. Locus overlap should therefore require a
+    genuine exon feature or CDS feature from the source GFF3.
+    """
+    return mrna.has_explicit_exon or bool(mrna.cds)
+
+
 def gene_boundary_start(gene):
-    """Return original gene-feature start, falling back to model start."""
-    return gene.raw_start if gene.raw_start is not None else gene.start
+    """Return the feature-derived gene model start."""
+    return gene.start
 
 
 def gene_boundary_end(gene):
-    """Return original gene-feature end, falling back to model end."""
-    return gene.raw_end if gene.raw_end is not None else gene.end
+    """Return the feature-derived gene model end."""
+    return gene.end
 
 
 def gene_boundary_length(gene):
-    """Return original gene-feature length, falling back to model length."""
+    """Return feature-derived gene model span length."""
     return gene_boundary_end(gene) - gene_boundary_start(gene) + 1
 
 
+def raw_gene_boundary_start(gene):
+    """Return original gene-feature start for audit output."""
+    return gene.raw_start if gene.raw_start is not None else gene.start
+
+
+def raw_gene_boundary_end(gene):
+    """Return original gene-feature end for audit output."""
+    return gene.raw_end if gene.raw_end is not None else gene.end
+
+
+def raw_gene_boundary_length(gene):
+    """Return original gene-feature length for audit output."""
+    return raw_gene_boundary_end(gene) - raw_gene_boundary_start(gene) + 1
+
+
 def gene_boundary_changed(before_gene, after_gene, boundary_tol=10):
-    """Return True when original gene-feature boundaries differ beyond tolerance."""
+    """Return True when feature-derived model boundaries differ beyond tolerance."""
     start_changed = abs(
         gene_boundary_start(before_gene) - gene_boundary_start(after_gene)
     ) > boundary_tol
@@ -371,6 +398,7 @@ def parse_gff3_to_models(filepath, gene_scope='mrna'):
                 m = mrnas[mrna_id]
                 if ftype == 'exon':
                     m.exons.append(ExonFeature(feat['start'], feat['end']))
+                    m.has_explicit_exon = True
                 elif ftype == 'CDS':
                     m.cds.append(CDSFeature(feat['start'], feat['end'], feat['phase']))
                 elif 'UTR' in ftype:
@@ -384,12 +412,11 @@ def parse_gff3_to_models(filepath, gene_scope='mrna'):
             m.cds.sort(key=lambda c: c.start)
             m.utrs.sort(key=lambda u: (u.start, u.end, u.utr_type))
 
-        # Step 1: Derive missing UTR side(s) from exon/CDS or mRNA/CDS bounds.
-        # Some inputs provide only CDS features, while AGAT statistics still
-        # infer terminal UTRs from the transcript span. Keep that same minimum
-        # inference here so before/after structural classes use the same model.
+        # Step 1: Derive missing UTR side(s) only from explicit exon/CDS
+        # relationships. Raw gene/mRNA ranges can be wrong or over-expanded in
+        # some inputs, so they must not create synthetic UTR/exon footprints.
         for m in gmodel.mrnas:
-            if not m.cds:
+            if not m.cds or not m.exons:
                 continue
 
             cds_start = min(c.start for c in m.cds)
@@ -410,25 +437,15 @@ def parse_gff3_to_models(filepath, gene_scope='mrna'):
                 if start <= end and utr_type not in present_utr_types:
                     missing_utrs.append(UTRFeature(start, end, utr_type))
 
-            if m.exons:
-                for e in m.exons:
-                    if e.end < cds_start:
-                        add_missing_utr(e.start, e.end, before_cds_type)
-                    elif e.start > cds_end:
-                        add_missing_utr(e.start, e.end, after_cds_type)
-                    else:
-                        # Exon spans a CDS boundary; extract only the UTR part.
-                        add_missing_utr(e.start, cds_start - 1, before_cds_type)
-                        add_missing_utr(cds_end + 1, e.end, after_cds_type)
-            else:
-                transcript_start = (
-                    m.raw_start if m.raw_start is not None else gene_boundary_start(gmodel)
-                )
-                transcript_end = (
-                    m.raw_end if m.raw_end is not None else gene_boundary_end(gmodel)
-                )
-                add_missing_utr(transcript_start, cds_start - 1, before_cds_type)
-                add_missing_utr(cds_end + 1, transcript_end, after_cds_type)
+            for e in m.exons:
+                if e.end < cds_start:
+                    add_missing_utr(e.start, e.end, before_cds_type)
+                elif e.start > cds_end:
+                    add_missing_utr(e.start, e.end, after_cds_type)
+                else:
+                    # Exon spans a CDS boundary; extract only the UTR part.
+                    add_missing_utr(e.start, cds_start - 1, before_cds_type)
+                    add_missing_utr(cds_end + 1, e.end, after_cds_type)
 
             if missing_utrs:
                 m.utrs.extend(missing_utrs)
@@ -457,12 +474,23 @@ def parse_gff3_to_models(filepath, gene_scope='mrna'):
                     else:
                         merged.append((start, end))
                 m.exons = [ExonFeature(s, e) for s, e in merged]
+                m.exons_are_inferred = True
 
         # Step 3: Canonicalize UTR order after explicit or derived UTR loading.
         for m in gmodel.mrnas:
             m.utrs.sort(key=lambda u: (u.start, u.end, u.utr_type))
 
-        # Step 4: Expand gene boundaries from all available feature coordinates
+        # Step 4: Drop transcripts that have no exon/CDS evidence in the input.
+        # These records cannot define a trustworthy locus footprint and should
+        # not participate in overlap analysis.
+        gmodel.mrnas = [
+            m for m in gmodel.mrnas
+            if mrna_has_overlap_evidence(m)
+        ]
+
+        # Step 5: Derive model span from child features. Keep raw gene-feature
+        # boundaries separately for audit output; do not let them define the
+        # comparison span when child features are available.
         all_starts = []
         all_ends = []
         for m in gmodel.mrnas:
@@ -478,6 +506,8 @@ def parse_gff3_to_models(filepath, gene_scope='mrna'):
         if all_starts:
             gmodel.start = min(all_starts)
             gmodel.end = max(all_ends)
+
+    genes = {gid: gene for gid, gene in genes.items() if gene.mrna_count > 0}
 
     if gene_scope == 'mrna':
         genes = {gid: gene for gid, gene in genes.items() if gene.mrna_count > 0}
@@ -497,41 +527,234 @@ def overlap_len(a_start, a_end, b_start, b_end):
     return max(0, min(a_end, b_end) - max(a_start, b_start) + 1)
 
 
-def reciprocal_overlap(ga, gb):
-    """Compute strict reciprocal overlap between two GeneModels.
+def merge_intervals(intervals):
+    """Merge coordinate intervals and drop invalid ranges."""
+    valid = sorted((start, end) for start, end in intervals if start and end and start <= end)
+    if not valid:
+        return []
+    merged = [valid[0]]
+    for start, end in valid[1:]:
+        last_start, last_end = merged[-1]
+        if start <= last_end + 1:
+            merged[-1] = (last_start, max(last_end, end))
+        else:
+            merged.append((start, end))
+    return merged
 
-    This is equivalent to requiring both genes to cover the same fraction:
-    overlap / max(length_before, length_after).
+
+def interval_total_length(intervals):
+    """Return total merged length of a set of intervals."""
+    return sum(end - start + 1 for start, end in merge_intervals(intervals))
+
+
+def interval_overlap_length(left_intervals, right_intervals):
+    """Return total overlap length between two interval sets."""
+    left = merge_intervals(left_intervals)
+    right = merge_intervals(right_intervals)
+    total = 0
+    i = j = 0
+    while i < len(left) and j < len(right):
+        l_start, l_end = left[i]
+        r_start, r_end = right[j]
+        total += overlap_len(l_start, l_end, r_start, r_end)
+        if l_end < r_end:
+            i += 1
+        else:
+            j += 1
+    return total
+
+
+def mrna_feature_intervals(mrna):
+    """Return real transcript feature intervals for locus matching.
+
+    Explicit or derived exons are preferred. When exon features are absent,
+    use CDS/UTR children; raw mRNA bounds are intentionally ignored because
+    they can be over-expanded in source annotations.
     """
-    olap = overlap_len(ga.start, ga.end, gb.start, gb.end)
-    if olap == 0:
+    if mrna.exons:
+        return [(e.start, e.end) for e in mrna.exons]
+    intervals = [(c.start, c.end) for c in mrna.cds]
+    intervals.extend((u.start, u.end) for u in mrna.utrs)
+    return intervals
+
+
+def transcript_feature_length(mrna):
+    """Return summed exon-footprint length for one transcript."""
+    return interval_total_length(mrna_feature_intervals(mrna))
+
+
+def gene_feature_intervals(gene):
+    """Return merged child-feature intervals used for gene-locus matching."""
+    intervals = []
+    for mrna in gene.mrnas:
+        intervals.extend(mrna_feature_intervals(mrna))
+    if intervals:
+        return merge_intervals(intervals)
+    return [(gene.start, gene.end)]
+
+
+def gene_lacks_explicit_exons(gene):
+    """Return True when no transcript has exon features from the input file."""
+    return not any(mrna.exons and not mrna.exons_are_inferred for mrna in gene.mrnas)
+
+
+def gene_transcript_interval_sets(gene, interval_getter=mrna_feature_intervals,
+                                  fallback_to_gene_span=True):
+    """Return per-transcript interval sets for overlap scoring.
+
+    Gene-level matching is scored by the best transcript pair, not by the
+    merged footprint of every isoform. This keeps the denominator as
+    sum(exons) for an individual transcript and prevents multiple isoforms
+    from inflating or diluting a locus overlap score.
+    """
+    interval_sets = []
+    for mrna in gene.mrnas:
+        intervals = merge_intervals(interval_getter(mrna))
+        if intervals:
+            interval_sets.append((mrna, intervals))
+    if interval_sets:
+        return interval_sets
+
+    if not fallback_to_gene_span:
+        return []
+
+    # Unit-test and defensive fallback. Parsed production genes without
+    # exon/CDS evidence are filtered before matching.
+    intervals = merge_intervals([(gene.start, gene.end)])
+    return [(None, intervals)] if intervals else []
+
+
+def best_transcript_overlap_metrics(ga, gb, interval_getter=mrna_feature_intervals,
+                                    fallback_to_gene_span=True):
+    """Return overlap metrics for the best transcript pair between two genes."""
+    best = {
+        'score': 0.0,
+        'jaccard': 0.0,
+        'overlap': 0,
+        'left_length': 0,
+        'right_length': 0,
+        'left_mrna': None,
+        'right_mrna': None,
+    }
+    for left_mrna, left in gene_transcript_interval_sets(
+        ga, interval_getter, fallback_to_gene_span
+    ):
+        left_len = interval_total_length(left)
+        if left_len == 0:
+            continue
+        for right_mrna, right in gene_transcript_interval_sets(
+            gb, interval_getter, fallback_to_gene_span
+        ):
+            right_len = interval_total_length(right)
+            if right_len == 0:
+                continue
+            olap = interval_overlap_length(left, right)
+            if olap == 0:
+                continue
+            score = olap / min(left_len, right_len)
+            union = left_len + right_len - olap
+            jc = olap / union if union else 0.0
+            candidate_key = (
+                score,
+                jc,
+                olap,
+                -abs(left_len - right_len),
+                left_mrna.mrna_id if left_mrna is not None else '',
+                right_mrna.mrna_id if right_mrna is not None else '',
+            )
+            best_key = (
+                best['score'],
+                best['jaccard'],
+                best['overlap'],
+                -abs(best['left_length'] - best['right_length']),
+                best['left_mrna'].mrna_id if best['left_mrna'] is not None else '',
+                best['right_mrna'].mrna_id if best['right_mrna'] is not None else '',
+            )
+            if candidate_key > best_key:
+                best = {
+                    'score': score,
+                    'jaccard': jc,
+                    'overlap': olap,
+                    'left_length': left_len,
+                    'right_length': right_len,
+                    'left_mrna': left_mrna,
+                    'right_mrna': right_mrna,
+                }
+    return best
+
+
+def mrna_cds_intervals(mrna):
+    """Return CDS intervals for one transcript."""
+    return [(c.start, c.end) for c in mrna.cds]
+
+
+def cds_compatible_reciprocal_overlap(ga, gb):
+    """Return a CDS-based rescue score for exon-incomplete annotations.
+
+    CDS is part of exon. If one annotation has no explicit exon features, its
+    CDS-derived "exons" are only a lower-bound footprint and should not be
+    penalized by UTR/exon extensions present in the other annotation. In that
+    case, matching CDS-to-CDS is valid evidence for the same coding locus.
+    """
+    if not (gene_lacks_explicit_exons(ga) or gene_lacks_explicit_exons(gb)):
         return 0.0
-    return olap / max(ga.length, gb.length)
+    return best_transcript_overlap_metrics(
+        ga, gb, mrna_cds_intervals, fallback_to_gene_span=False
+    )['score']
+
+
+def cds_overlap_ratio(ga, gb):
+    """Return best transcript-pair containment ratio between CDS footprints."""
+    return best_transcript_overlap_metrics(
+        ga, gb, mrna_cds_intervals, fallback_to_gene_span=False
+    )['score']
+
+
+def any_feature_overlap_len(ga, gb):
+    """Return overlap across the full child-feature footprint."""
+    return interval_overlap_length(gene_feature_intervals(ga), gene_feature_intervals(gb))
+
+
+def feature_overlap_len(ga, gb):
+    """Return best transcript-pair overlap used for locus matching."""
+    return best_transcript_overlap_metrics(ga, gb)['overlap']
+
+
+def reciprocal_overlap(ga, gb):
+    """Compute best transcript-pair overlap between feature footprints.
+
+    This avoids treating over-expanded raw gene-feature spans as true locus
+    evidence when child exon/CDS/UTR features indicate a tighter footprint. The
+    denominator is the smaller summed exon length of the best transcript pair,
+    so complete containment is considered strong overlap evidence without
+    letting all isoforms of a gene dilute the score.
+    """
+    feature_score = best_transcript_overlap_metrics(ga, gb)['score']
+    return max(feature_score, cds_compatible_reciprocal_overlap(ga, gb))
 
 
 def containment_overlap(ga, gb):
-    """Compute containment-style overlap between two GeneModels."""
-    olap = overlap_len(ga.start, ga.end, gb.start, gb.end)
-    if olap == 0:
-        return 0.0
-    return olap / min(ga.length, gb.length)
+    """Compute best transcript-pair containment-style overlap."""
+    return best_transcript_overlap_metrics(ga, gb)['score']
 
 
 def jaccard_overlap(ga, gb):
-    """Jaccard index between two GeneModels."""
-    olap = overlap_len(ga.start, ga.end, gb.start, gb.end)
-    if olap == 0:
-        return 0.0
-    union = ga.length + gb.length - olap
-    return olap / union
+    """Jaccard index for the best transcript-pair feature overlap."""
+    return best_transcript_overlap_metrics(ga, gb)['jaccard']
 
 
 def containment_ratio(ga, gb):
-    """What fraction of ga is contained within gb."""
-    olap = overlap_len(ga.start, ga.end, gb.start, gb.end)
-    if olap == 0:
-        return 0.0
-    return olap / ga.length
+    """What fraction of ga's best transcript footprint is contained within gb."""
+    best = 0.0
+    for _left_mrna, left in gene_transcript_interval_sets(ga):
+        left_len = interval_total_length(left)
+        if left_len == 0:
+            continue
+        for _right_mrna, right in gene_transcript_interval_sets(gb):
+            olap = interval_overlap_length(left, right)
+            if olap:
+                best = max(best, olap / left_len)
+    return best
 
 
 # ---------------------------------------------------------------------------
@@ -568,7 +791,7 @@ def find_overlapping_pairs(before_genes, after_genes, min_reciprocal=0.5,
         for bg in active_before:
             if bg.strand != ag.strand:
                 continue
-            if overlap_len(bg.start, bg.end, ag.start, ag.end) == 0:
+            if feature_overlap_len(bg, ag) == 0:
                 continue
             ro = reciprocal_overlap(bg, ag)
             co = containment_overlap(bg, ag)
@@ -589,6 +812,90 @@ def find_overlapping_pairs(before_genes, after_genes, min_reciprocal=0.5,
         j += 1
 
     return pairs
+
+
+def prune_containment_bridge_edges(containment_pairs, reciprocal_pairs):
+    """Remove weak bridge edges between separate strong 1:1 anchors.
+
+    Hybrid mode uses containment edges to preserve real split/merge/complex
+    events, but a small exon overlap can also connect two adjacent genes that
+    already have independent strong reciprocal matches. In that specific case,
+    the bridge edge is not needed to explain the locus and can inflate two
+    syntenic pairs into a false complex component.
+
+    A bridge is pruned only when both endpoints already have different mutual
+    best anchors and the bridge itself lacks CDS support and has low feature
+    Jaccard. This keeps true split/merge components while removing adjacent
+    UTR/exon tail overlaps between otherwise well-matched loci.
+    """
+    all_pairs = []
+    seen = set()
+    for pair in list(containment_pairs) + list(reciprocal_pairs):
+        bg, ag, _score, _jc = pair
+        key = (bg.gene_id, ag.gene_id)
+        if key in seen:
+            continue
+        seen.add(key)
+        all_pairs.append(pair)
+
+    def quality(pair):
+        bg, ag, score, jc = pair
+        cds_score = cds_overlap_ratio(bg, ag)
+        return (
+            cds_score >= 0.5,
+            cds_score,
+            jc,
+            score,
+        )
+
+    best_after_by_before = {}
+    best_before_by_after = {}
+    for pair in all_pairs:
+        bg, ag, _score, _jc = pair
+        bkey = bg.gene_id
+        akey = ag.gene_id
+        if bkey not in best_after_by_before or quality(pair) > quality(best_after_by_before[bkey]):
+            best_after_by_before[bkey] = pair
+        if akey not in best_before_by_after or quality(pair) > quality(best_before_by_after[akey]):
+            best_before_by_after[akey] = pair
+
+    mutual_anchor_after_by_before = {}
+    mutual_anchor_before_by_after = {}
+    for pair in all_pairs:
+        bg, ag, score, jc = pair
+        bkey = bg.gene_id
+        akey = ag.gene_id
+        if (
+            best_after_by_before.get(bkey) is pair
+            and best_before_by_after.get(akey) is pair
+            and (cds_overlap_ratio(bg, ag) >= 0.5 or jc >= 0.5 or score >= 0.95)
+        ):
+            mutual_anchor_after_by_before[bkey] = akey
+            mutual_anchor_before_by_after[akey] = bkey
+
+    pruned = []
+    pruned_count = 0
+    for pair in containment_pairs:
+        bg, ag, _score, jc = pair
+        before_anchor = mutual_anchor_after_by_before.get(bg.gene_id)
+        after_anchor = mutual_anchor_before_by_after.get(ag.gene_id)
+        bridges_two_independent_anchors = (
+            before_anchor is not None
+            and after_anchor is not None
+            and before_anchor != ag.gene_id
+            and after_anchor != bg.gene_id
+        )
+        low_support_bridge = (
+            cds_overlap_ratio(bg, ag) < 0.5
+            and jc < 0.25
+        )
+        if bridges_two_independent_anchors and low_support_bridge:
+            pruned_count += 1
+            continue
+
+        pruned.append(pair)
+
+    return pruned, pruned_count
 
 
 def count_no_overlap_loci(before_genes, after_genes):
@@ -615,7 +922,7 @@ def count_no_overlap_loci(before_genes, after_genes):
                 while i < len(target_genes) and target_genes[i].start <= q.end:
                     active.append(target_genes[i])
                     i += 1
-                if not any(overlap_len(q.start, q.end, t.start, t.end) > 0 for t in active):
+                if not any(any_feature_overlap_len(q, t) > 0 for t in active):
                     count += 1
         return count
 
@@ -683,6 +990,7 @@ def resolve_matches(pairs, before_genes, after_genes):
       split: list of (before_gene, [after_genes]) for 1:N loci
       merge: list of ([before_genes], after_gene) for N:1 loci
       complex: list of ([before_genes], [after_genes]) for M:N loci
+      complex_edges: list of ([before_genes], [after_genes], [(before_gene, after_gene)])
       novel: list of after_genes with no overlap
       deleted: list of before_genes with no overlap
     """
@@ -691,6 +999,7 @@ def resolve_matches(pairs, before_genes, after_genes):
     adj = defaultdict(set)
     before_ids_in_graph = set()
     after_ids_in_graph = set()
+    direct_pair_ids = set()
 
     for bg, ag, ro, jc in pairs:
         before_node = ('before', bg.gene_id)
@@ -699,6 +1008,7 @@ def resolve_matches(pairs, before_genes, after_genes):
         adj[after_node].add(before_node)
         before_ids_in_graph.add(before_node)
         after_ids_in_graph.add(after_node)
+        direct_pair_ids.add((bg.gene_id, ag.gene_id))
 
     # Find connected components
     all_nodes = before_ids_in_graph | after_ids_in_graph
@@ -730,6 +1040,7 @@ def resolve_matches(pairs, before_genes, after_genes):
     splits = []
     merges = []
     complexes = []
+    complex_edges = []
 
     matched_before = set()
     matched_after = set()
@@ -765,6 +1076,13 @@ def resolve_matches(pairs, before_genes, after_genes):
             bgs = [before_genes[bid] for bid in comp_before]
             ags = [after_genes[aid] for aid in comp_after]
             complexes.append((bgs, ags))
+            direct_edges = [
+                (before_genes[bid], after_genes[aid])
+                for bid in comp_before
+                for aid in comp_after
+                if (bid, aid) in direct_pair_ids
+            ]
+            complex_edges.append((bgs, ags, direct_edges))
             for bid in comp_before:
                 matched_before.add(bid)
             for aid in comp_after:
@@ -786,6 +1104,7 @@ def resolve_matches(pairs, before_genes, after_genes):
         'split': splits,
         'merge': merges,
         'complex': complexes,
+        'complex_edges': complex_edges,
         'novel': novel,
         'deleted': deleted,
     }
@@ -1072,19 +1391,19 @@ def make_change_log_row(bg, ag, match_type, change_subtype):
         return gene.length if gene is not None else 0
 
     def raw_start(gene):
-        return gene_boundary_start(gene) if gene is not None else 0
+        return raw_gene_boundary_start(gene) if gene is not None else 0
 
     def raw_end(gene):
-        return gene_boundary_end(gene) if gene is not None else 0
+        return raw_gene_boundary_end(gene) if gene is not None else 0
 
     def raw_length(gene):
-        return gene_boundary_length(gene) if gene is not None else 0
+        return raw_gene_boundary_length(gene) if gene is not None else 0
 
     return {
         'before_gene': bg.gene_id if bg is not None else '',
         'after_gene': ag.gene_id if ag is not None else '',
         'seqid': anchor.seqid if anchor is not None else '',
-        # Model span is the coordinate interval used for overlap matching.
+        # Model span is derived from child features, not raw gene feature range.
         'before_start': model_start(bg),
         'before_end': model_end(bg),
         'after_start': model_start(ag),
@@ -1197,15 +1516,21 @@ def compare_annotations(before_gff, after_gff, min_reciprocal=0.5,
             reciprocal_pairs.extend(pairs)
 
     if overlap_mode == 'hybrid':
-        graph_pairs = containment_pairs
+        graph_pairs, pruned_containment_bridge_edges = prune_containment_bridge_edges(
+            containment_pairs,
+            reciprocal_pairs,
+        )
         reciprocal_pair_keys = {
-            (bg.gene_id, ag.gene_id) for bg, ag, _ro, _jc in reciprocal_pairs
+            (bg.gene_id, ag.gene_id) for bg, ag, _ro, _jc in graph_pairs
         }
         print(f"  Found {len(reciprocal_pairs)} strict reciprocal candidate pairs")
         print(f"  Found {len(containment_pairs)} containment candidate pairs")
+        print("  Pruned weak bridge edges between strong 1:1 anchors: "
+              f"{pruned_containment_bridge_edges}")
     else:
         graph_pairs = reciprocal_pairs
         reciprocal_pair_keys = None
+        pruned_containment_bridge_edges = 0
         print(f"  Found {len(graph_pairs)} candidate matching pairs")
     if overlap_mode in ('reciprocal', 'hybrid'):
         print("  Containment-style pairs filtered by reciprocal threshold: "
@@ -1275,12 +1600,11 @@ def compare_annotations(before_gff, after_gff, min_reciprocal=0.5,
         for bg in bgs:
             change_log.append(make_change_log_row(bg, ag, 'merge', f'merge_from_{len(bgs)}'))
 
-    for bgs, ags in results['complex']:
-        for bg in bgs:
-            for ag in ags:
-                change_log.append(
-                    make_change_log_row(bg, ag, 'complex', f'complex_{len(bgs)}x{len(ags)}')
-                )
+    for bgs, ags, edge_pairs in results['complex_edges']:
+        for bg, ag in edge_pairs:
+            change_log.append(
+                make_change_log_row(bg, ag, 'complex', f'complex_{len(bgs)}x{len(ags)}')
+            )
 
     for ag in strict_novel:
         change_log.append(make_change_log_row(None, ag, 'novel', 'new_gene'))
@@ -1310,6 +1634,7 @@ def compare_annotations(before_gff, after_gff, min_reciprocal=0.5,
         'same_strand_overlaps': overlap_diagnostics['same_strand_overlaps'],
         'containment_pairs_filtered_by_reciprocal': overlap_diagnostics['containment_pairs_filtered_by_reciprocal'],
         'containment_candidate_pairs': len(containment_pairs) if overlap_mode == 'hybrid' else '',
+        'containment_bridge_edges_pruned': pruned_containment_bridge_edges,
         'total_before_genes': len(before_genes),
         'total_after_genes': len(after_genes),
         'syntenic_total': len(results['syntenic']),

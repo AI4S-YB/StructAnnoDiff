@@ -1,8 +1,8 @@
-Species	Overlap_mode	Overlap_threshold	Candidate_pairs	Same_strand_overlaps	Containment_pairs_filtered_by_reciprocal
-A. annua	hybrid	0.5	33,531	39,529	5,710
-Cucumber	hybrid	0.5	19,975	23,190	2,956
-F. ananassa	hybrid	0.5	95,154	108,333	12,010
-F. vesca	hybrid	0.5	21,493	27,865	5,732
-Peach	hybrid	0.5	29,665	31,034	1,333
-Pineapple	hybrid	0.5	24,680	27,074	1,692
-Rice	hybrid	0.5	32,350	37,744	4,907
+Species	Overlap_mode	Overlap_threshold	Candidate_pairs	Same_strand_overlaps	Containment_candidate_pairs	Containment_bridge_edges_pruned	Containment_pairs_filtered_by_reciprocal
+A. annua	hybrid	0.5	37,465	39,052	37,465	41	0
+Cucumber	hybrid	0.5	22,328	22,919	22,328	1	0
+F. ananassa	hybrid	0.5	106,242	108,056	106,242	292	0
+F. vesca	hybrid	0.5	26,629	27,590	26,629	4	0
+Peach	hybrid	0.5	30,836	31,006	30,836	2	0
+Pineapple	hybrid	0.5	26,222	26,743	26,186	228	0
+Rice	hybrid	0.5	36,838	37,615	36,838	40	0

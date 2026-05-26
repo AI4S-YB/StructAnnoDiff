@@ -93,12 +93,18 @@ pixi run locus
 ```
 
 The default locus scope is `mrna`, which excludes gene features without an
-`mRNA` or `transcript` child. Use `python run_locus_comparisons.py --gene-scope all`
-when non-mRNA gene features such as tRNA or ncRNA should be included.
-The default overlap mode is strict `reciprocal`, requiring overlap to cover at
-least the threshold fraction of both before and after gene spans. Use
-`--overlap-mode containment` only to reproduce the legacy containment-style
-matching behavior.
+`mRNA` or `transcript` child. Transcripts must also contain an explicit `exon`
+or `CDS` feature in the input GFF; mRNA-only or UTR-only records are filtered
+before overlap matching because their raw spans cannot define reliable loci.
+The default overlap mode is `hybrid`: candidate gene pairs are scored by the
+best before/after transcript pair, using exon-footprint overlap defined as
+`overlap / min(tx_length_before, tx_length_after)`, where `tx_length` is the
+summed length of merged exons in one transcript. Complete or high-confidence
+containment is therefore treated as strong locus evidence without letting all
+isoforms of a gene inflate the denominator. The overlap graph also prunes weak
+bridge edges when two independent strong one-to-one anchors already explain the
+locus. Use `--overlap-mode reciprocal` or `--overlap-mode containment` only for
+sensitivity checks or legacy comparisons.
 
 Generate final locus summary tables and figures:
 
@@ -112,6 +118,23 @@ Generate A/B/C/D single-species summary tables and a four-panel figure:
 
 ```bash
 python plot_single_species_abcd.py --species Pineapple
+```
+
+Export IGV-friendly event tracks from the locus change logs:
+
+```bash
+pixi run tracks
+```
+
+The track exporter reads `results/locus/<species_id>_change_log.csv` and writes
+event-level BED, GFF3, and TSV review files under `results/tracks/`. Load the
+BED track together with the before/after GFF3 annotations in IGV to inspect
+whether each predicted locus or structural-change event is reasonable.
+
+Single-species IGV track example:
+
+```bash
+python export_change_tracks.py --species Pineapple
 ```
 
 Concrete single-species example using Pineapple:
@@ -176,7 +199,7 @@ Important result tables:
 - `locus_comparison_summary.csv`: mutually exclusive locus subtype summary; one syntenic gene contributes to one broad category.
 - `locus_comparison_multilabel.csv`: non-exclusive locus subtype attributes; one syntenic gene can count in multiple columns.
 - `curation_core_metrics.csv`: compact per-species table for the publication figure. The main metrics are no-overlap new/deleted loci, split/merge events, and the fraction of before/after genes whose strict 1:1 representative transcript has an exon change; representative-transcript union and CDS subcounts are retained as audit columns.
-- `locus_diagnostics.csv`: overlap-mode diagnostics, including candidate pairs and containment-style pairs filtered by strict reciprocal overlap.
+- `locus_diagnostics.csv`: overlap-mode diagnostics, including candidate pairs and weak bridge edges pruned between strong one-to-one anchors.
 - `validation_report.csv` / `.md`: consistency checks across summary, compare, and locus outputs.
 
 Large per-gene files such as `results/locus/*_change_log.csv` and
@@ -193,6 +216,7 @@ Primary figures:
 
 Documentation:
 
+- `docs/locus_compare_calculation_and_results.html`: compact calculation summary, latest results, and IGV validation notes.
 - `docs/locus_compare_algorithm.html`: full locus-comparison algorithm notes.
 - `docs/curation_core_metrics_figure_algorithm.html`: focused explanation of the current A/B/C core figure.
 

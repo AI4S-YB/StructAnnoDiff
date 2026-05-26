@@ -1,8 +1,8 @@
-Species,Overlap_mode,Overlap_threshold,Candidate_pairs,Same_strand_overlaps,Containment_pairs_filtered_by_reciprocal
-A. annua,hybrid,0.5,33531,39529,5710
-Cucumber,hybrid,0.5,19975,23190,2956
-F. ananassa,hybrid,0.5,95154,108333,12010
-F. vesca,hybrid,0.5,21493,27865,5732
-Peach,hybrid,0.5,29665,31034,1333
-Pineapple,hybrid,0.5,24680,27074,1692
-Rice,hybrid,0.5,32350,37744,4907
+Species,Overlap_mode,Overlap_threshold,Candidate_pairs,Same_strand_overlaps,Containment_candidate_pairs,Containment_bridge_edges_pruned,Containment_pairs_filtered_by_reciprocal
+A. annua,hybrid,0.5,37465,39052,37465,41,0
+Cucumber,hybrid,0.5,22328,22919,22328,1,0
+F. ananassa,hybrid,0.5,106242,108056,106242,292,0
+F. vesca,hybrid,0.5,26629,27590,26629,4,0
+Peach,hybrid,0.5,30836,31006,30836,2,0
+Pineapple,hybrid,0.5,26222,26743,26186,228,0
+Rice,hybrid,0.5,36838,37615,36838,40,0

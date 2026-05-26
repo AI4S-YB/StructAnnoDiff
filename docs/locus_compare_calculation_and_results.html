@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>结构注释校准前后比较：计算说明与当前效果</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --ink: #1f2937;
+      --muted: #5f6b7a;
+      --line: #d8dee8;
+      --blue: #2f6fed;
+      --green: #208a5b;
+      --orange: #b76300;
+      --red: #c43b3b;
+      --purple: #7457c8;
+      --code: #eef2f7;
+      --soft-blue: #e9f1ff;
+      --soft-green: #e7f6ef;
+      --soft-orange: #fff2df;
+      --soft-red: #fff0ef;
+      --soft-purple: #f2ecff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC",
+            "Microsoft YaHei", Arial, sans-serif;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 30px 20px 56px;
+    }
+    header, section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 0 8px 22px rgba(31, 41, 55, 0.05);
+    }
+    header { padding: 28px 30px; }
+    section { margin-top: 20px; padding: 24px 26px; }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 0 0 14px;
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+    h3 {
+      margin: 20px 0 8px;
+      font-size: 17px;
+      line-height: 1.4;
+    }
+    p { margin: 8px 0 12px; }
+    ul, ol { margin: 8px 0 12px; padding-left: 22px; }
+    li { margin: 5px 0; }
+    code {
+      padding: 2px 5px;
+      background: var(--code);
+      border-radius: 4px;
+      color: #26384f;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+    }
+    pre {
+      margin: 12px 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      background: #172033;
+      color: #f2f6ff;
+      border-radius: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 18px;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      text-align: left;
+      background: #f2f5f9;
+      color: #344054;
+      font-weight: 700;
+    }
+    tbody tr:nth-child(even) td { background: #fafbfe; }
+    .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: #344054;
+      background: #fbfcfe;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    nav {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+    nav a {
+      display: block;
+      padding: 8px 10px;
+      color: var(--ink);
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      font-size: 13px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .box {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+    .box h3:first-child { margin-top: 0; }
+    .note {
+      padding: 12px 14px;
+      margin: 12px 0;
+      border-left: 4px solid var(--orange);
+      background: var(--soft-orange);
+      border-radius: 0 7px 7px 0;
+    }
+    .note.ok { border-left-color: var(--green); background: var(--soft-green); }
+    .note.warn { border-left-color: var(--red); background: var(--soft-red); }
+    .tag {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .tag.green { background: var(--soft-green); color: var(--green); }
+    .tag.blue { background: var(--soft-blue); color: var(--blue); }
+    .tag.orange { background: var(--soft-orange); color: var(--orange); }
+    .tag.red { background: var(--soft-red); color: var(--red); }
+    .tag.purple { background: var(--soft-purple); color: var(--purple); }
+    .figure {
+      margin: 14px 0 8px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+    .figure img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto;
+      border-radius: 4px;
+    }
+    .logic-diagram {
+      margin: 16px 0 18px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      overflow-x: auto;
+    }
+    .logic-diagram svg {
+      display: block;
+      width: 100%;
+      min-width: 980px;
+      height: auto;
+    }
+    .caption {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .step {
+      min-height: 106px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+    .step b { display: block; margin-bottom: 6px; }
+    .step p { margin: 0; color: var(--muted); font-size: 13px; }
+    .small { color: var(--muted); font-size: 13px; }
+    @media (max-width: 900px) {
+      nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid, .grid.three { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      table { font-size: 13px; }
+    }
+    @media (max-width: 560px) {
+      .wrap { padding: 18px 12px 40px; }
+      header, section { padding: 18px 16px; }
+      h1 { font-size: 24px; }
+      nav, .flow { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>结构注释校准前后比较：计算说明与当前效果</h1>
+    <p class="subtitle">
+      本文档总结当前项目中基因结构注释人工校准前后的比较算法、核心统计口径、最新运行结果和人工核验方式。
+    </p>
+    <div class="meta">
+      <span class="pill">生成日期：2026-05-26</span>
+      <span class="pill">默认范围：gene_scope=mrna</span>
+      <span class="pill">匹配阈值：0.5</span>
+      <span class="pill">主图：3 个 Panel</span>
+      <span class="pill">phase：不参与结构变化判断</span>
+    </div>
+    <nav>
+      <a href="#summary">1. 当前结论</a>
+      <a href="#algorithm">2. 计算逻辑</a>
+      <a href="#metrics">3. 指标口径</a>
+      <a href="#results">4. 最新效果</a>
+      <a href="#tracks">5. IGV 校验</a>
+      <a href="#validation">6. 程序验证</a>
+      <a href="#files">7. 输出文件</a>
+      <a href="#limits">8. 注意事项</a>
+    </nav>
+  </header>
+
+  <section id="summary">
+    <h2>1. 当前结论</h2>
+    <div class="grid three">
+      <div class="box">
+        <h3>算法状态</h3>
+        <p>
+          当前算法已经从原始 gene span 匹配切换为基于子特征的转录本级匹配。
+          基因对得分来自基因内最佳 before/after 转录本对，分母是单个转录本的 exon 总长度。
+        </p>
+      </div>
+      <div class="box">
+        <h3>主要修复</h3>
+        <p>
+          对已有清楚 1:1 锚点的重叠群，会过滤额外的弱桥接边，避免两个独立基因座因为少量尾部 exon/UTR 重叠被误归为 complex。
+        </p>
+      </div>
+      <div class="box">
+        <h3>结果状态</h3>
+        <p>
+          全部 7 个物种已重新运行；结果表、IGV tracks、跨物种主图和单物种图均已刷新。
+          验证脚本和单元测试通过。
+        </p>
+      </div>
+    </div>
+    <div class="note ok">
+      <p>
+        菠萝区域 <code>contig05:19,767,616-19,774,408</code> 已作为定点检查案例：
+        当前输出为 <code>g05902 -> lcfv2_06000</code> 的 1:1 exon/UTR 边界调整，
+        以及 <code>g05903 -> lcfv2_06001</code> 的 1:1 exact，不再被误判为 complex。
+      </p>
+    </div>
+  </section>
+
+  <section id="algorithm">
+    <h2>2. 计算逻辑</h2>
+    <div class="flow">
+      <div class="step">
+        <b>解析 GFF</b>
+        <p>读取 gene、mRNA/transcript、exon、CDS、UTR。</p>
+      </div>
+      <div class="step">
+        <b>清洗模型</b>
+        <p>剔除没有显式 exon 或 CDS 证据的 mRNA；无有效 mRNA 的 gene 不参与 overlap。</p>
+      </div>
+      <div class="step">
+        <b>补全结构</b>
+        <p>UTR 只由 exon/CDS 推导；缺 exon 时只用 CDS 和显式 UTR 推断 exon。</p>
+      </div>
+      <div class="step">
+        <b>转录本打分</b>
+        <p>同 seqid、同 strand 内，基因对得分取最佳转录本对的 exon overlap。</p>
+      </div>
+      <div class="step">
+        <b>图解析</b>
+        <p>候选边构成 before/after 二部图，连通分量归为 1:1、split、merge、complex。</p>
+      </div>
+      <div class="step">
+        <b>结构分类</b>
+        <p>只对严格 1:1 基因对评估代表性转录本 exon/CDS/UTR/isoform 变化。</p>
+      </div>
+    </div>
+
+    <div class="logic-diagram" role="img" aria-label="当前计算逻辑示意图">
+      <svg viewBox="0 0 1160 650" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+            <path d="M0,0 L9,3.5 L0,7 Z" fill="#5f6b7a"/>
+          </marker>
+          <marker id="arrow-green" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+            <path d="M0,0 L9,3.5 L0,7 Z" fill="#208a5b"/>
+          </marker>
+          <marker id="arrow-orange" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+            <path d="M0,0 L9,3.5 L0,7 Z" fill="#b76300"/>
+          </marker>
+          <filter id="shadow" x="-10%" y="-18%" width="120%" height="136%">
+            <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#1f2937" flood-opacity="0.12"/>
+          </filter>
+          <style>
+            .d-title { font: 700 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; fill: #1f2937; }
+            .d-label { font: 700 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; fill: #1f2937; }
+            .d-sub { font: 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; fill: #415065; }
+            .d-mini { font: 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; fill: #5f6b7a; }
+            .d-code { font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #26384f; }
+            .d-node { filter: url(#shadow); }
+            .d-line { stroke: #5f6b7a; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+            .d-line-green { stroke: #208a5b; stroke-width: 2.2; fill: none; marker-end: url(#arrow-green); }
+            .d-line-orange { stroke: #b76300; stroke-width: 2.2; fill: none; marker-end: url(#arrow-orange); }
+            .d-dash { stroke-dasharray: 6 5; }
+          </style>
+        </defs>
+
+        <text x="580" y="32" text-anchor="middle" class="d-title">当前结构注释比较计算逻辑</text>
+
+        <rect class="d-node" x="28" y="64" width="165" height="94" rx="9" fill="#e9f1ff" stroke="#9bb8f8"/>
+        <text x="110" y="94" text-anchor="middle" class="d-label">输入</text>
+        <text x="110" y="119" text-anchor="middle" class="d-sub">before / after GFF</text>
+        <text x="110" y="139" text-anchor="middle" class="d-sub">gene, mRNA, exon, CDS</text>
+
+        <rect class="d-node" x="238" y="64" width="180" height="94" rx="9" fill="#e7f6ef" stroke="#a9dec5"/>
+        <text x="328" y="94" text-anchor="middle" class="d-label">有效转录本筛选</text>
+        <text x="328" y="119" text-anchor="middle" class="d-sub">必须有显式 exon 或 CDS</text>
+        <text x="328" y="139" text-anchor="middle" class="d-sub">mRNA-only / UTR-only 剔除</text>
+
+        <rect class="d-node" x="463" y="64" width="190" height="94" rx="9" fill="#fff2df" stroke="#ffd19a"/>
+        <text x="558" y="94" text-anchor="middle" class="d-label">构建 feature footprint</text>
+        <text x="558" y="119" text-anchor="middle" class="d-sub">优先 explicit exon</text>
+        <text x="558" y="139" text-anchor="middle" class="d-sub">缺 exon: CDS + 显式 UTR</text>
+
+        <rect class="d-node" x="698" y="64" width="195" height="94" rx="9" fill="#f2ecff" stroke="#d2c3ff"/>
+        <text x="795" y="94" text-anchor="middle" class="d-label">同位点候选扫描</text>
+        <text x="795" y="119" text-anchor="middle" class="d-sub">同 seqid + 同 strand</text>
+        <text x="795" y="139" text-anchor="middle" class="d-sub">双指针区间重叠扫描</text>
+
+        <rect class="d-node" x="938" y="64" width="190" height="94" rx="9" fill="#e6f6f9" stroke="#a9dce5"/>
+        <text x="1033" y="94" text-anchor="middle" class="d-label">候选基因对</text>
+        <text x="1033" y="119" text-anchor="middle" class="d-sub">保留所有满足阈值的边</text>
+        <text x="1033" y="139" text-anchor="middle" class="d-sub">不做贪心 1:1</text>
+
+        <path class="d-line" d="M193 111 H230"/>
+        <path class="d-line" d="M418 111 H455"/>
+        <path class="d-line" d="M653 111 H690"/>
+        <path class="d-line" d="M893 111 H930"/>
+
+        <rect class="d-node" x="70" y="225" width="310" height="145" rx="10" fill="#ffffff" stroke="#d8dee8"/>
+        <text x="225" y="254" text-anchor="middle" class="d-label">基因内所有转录本两两比较</text>
+        <text x="225" y="281" text-anchor="middle" class="d-code">tx_length = sum(merged exons)</text>
+        <text x="225" y="305" text-anchor="middle" class="d-code">score = overlap(exon footprints)</text>
+        <text x="225" y="326" text-anchor="middle" class="d-code">        / min(tx_length_before, tx_length_after)</text>
+        <text x="225" y="352" text-anchor="middle" class="d-sub">gene_pair_score = max(score across transcript pairs)</text>
+
+        <g transform="translate(420 219)">
+          <rect class="d-node" x="0" y="0" width="320" height="158" rx="10" fill="#f8fafc" stroke="#d8dee8"/>
+          <text x="160" y="27" text-anchor="middle" class="d-label">最佳转录本对示意</text>
+          <text x="54" y="56" class="d-mini">before tx</text>
+          <rect x="42" y="72" width="46" height="10" rx="2" fill="#2f6fed"/>
+          <rect x="112" y="72" width="64" height="10" rx="2" fill="#2f6fed"/>
+          <rect x="210" y="72" width="38" height="10" rx="2" fill="#2f6fed"/>
+          <text x="54" y="109" class="d-mini">after tx</text>
+          <rect x="48" y="124" width="40" height="10" rx="2" fill="#208a5b"/>
+          <rect x="112" y="124" width="72" height="10" rx="2" fill="#208a5b"/>
+          <rect x="214" y="124" width="34" height="10" rx="2" fill="#208a5b"/>
+          <path d="M112 86 V118" stroke="#b76300" stroke-width="2" stroke-dasharray="5 4"/>
+          <path d="M176 86 V118" stroke="#b76300" stroke-width="2" stroke-dasharray="5 4"/>
+          <text x="235" y="105" class="d-mini">重叠 exon footprint</text>
+        </g>
+
+        <rect class="d-node" x="785" y="225" width="305" height="145" rx="10" fill="#ffffff" stroke="#d8dee8"/>
+        <text x="938" y="254" text-anchor="middle" class="d-label">进入候选图的条件</text>
+        <text x="938" y="282" text-anchor="middle" class="d-code">gene_pair_score &gt;= 0.5</text>
+        <text x="938" y="307" text-anchor="middle" class="d-sub">或 exon 不完整时 CDS-to-CDS rescue 通过</text>
+        <text x="938" y="332" text-anchor="middle" class="d-sub">CDS 是 exon 的组成部分，不按 UTR 长度稀释</text>
+        <text x="938" y="354" text-anchor="middle" class="d-sub">phase-only 差异不作为结构变化</text>
+
+        <path class="d-line" d="M1033 158 V194 H225 V218"/>
+        <path class="d-line" d="M380 298 H413"/>
+        <path class="d-line" d="M740 298 H777"/>
+
+        <rect class="d-node" x="72" y="444" width="180" height="116" rx="10" fill="#f2ecff" stroke="#d2c3ff"/>
+        <text x="162" y="475" text-anchor="middle" class="d-label">二部图</text>
+        <circle cx="120" cy="506" r="9" fill="#2f6fed"/>
+        <circle cx="120" cy="535" r="9" fill="#2f6fed"/>
+        <circle cx="204" cy="506" r="9" fill="#208a5b"/>
+        <circle cx="204" cy="535" r="9" fill="#208a5b"/>
+        <line x1="129" y1="506" x2="195" y2="506" stroke="#5f6b7a" stroke-width="2"/>
+        <line x1="129" y1="535" x2="195" y2="535" stroke="#5f6b7a" stroke-width="2"/>
+        <line x1="129" y1="535" x2="195" y2="506" stroke="#b76300" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="162" y="550" text-anchor="middle" class="d-mini">before / after gene nodes</text>
+
+        <rect class="d-node" x="300" y="444" width="245" height="116" rx="10" fill="#fff2df" stroke="#ffd19a"/>
+        <text x="422" y="475" text-anchor="middle" class="d-label">弱桥接边剪枝</text>
+        <text x="422" y="502" text-anchor="middle" class="d-sub">两端已有不同互为最佳锚点</text>
+        <text x="422" y="526" text-anchor="middle" class="d-sub">且 CDS overlap &lt; 0.5</text>
+        <text x="422" y="548" text-anchor="middle" class="d-sub">且 feature Jaccard &lt; 0.25</text>
+
+        <rect class="d-node" x="595" y="444" width="230" height="116" rx="10" fill="#e7f6ef" stroke="#a9dec5"/>
+        <text x="710" y="475" text-anchor="middle" class="d-label">连通分量分类</text>
+        <text x="710" y="502" text-anchor="middle" class="d-sub">1:1 = syntenic</text>
+        <text x="710" y="526" text-anchor="middle" class="d-sub">1:N = split, N:1 = merge</text>
+        <text x="710" y="548" text-anchor="middle" class="d-sub">M:N = complex</text>
+
+        <rect class="d-node" x="875" y="444" width="235" height="116" rx="10" fill="#e9f1ff" stroke="#9bb8f8"/>
+        <text x="992" y="475" text-anchor="middle" class="d-label">输出与图表</text>
+        <text x="992" y="502" text-anchor="middle" class="d-sub">Panel A: no-overlap gain/loss</text>
+        <text x="992" y="526" text-anchor="middle" class="d-sub">Panel B: split / merge</text>
+        <text x="992" y="548" text-anchor="middle" class="d-sub">Panel C: 1:1 representative exon change</text>
+
+        <path class="d-line" d="M938 370 V415 H162 V437"/>
+        <path class="d-line-orange" d="M252 502 H292"/>
+        <path class="d-line-green" d="M545 502 H587"/>
+        <path class="d-line" d="M825 502 H867"/>
+
+        <rect x="84" y="590" width="980" height="38" rx="8" fill="#f6f8fb" stroke="#d8dee8"/>
+        <text x="574" y="614" text-anchor="middle" class="d-sub">
+          人工校验：results/tracks/*_annotation_changes.bed/gff3/tsv 可直接与 before/after GFF 一起加载到 IGV
+        </text>
+      </svg>
+      <p class="caption">
+        图示强调当前算法的核心：以单个转录本 exon 总长度作为 overlap 分母，先获得最佳转录本对，再在基因二部图中解析基因座事件；
+        对已被强 1:1 锚点解释的重叠群，低 CDS 支持、低 Jaccard 的额外桥接边会被过滤。
+      </p>
+    </div>
+
+    <h3>2.1 模型边界</h3>
+    <p>
+      GFF 中的 gene feature span 可能过宽或不可靠，因此当前匹配不使用 raw gene span。
+      模型的 <code>start/end</code> 由真实子特征推导；原始 gene 边界保存在
+      <code>before_gene_start/end</code> 和 <code>after_gene_start/end</code> 中，仅用于审计。
+    </p>
+
+    <h3>2.2 转录本级 overlap 得分</h3>
+    <p>
+      当前关键定义如下。这里的 <code>tx_length</code> 是一个转录本 merged exon 区间的总长度，
+      不是 raw gene span，也不是一个 gene 内所有 isoform 合并后的长度。
+    </p>
+    <pre>tx_length(t) =
+  sum(length of merged exon intervals in transcript t)
+
+tx_overlap_score(t_before, t_after) =
+  overlap(exons(t_before), exons(t_after))
+  / min(tx_length(t_before), tx_length(t_after))
+
+gene_pair_score(g_before, g_after) =
+  max(tx_overlap_score(t_before, t_after)
+      for all before/after transcript pairs)</pre>
+    <p>
+      采用 <code>min()</code> 作为分母后，较短转录本被较长转录本充分包含时会被视为强对应证据。
+      这符合“被包含就是被包含”的当前判断原则。
+    </p>
+
+    <h3>2.3 CDS 兼容性救援</h3>
+    <p>
+      如果某一侧没有显式 exon，exon 只能由 CDS/UTR 下限推断。此时同时计算 CDS-to-CDS 的最佳转录本对 overlap。
+      由于 CDS 本身是 exon 的组成部分，CDS-only 注释不应因为另一侧补充了 UTR 或非编码 exon 而被稀释成未匹配。
+    </p>
+
+    <h3>2.4 弱桥接边过滤</h3>
+    <p>
+      containment/min-denominator 策略会更容易保留包含式重叠，但在相邻基因存在 UTR 或 exon 尾部接触时，
+      也可能把两个本来已经能两两对应的基因座连成一个 complex。当前剪枝规则为：
+    </p>
+    <ol>
+      <li>先在候选图中寻找互为最佳的 1:1 锚点。</li>
+      <li>如果一条边连接的 before 和 after 两端都已经各自有不同的强锚点，则认为它可能是桥接边。</li>
+      <li>只有当该桥接边 CDS overlap &lt; 0.5 且 feature Jaccard &lt; 0.25 时才剪掉。</li>
+      <li>如果桥接边解释了未锚定成员，或 CDS/Jaccard 支持足够，则保留，以免漏掉真实 split/merge/complex。</li>
+    </ol>
+  </section>
+
+  <section id="metrics">
+    <h2>3. 指标口径</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>指标组</th>
+          <th>问题</th>
+          <th>计算口径</th>
+          <th>主图位置</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag blue">Locus gain/loss</span></td>
+          <td>校准前后有没有这个基因座？</td>
+          <td>不看链向，不用 0.5 阈值；只统计新旧注释完全没有任何子特征重叠的 after/before gene。</td>
+          <td>Panel A</td>
+        </tr>
+        <tr>
+          <td><span class="tag orange">Split/Merge</span></td>
+          <td>不是 1:1 的对应关系有多少？</td>
+          <td>二部图连通分量中 1:N 记 split，N:1 记 merge；按事件计数，不按转录本重复计数。</td>
+          <td>Panel B</td>
+        </tr>
+        <tr>
+          <td><span class="tag green">Rep exon change</span></td>
+          <td>确定 1:1 的基因中代表性转录本 exon 是否改变？</td>
+          <td>before 取 primary mRNA；after 取与 before primary 最相似的 mRNA。exon 数量变化或 exon 坐标变化均计入。</td>
+          <td>Panel C</td>
+        </tr>
+        <tr>
+          <td><span class="tag purple">Audit fields</span></td>
+          <td>CDS、isoform、strict unmatched 如何审计？</td>
+          <td>保留在 CSV 和 change log 中；CDS phase 完全忽略。summary 中 novel/deleted 字段为 strict unmatched，不等同于生物学新生或删除基因。</td>
+          <td>表格与 IGV track</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <p>
+        当前主图不再单独设置 Panel D。CDS 和 paired delta 仍保留在
+        <code>results/curation_core_metrics.csv</code>、<code>results/single_species/*</code> 和
+        <code>results/locus/*_change_log.csv</code> 中，作为人工审阅与追溯字段。
+      </p>
+    </div>
+  </section>
+
+  <section id="results">
+    <h2>4. 最新运行效果</h2>
+    <p>
+      下表来自最新的 <code>results/locus/*_change_summary.csv</code> 与
+      <code>results/curation_core_metrics.csv</code>。百分比中的 Panel C 以校准前/后总 gene 数为分母，
+      表示严格 1:1 基因中代表性转录本 exon 变化占前后注释规模的比例。
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Species</th>
+          <th class="num">Before genes</th>
+          <th class="num">After genes</th>
+          <th class="num">1:1</th>
+          <th class="num">Exact</th>
+          <th class="num">No-overlap new</th>
+          <th class="num">No-overlap deleted</th>
+          <th class="num">Split</th>
+          <th class="num">Merge</th>
+          <th class="num">Complex</th>
+          <th class="num">Rep exon changed</th>
+          <th class="num">Before ref.</th>
+          <th class="num">After ref.</th>
+          <th class="num">Pruned bridges</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>A. annua</td><td class="num">54,347</td><td class="num">39,322</td><td class="num">34,444</td><td class="num">18,932</td><td class="num">2,747</td><td class="num">14,956</td><td class="num">28</td><td class="num">1,325</td><td class="num">38</td><td class="num">13,757</td><td class="num">25.3%</td><td class="num">35.0%</td><td class="num">41</td></tr>
+        <tr><td>Cucumber</td><td class="num">24,317</td><td class="num">24,145</td><td class="num">20,523</td><td class="num">16,381</td><td class="num">1,710</td><td class="num">1,324</td><td class="num">274</td><td class="num">591</td><td class="num">12</td><td class="num">4,142</td><td class="num">17.0%</td><td class="num">17.2%</td><td class="num">1</td></tr>
+        <tr><td>F. ananassa</td><td class="num">108,087</td><td class="num">108,447</td><td class="num">96,298</td><td class="num">50,854</td><td class="num">1,679</td><td class="num">2,551</td><td class="num">3,964</td><td class="num">327</td><td class="num">175</td><td class="num">45,361</td><td class="num">42.0%</td><td class="num">41.8%</td><td class="num">292</td></tr>
+        <tr><td>F. vesca</td><td class="num">28,588</td><td class="num">34,006</td><td class="num">22,873</td><td class="num">2,835</td><td class="num">6,699</td><td class="num">2,130</td><td class="num">1,441</td><td class="num">267</td><td class="num">23</td><td class="num">19,875</td><td class="num">69.5%</td><td class="num">58.4%</td><td class="num">4</td></tr>
+        <tr><td>Peach</td><td class="num">30,181</td><td class="num">31,750</td><td class="num">29,305</td><td class="num">26,561</td><td class="num">607</td><td class="num">15</td><td class="num">678</td><td class="num">33</td><td class="num">3</td><td class="num">2,463</td><td class="num">8.2%</td><td class="num">7.8%</td><td class="num">2</td></tr>
+        <tr><td>Pineapple</td><td class="num">26,162</td><td class="num">26,625</td><td class="num">24,870</td><td class="num">8,759</td><td class="num">809</td><td class="num">167</td><td class="num">205</td><td class="num">288</td><td class="num">23</td><td class="num">16,110</td><td class="num">61.6%</td><td class="num">60.5%</td><td class="num">228</td></tr>
+        <tr><td>Rice</td><td class="num">39,406</td><td class="num">40,325</td><td class="num">32,478</td><td class="num">17,415</td><td class="num">3,263</td><td class="num">2,725</td><td class="num">746</td><td class="num">498</td><td class="num">449</td><td class="num">11,864</td><td class="num">30.1%</td><td class="num">29.4%</td><td class="num">40</td></tr>
+      </tbody>
+    </table>
+
+    <div class="figure">
+      <img src="../figures/curation_core_metrics_publication.png" alt="Cross-species curation core metrics figure">
+      <p class="caption">
+        最新跨物种主图：Panel A 显示无重叠新增/删除基因座；Panel B 显示 split/merge 事件；
+        Panel C 显示严格 1:1 代表性转录本 exon 变化相对校准前/后总 gene 数的比例。
+      </p>
+    </div>
+
+    <h3>结果解读</h3>
+    <ul>
+      <li><b>F. vesca</b> 的代表性 exon 变化比例仍然很高。当前数据中 1:1 exact 只有 2,835 个，而 1:1 代表性 exon changed 为 19,875 个，说明校准前后存在大范围 exon 边界或 exon 数目变化；这更像全局注释风格差异或大规模校准，而不是多转录本重复计数造成的假高。</li>
+      <li><b>Pineapple</b> 的 weak bridge pruning 为 228 条，说明此前确实存在不少“两个清楚 1:1 被弱尾部重叠连成 complex”的情况；修复后仍保留 23 个 complex。</li>
+      <li><b>Rice</b> complex 事件数较高，为 449，需要后续人工抽样检查是否存在真实复杂重排、大片段重复区域或注释模型过密造成的多对多连接。</li>
+      <li><b>Peach</b> 的 exact 比例最高，代表性 exon 改变比例最低，说明校准前后结构整体较稳定。</li>
+    </ul>
+  </section>
+
+  <section id="tracks">
+    <h2>5. IGV 和人工校验方式</h2>
+    <p>
+      当前已经为每个物种导出 IGV 友好的 BED、GFF3 和 TSV track。推荐在 IGV 中同时加载：
+      before GFF、after GFF、以及对应的 <code>results/tracks/{Species}_annotation_changes.bed</code>
+      或 <code>.gff3</code>。
+    </p>
+    <table>
+      <thead>
+        <tr><th>文件</th><th>用途</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>results/tracks/*_annotation_changes.bed</code></td>
+          <td>适合快速在 IGV 中浏览事件区间，颜色按 syntenic/split/merge/complex/strict unmatched 区分。</td>
+        </tr>
+        <tr>
+          <td><code>results/tracks/*_annotation_changes.gff3</code></td>
+          <td>保留事件属性，适合在 feature tooltip 中查看 before/after gene、match type 和 subtype。</td>
+        </tr>
+        <tr>
+          <td><code>results/tracks/*_annotation_changes.tsv</code></td>
+          <td>用于按坐标、基因 ID 或事件类型过滤，适合批量抽查。</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>定点校验示例</h3>
+    <pre>Species: Pineapple
+Region: contig05:19,767,616-19,774,408
+
+g05902 -> lcfv2_06000   syntenic   exon_boundary_refined_utr_added
+g05903 -> lcfv2_06001   syntenic   exact</pre>
+    <p>
+      这个区域用于验证“已有两个转录本清楚两两对应时，其他弱重叠关系应被过滤”的逻辑。
+      当前结果符合预期。
+    </p>
+  </section>
+
+  <section id="validation">
+    <h2>6. 程序验证</h2>
+    <div class="grid">
+      <div class="box">
+        <h3>自动测试</h3>
+        <pre>python -m unittest discover -s tests
+
+Ran 50 tests
+OK</pre>
+      </div>
+      <div class="box">
+        <h3>结果一致性</h3>
+        <pre>python validate_results.py
+
+Integrity checks: OK</pre>
+      </div>
+    </div>
+    <p>
+      额外检查还包括：<code>git diff --check</code> 无空白错误；
+      每个物种的 <code>change_log.csv</code> 行数与导出的 BED/GFF3/TSV track 行数完全一致。
+    </p>
+    <div class="note ok">
+      <p>
+        计数闭合关系已经通过：每个物种的 before gene 与 after gene 都能被分配到
+        1:1、split、merge、complex、unresolved overlap、strict unmatched 中的某一类。
+      </p>
+    </div>
+  </section>
+
+  <section id="files">
+    <h2>7. 主要输出文件</h2>
+    <table>
+      <thead>
+        <tr><th>路径</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>locus_compare.py</code></td><td>核心比较算法实现。</td></tr>
+        <tr><td><code>results/locus/*_change_summary.csv</code></td><td>每个物种的总体统计和分类计数。</td></tr>
+        <tr><td><code>results/locus/*_change_log.csv</code></td><td>逐事件 before/after gene 对、坐标、match type 和 subtype。</td></tr>
+        <tr><td><code>results/curation_core_metrics.csv</code></td><td>主图使用的跨物种核心指标表。</td></tr>
+        <tr><td><code>figures/curation_core_metrics_publication.png</code></td><td>当前推荐使用的跨物种三 Panel 主图。</td></tr>
+        <tr><td><code>figures/*_ABCD_single_species.png</code></td><td>每个物种的单独审阅图，包含数量、基因座归类、1:1 结构变化和审计型 paired delta。</td></tr>
+        <tr><td><code>docs/locus_compare_algorithm.html</code></td><td>更完整的算法说明。</td></tr>
+        <tr><td><code>docs/curation_core_metrics_figure_algorithm.html</code></td><td>当前 A/B/C 核心图的专门说明。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="limits">
+    <h2>8. 注意事项</h2>
+    <ul>
+      <li><b>Strict unmatched 不是生物学 novel/deleted。</b> 这些基因只是按当前坐标与结构规则未匹配到另一侧，summary 中字段名保留为 <code>novel_genes</code> 和 <code>deleted_genes</code> 是为了兼容已有结果表。</li>
+      <li><b>Panel A 更保守。</b> 它统计完全没有坐标重叠的基因座，因此比 strict unmatched 更接近“新增/删除基因座”的概念。</li>
+      <li><b>多转录本不会在 Panel B 中重复计数。</b> split/merge/complex 是 gene/locus 连通分量事件，不是转录本事件。</li>
+      <li><b>Panel C 只看代表性转录本。</b> before 取 primary mRNA，after 取最佳匹配 mRNA，避免 after 多转录本展开导致重复计数。</li>
+      <li><b>CDS phase 被完全忽略。</b> phase-only 变化不计为结构变化。</li>
+      <li><b>仍建议人工抽样。</b> 对 F. vesca 的高比例 exon 变化、Rice 的较多 complex、以及每个物种的高影响区域，应继续用 IGV track 做人工抽查。</li>
+    </ul>
+  </section>
+
+  <p class="small">
+    本文档为当前项目状态的汇总。详细实现见 <code>locus_compare.py</code>，
+    更细的算法说明见 <code>docs/locus_compare_algorithm.html</code>。
+  </p>
+</div>
+</body>
+</html>

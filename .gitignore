@@ -31,6 +31,7 @@ stats/
 
 # Large per-gene result details; summary tables remain tracked.
 results/locus/*_change_log.csv
+results/tracks/
 results/single_species/*_syntenic_pair_deltas.csv
 
 # Java build/generated outputs

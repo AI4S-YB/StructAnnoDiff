@@ -12,13 +12,18 @@ from locus_compare import (
     classify_syntenic_change,
     compare_annotations,
     compute_syntenic_attributes,
+    best_transcript_overlap_metrics,
     containment_overlap,
     count_no_overlap_loci,
+    feature_overlap_len,
     find_overlapping_pairs,
+    gene_feature_intervals,
     parse_gff3_to_models,
+    prune_containment_bridge_edges,
     reciprocal_overlap,
     resolve_matches,
     summarize_representative_transcript_changes,
+    transcript_feature_length,
 )
 
 
@@ -70,11 +75,40 @@ class LocusResolutionTests(unittest.TestCase):
         self.assertEqual(len(result["novel"]), 0)
         self.assertEqual(len(result["deleted"]), 0)
 
-    def test_reciprocal_overlap_rejects_simple_containment(self):
+    def test_complex_edges_keep_only_direct_overlap_pairs(self):
+        before = {
+            "b1": self._gene("b1", 1, 100),
+            "b2": self._gene("b2", 201, 300),
+        }
+        after = {
+            "a1": self._gene("a1", 1, 250),
+            "a2": self._gene("a2", 1, 100),
+        }
+        pairs = [
+            (before["b1"], after["a1"], 0.8, 0.8),
+            (before["b1"], after["a2"], 1.0, 1.0),
+            (before["b2"], after["a1"], 0.5, 0.2),
+        ]
+
+        result = resolve_matches(pairs, before, after)
+
+        self.assertEqual(len(result["complex"]), 1)
+        self.assertEqual(len(result["complex_edges"]), 1)
+        _bgs, _ags, edge_pairs = result["complex_edges"][0]
+        self.assertEqual(
+            {(bg.gene_id, ag.gene_id) for bg, ag in edge_pairs},
+            {("b1", "a1"), ("b1", "a2"), ("b2", "a1")},
+        )
+        self.assertNotIn(
+            ("b2", "a2"),
+            {(bg.gene_id, ag.gene_id) for bg, ag in edge_pairs},
+        )
+
+    def test_reciprocal_overlap_accepts_complete_containment(self):
         before = self._gene("small", 101, 200)
         after = self._gene("large", 1, 1000)
 
-        self.assertAlmostEqual(reciprocal_overlap(before, after), 0.1)
+        self.assertAlmostEqual(reciprocal_overlap(before, after), 1.0)
         self.assertAlmostEqual(containment_overlap(before, after), 1.0)
 
         strict_pairs = find_overlapping_pairs(
@@ -83,15 +117,15 @@ class LocusResolutionTests(unittest.TestCase):
             min_reciprocal=0.5,
             overlap_mode="reciprocal",
         )
-        legacy_pairs = find_overlapping_pairs(
+        containment_pairs = find_overlapping_pairs(
             [before],
             [after],
             min_reciprocal=0.5,
             overlap_mode="containment",
         )
 
-        self.assertEqual(strict_pairs, [])
-        self.assertEqual(len(legacy_pairs), 1)
+        self.assertEqual(len(strict_pairs), 1)
+        self.assertEqual(len(containment_pairs), 1)
 
     def test_hybrid_mode_counts_contained_fragments_as_split_events(self):
         before = {"large": self._gene("large", 1, 1000)}
@@ -118,9 +152,134 @@ class LocusResolutionTests(unittest.TestCase):
         strict_result = resolve_matches(reciprocal_pairs, before, after)
         hybrid_event_result = resolve_matches(containment_pairs, before, after)
 
-        self.assertEqual(len(strict_result["split"]), 0)
+        self.assertEqual(len(strict_result["split"]), 1)
         self.assertEqual(len(hybrid_event_result["split"]), 1)
         self.assertEqual(len(hybrid_event_result["split"][0][1]), 2)
+
+    def test_prunes_weak_containment_bridge_between_two_strong_one_to_one_pairs(self):
+        before_left = self._gene("before_left", 100, 200)
+        before_right = self._gene("before_right", 220, 240)
+        after_left = self._gene("after_left", 100, 230)
+        after_right = self._gene("after_right", 220, 240)
+        reciprocal_pairs = [
+            (before_left, after_left, 0.75, 0.70),
+            (before_right, after_right, 1.0, 1.0),
+        ]
+        containment_pairs = [
+            *reciprocal_pairs,
+            (before_right, after_left, 0.52, 0.08),
+        ]
+
+        pruned, pruned_count = prune_containment_bridge_edges(
+            containment_pairs,
+            reciprocal_pairs,
+        )
+
+        self.assertEqual(pruned_count, 1)
+        self.assertEqual(
+            {(bg.gene_id, ag.gene_id) for bg, ag, _score, _jc in pruned},
+            {("before_left", "after_left"), ("before_right", "after_right")},
+        )
+
+    def test_prunes_cross_bridges_when_transcript_anchors_are_clear(self):
+        before_left = self._gene_with_mrnas(
+            "before_left",
+            [self._mrna("bl.t1", [(100, 120)], [(100, 120, "0")])],
+        )
+        before_right = self._gene_with_mrnas(
+            "before_right",
+            [self._mrna("br.t1", [(220, 240)], [(220, 240, "0")])],
+        )
+        after_left = self._gene_with_mrnas(
+            "after_left",
+            [self._mrna("al.t1", [(100, 230)], [(100, 120, "0")])],
+        )
+        after_right = self._gene_with_mrnas(
+            "after_right",
+            [self._mrna("ar.t1", [(110, 240)], [(220, 240, "0")])],
+        )
+        reciprocal_pairs = [
+            (before_left, after_left, 1.0, best_transcript_overlap_metrics(before_left, after_left)["jaccard"]),
+            (before_right, after_right, 1.0, best_transcript_overlap_metrics(before_right, after_right)["jaccard"]),
+        ]
+        containment_pairs = [
+            *reciprocal_pairs,
+            (
+                before_left,
+                after_right,
+                reciprocal_overlap(before_left, after_right),
+                best_transcript_overlap_metrics(before_left, after_right)["jaccard"],
+            ),
+            (
+                before_right,
+                after_left,
+                reciprocal_overlap(before_right, after_left),
+                best_transcript_overlap_metrics(before_right, after_left)["jaccard"],
+            ),
+        ]
+
+        pruned, pruned_count = prune_containment_bridge_edges(
+            containment_pairs,
+            reciprocal_pairs,
+        )
+
+        self.assertEqual(pruned_count, 2)
+        self.assertEqual(
+            {(bg.gene_id, ag.gene_id) for bg, ag, _score, _jc in pruned},
+            {("before_left", "after_left"), ("before_right", "after_right")},
+        )
+
+    def test_overlap_score_uses_best_transcript_pair_exon_length(self):
+        before = self._gene_with_mrnas(
+            "before",
+            [
+                self._mrna("b.match", [(100, 199)], [(100, 199, "0")]),
+                self._mrna("b.alt1", [(1000, 1099)], [(1000, 1099, "0")]),
+                self._mrna("b.alt2", [(2000, 2099)], [(2000, 2099, "0")]),
+            ],
+        )
+        after = self._gene_with_mrnas(
+            "after",
+            [
+                self._mrna("a.match", [(100, 199)], [(100, 199, "0")]),
+                self._mrna("a.alt1", [(3000, 3099)], [(3000, 3099, "0")]),
+                self._mrna("a.alt2", [(4000, 4099)], [(4000, 4099, "0")]),
+            ],
+        )
+
+        best = best_transcript_overlap_metrics(before, after)
+
+        self.assertEqual(transcript_feature_length(before.mrnas[0]), 100)
+        self.assertEqual(best["left_mrna"].mrna_id, "b.match")
+        self.assertEqual(best["right_mrna"].mrna_id, "a.match")
+        self.assertEqual(feature_overlap_len(before, after), 100)
+        self.assertAlmostEqual(reciprocal_overlap(before, after), 1.0)
+        self.assertAlmostEqual(best["jaccard"], 1.0)
+
+    def test_keeps_containment_bridge_when_it_explains_unanchored_complex_member(self):
+        before_left = self._gene("before_left", 100, 200)
+        before_right = self._gene("before_right", 220, 240)
+        after_left = self._gene("after_left", 100, 230)
+        after_alt = self._gene("after_alt", 100, 180)
+        reciprocal_pairs = [
+            (before_left, after_left, 0.75, 0.70),
+            (before_left, after_alt, 0.80, 0.80),
+        ]
+        containment_pairs = [
+            *reciprocal_pairs,
+            (before_right, after_left, 0.52, 0.08),
+        ]
+
+        pruned, pruned_count = prune_containment_bridge_edges(
+            containment_pairs,
+            reciprocal_pairs,
+        )
+
+        self.assertEqual(pruned_count, 0)
+        self.assertIn(
+            ("before_right", "after_left"),
+            {(bg.gene_id, ag.gene_id) for bg, ag, _score, _jc in pruned},
+        )
 
     def test_overlap_diagnostics_count_only_real_overlaps(self):
         before = [
@@ -141,7 +300,7 @@ class LocusResolutionTests(unittest.TestCase):
         self.assertEqual(len(pairs), 1)
         self.assertEqual(diagnostics["same_strand_overlaps"], 1)
 
-    def test_weak_rejected_does_not_depend_on_diagnostics(self):
+    def test_containment_reciprocal_match_does_not_mark_weak_rejected(self):
         before = self._gene("small", 101, 200)
         after = self._gene("large", 1, 1000)
         weak_rejected = {"before": set(), "after": set()}
@@ -154,9 +313,9 @@ class LocusResolutionTests(unittest.TestCase):
             weak_rejected=weak_rejected,
         )
 
-        self.assertEqual(pairs, [])
-        self.assertEqual(weak_rejected["before"], {"small"})
-        self.assertEqual(weak_rejected["after"], {"large"})
+        self.assertEqual(len(pairs), 1)
+        self.assertEqual(weak_rejected["before"], set())
+        self.assertEqual(weak_rejected["after"], set())
 
     def test_primary_mrna_tie_uses_file_order(self):
         first = self._mrna("tx_a", [(1, 100)], [(1, 90, "0")])
@@ -201,7 +360,7 @@ class LocusResolutionTests(unittest.TestCase):
         self.assertEqual(summary["rep_structural_changed_pct"], 0.0)
         self.assertEqual(summary["rep_cds_boundary_changed_same_count"], 0)
 
-    def test_boundary_refinement_uses_raw_gene_boundaries(self):
+    def test_boundary_refinement_ignores_raw_gene_boundaries(self):
         before = self._gene_with_mrnas(
             "before",
             [self._mrna("b1", [(1, 100)], [(10, 90, "0")])],
@@ -217,7 +376,7 @@ class LocusResolutionTests(unittest.TestCase):
 
         subtype = classify_syntenic_change(before, after, boundary_tol=10)
 
-        self.assertEqual(subtype, "boundary_refined")
+        self.assertEqual(subtype, "exact")
 
     def test_exact_requires_non_primary_isoform_coordinate_identity(self):
         before = self._gene_with_mrnas(
@@ -353,7 +512,7 @@ class LocusResolutionTests(unittest.TestCase):
         self.assertIn("cds_extended", subtype)
         self.assertNotIn("exon_gain", subtype)
 
-    def test_missing_utrs_are_derived_from_transcript_bounds_without_exons(self):
+    def test_missing_utrs_are_not_derived_from_raw_transcript_bounds_without_exons(self):
         with TemporaryDirectory() as tmpdir:
             gff = Path(tmpdir) / "input.gff3"
             gff.write_text(
@@ -367,12 +526,153 @@ class LocusResolutionTests(unittest.TestCase):
 
             genes = parse_gff3_to_models(gff)
 
+        gene = genes["g1"]
         mrna = genes["g1"].mrnas[0]
-        self.assertEqual(
-            [(u.start, u.end, u.utr_type) for u in mrna.utrs],
-            [(1, 100, "five_prime_UTR"), (201, 300, "three_prime_UTR")],
+        self.assertEqual([(u.start, u.end, u.utr_type) for u in mrna.utrs], [])
+        self.assertEqual([(e.start, e.end) for e in mrna.exons], [(101, 200)])
+        self.assertTrue(mrna.exons_are_inferred)
+        self.assertEqual((gene.start, gene.end), (101, 200))
+
+    def test_feature_footprint_overlap_matches_genes_with_bad_raw_span(self):
+        before = self._gene_with_mrnas(
+            "before",
+            [self._mrna("b1", [(900, 1000)], [(900, 1000, "0")])],
         )
-        self.assertEqual([(e.start, e.end) for e in mrna.exons], [(1, 300)])
+        after = self._gene_with_mrnas(
+            "after",
+            [self._mrna("a1", [(900, 1000)], [(900, 1000, "0")])],
+        )
+        before.start, before.end = 1, 1000
+        before.raw_start, before.raw_end = 1, 1000
+        after.start, after.end = 880, 1000
+        after.raw_start, after.raw_end = 880, 1000
+
+        pairs = find_overlapping_pairs(
+            [before],
+            [after],
+            min_reciprocal=0.5,
+            overlap_mode="reciprocal",
+        )
+
+        self.assertEqual(feature_overlap_len(before, after), 101)
+        self.assertEqual(reciprocal_overlap(before, after), 1.0)
+        self.assertEqual(len(pairs), 1)
+
+    def test_cds_only_feature_footprint_ignores_raw_span_for_matching(self):
+        with TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            before = tmp / "before.gff3"
+            after = tmp / "after.gff3"
+            before.write_text(
+                "\n".join([
+                    "chr1\ttest\tgene\t1\t1000\t.\t+\t.\tID=g1",
+                    "chr1\ttest\tmRNA\t1\t1000\t.\t+\t.\tID=t1;Parent=g1",
+                    "chr1\ttest\tCDS\t10\t20\t.\t+\t0\tParent=t1",
+                    "chr1\ttest\tCDS\t900\t1000\t.\t+\t0\tParent=t1",
+                ]),
+                encoding="utf-8",
+            )
+            after.write_text(
+                "\n".join([
+                    "chr1\ttest\tgene\t880\t1000\t.\t+\t.\tID=g2",
+                    "chr1\ttest\tmRNA\t880\t1000\t.\t+\t.\tID=t2;Parent=g2",
+                    "chr1\ttest\texon\t900\t1000\t.\t+\t.\tParent=t2",
+                    "chr1\ttest\tCDS\t900\t1000\t.\t+\t0\tParent=t2",
+                ]),
+                encoding="utf-8",
+            )
+
+            before_genes = parse_gff3_to_models(before)
+            after_genes = parse_gff3_to_models(after)
+            summary, change_log = compare_annotations(before, after)
+
+        before_gene = before_genes["g1"]
+        after_gene = after_genes["g2"]
+        self.assertEqual(gene_feature_intervals(before_gene), [(10, 20), (900, 1000)])
+        self.assertEqual((before_gene.start, before_gene.end), (10, 1000))
+        self.assertGreaterEqual(reciprocal_overlap(before_gene, after_gene), 0.5)
+        self.assertEqual(summary["syntenic_total"], 1)
+        self.assertEqual({row["match_type"] for row in change_log}, {"syntenic"})
+
+    def test_cds_only_annotation_matches_exon_annotation_with_utr_extensions(self):
+        with TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            before = tmp / "before.gff3"
+            after = tmp / "after.gff3"
+            before.write_text(
+                "\n".join([
+                    "chr1\ttest\tgene\t100\t900\t.\t+\t.\tID=g1",
+                    "chr1\ttest\tmRNA\t100\t900\t.\t+\t.\tID=t1;Parent=g1",
+                    "chr1\ttest\tCDS\t400\t500\t.\t+\t0\tParent=t1",
+                ]),
+                encoding="utf-8",
+            )
+            after.write_text(
+                "\n".join([
+                    "chr1\ttest\tgene\t100\t900\t.\t+\t.\tID=g2",
+                    "chr1\ttest\tmRNA\t100\t900\t.\t+\t.\tID=t2;Parent=g2",
+                    "chr1\ttest\texon\t100\t500\t.\t+\t.\tParent=t2",
+                    "chr1\ttest\tfive_prime_UTR\t100\t399\t.\t+\t.\tParent=t2",
+                    "chr1\ttest\tCDS\t400\t500\t.\t+\t0\tParent=t2",
+                ]),
+                encoding="utf-8",
+            )
+
+            before_genes = parse_gff3_to_models(before)
+            after_genes = parse_gff3_to_models(after)
+            summary, change_log = compare_annotations(before, after)
+
+        before_gene = before_genes["g1"]
+        after_gene = after_genes["g2"]
+        self.assertLess(
+            feature_overlap_len(before_gene, after_gene)
+            / max(
+                sum(e.end - e.start + 1 for e in before_gene.primary_mrna.exons),
+                sum(e.end - e.start + 1 for e in after_gene.primary_mrna.exons),
+            ),
+            0.5,
+        )
+        self.assertGreaterEqual(reciprocal_overlap(before_gene, after_gene), 0.5)
+        self.assertEqual(summary["syntenic_total"], 1)
+        self.assertEqual(summary["unresolved_overlap_after_genes"], 0)
+        self.assertEqual(summary["unresolved_overlap_before_genes"], 0)
+        self.assertEqual({row["match_type"] for row in change_log}, {"syntenic"})
+
+    def test_mrna_without_exon_or_cds_does_not_create_overlap_event(self):
+        with TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            before = tmp / "before.gff3"
+            after = tmp / "after.gff3"
+            before.write_text(
+                "\n".join([
+                    "chr1\ttest\tgene\t100\t200\t.\t+\t.\tID=g1",
+                    "chr1\ttest\tmRNA\t100\t200\t.\t+\t.\tID=t1;Parent=g1",
+                    "chr1\ttest\texon\t100\t200\t.\t+\t.\tParent=t1",
+                    "chr1\ttest\tCDS\t120\t180\t.\t+\t0\tParent=t1",
+                ]),
+                encoding="utf-8",
+            )
+            after.write_text(
+                "\n".join([
+                    "chr1\ttest\tgene\t1\t1000\t.\t+\t.\tID=bad",
+                    "chr1\ttest\tmRNA\t1\t1000\t.\t+\t.\tID=bad.t1;Parent=bad",
+                    "chr1\ttest\tgene\t500\t600\t.\t+\t.\tID=good",
+                    "chr1\ttest\tmRNA\t500\t600\t.\t+\t.\tID=good.t1;Parent=good",
+                    "chr1\ttest\texon\t500\t600\t.\t+\t.\tParent=good.t1",
+                    "chr1\ttest\tCDS\t520\t580\t.\t+\t0\tParent=good.t1",
+                ]),
+                encoding="utf-8",
+            )
+
+            after_genes = parse_gff3_to_models(after)
+            summary, change_log = compare_annotations(before, after)
+
+        self.assertEqual(set(after_genes), {"good"})
+        self.assertEqual(summary["total_after_genes"], 1)
+        self.assertEqual(summary["syntenic_total"], 0)
+        self.assertEqual(summary["unresolved_overlap_after_genes"], 0)
+        self.assertEqual(summary["unresolved_overlap_before_genes"], 0)
+        self.assertEqual({row["match_type"] for row in change_log}, {"novel", "deleted"})
 
     def test_missing_one_sided_utr_is_derived_from_exons(self):
         with TemporaryDirectory() as tmpdir:
@@ -425,7 +725,7 @@ class LocusResolutionTests(unittest.TestCase):
         self.assertIsNone(summary)
         self.assertIsNone(change_log)
 
-    def test_weak_containment_overlap_is_not_counted_as_novel_deleted(self):
+    def test_complete_containment_overlap_is_counted_as_syntenic(self):
         with TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
             before = tmp / "before.gff3"
@@ -451,15 +751,54 @@ class LocusResolutionTests(unittest.TestCase):
 
             summary, change_log = compare_annotations(before, after)
 
-        self.assertEqual(summary["syntenic_total"], 0)
+        self.assertEqual(summary["syntenic_total"], 1)
         self.assertEqual(summary["novel_genes"], 0)
         self.assertEqual(summary["deleted_genes"], 0)
-        self.assertEqual(summary["unresolved_overlap_after_genes"], 1)
-        self.assertEqual(summary["unresolved_overlap_before_genes"], 1)
+        self.assertEqual(summary["unresolved_overlap_after_genes"], 0)
+        self.assertEqual(summary["unresolved_overlap_before_genes"], 0)
         self.assertEqual(
             {row["match_type"] for row in change_log},
-            {"unresolved_overlap_after", "unresolved_overlap_before"},
+            {"syntenic"},
         )
+
+    def test_hybrid_graph_prunes_weak_bridge_between_strong_pairs(self):
+        with TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            before = tmp / "before.gff3"
+            after = tmp / "after.gff3"
+            before.write_text(
+                "\n".join([
+                    "chr1\ttest\tgene\t100\t200\t.\t+\t.\tID=g1",
+                    "chr1\ttest\tmRNA\t100\t200\t.\t+\t.\tID=t1;Parent=g1",
+                    "chr1\ttest\texon\t100\t200\t.\t+\t.\tParent=t1",
+                    "chr1\ttest\tCDS\t100\t200\t.\t+\t0\tParent=t1",
+                    "chr1\ttest\tgene\t220\t240\t.\t+\t.\tID=g2",
+                    "chr1\ttest\tmRNA\t220\t240\t.\t+\t.\tID=t2;Parent=g2",
+                    "chr1\ttest\texon\t220\t240\t.\t+\t.\tParent=t2",
+                    "chr1\ttest\tCDS\t220\t240\t.\t+\t0\tParent=t2",
+                ]),
+                encoding="utf-8",
+            )
+            after.write_text(
+                "\n".join([
+                    "chr1\ttest\tgene\t100\t230\t.\t+\t.\tID=a1",
+                    "chr1\ttest\tmRNA\t100\t230\t.\t+\t.\tID=ta1;Parent=a1",
+                    "chr1\ttest\texon\t100\t230\t.\t+\t.\tParent=ta1",
+                    "chr1\ttest\tCDS\t100\t200\t.\t+\t0\tParent=ta1",
+                    "chr1\ttest\tgene\t220\t240\t.\t+\t.\tID=a2",
+                    "chr1\ttest\tmRNA\t220\t240\t.\t+\t.\tID=ta2;Parent=a2",
+                    "chr1\ttest\texon\t220\t240\t.\t+\t.\tParent=ta2",
+                    "chr1\ttest\tCDS\t220\t240\t.\t+\t0\tParent=ta2",
+                ]),
+                encoding="utf-8",
+            )
+
+            summary, change_log = compare_annotations(before, after)
+
+        self.assertEqual(summary["syntenic_total"], 2)
+        self.assertEqual(summary["complex_events"], 0)
+        self.assertEqual(summary["containment_bridge_edges_pruned"], 1)
+        self.assertEqual({row["match_type"] for row in change_log}, {"syntenic"})
 
     def test_no_overlap_loci_ignore_strand(self):
         before_overlap = self._gene("before_overlap", 100, 200)

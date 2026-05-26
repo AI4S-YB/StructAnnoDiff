@@ -8,7 +8,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from analysis_config import ANALYSIS, RESULTS_DIR, SPECIES, SPECIES_LABELS
+from analysis_config import ANALYSIS, RESULTS_DIR, SPECIES, SPECIES_LABELS, find_annotation
+from gff_utils import normalize_attribute_id, normalize_attribute_ids, parse_gff3
 
 EXCLUSIVE_LOCUS_COLS = [
     "Exact",
@@ -64,7 +65,53 @@ def _locus_with_species_ids(locus_df: pd.DataFrame) -> pd.DataFrame:
     return locus_df
 
 
+def _attr(attrs, key, default=""):
+    return attrs.get(key, attrs.get(key.lower(), default))
+
+
+def count_genes_filtered_by_locus_evidence(annotation_path: Path | None) -> int:
+    """Count mRNA-scope genes excluded because no mRNA has exon/CDS evidence."""
+    if annotation_path is None or not annotation_path.exists():
+        return 0
+
+    gene_ids = set()
+    gene_mrnas = {}
+    mrna_has_locus_evidence = {}
+
+    for feat in parse_gff3(annotation_path):
+        ftype = feat["type"]
+        attrs = feat["attributes"]
+        if ftype == "gene":
+            gid = normalize_attribute_id(_attr(attrs, "ID"), prefixes=("gene:",))
+            if gid:
+                gene_ids.add(gid)
+                gene_mrnas.setdefault(gid, set())
+        elif ftype in ("mRNA", "transcript"):
+            mid = normalize_attribute_id(_attr(attrs, "ID"), prefixes=("transcript:",))
+            if not mid:
+                continue
+            parents = normalize_attribute_ids(_attr(attrs, "Parent"), prefixes=("gene:",))
+            mrna_has_locus_evidence.setdefault(mid, False)
+            for parent in parents:
+                gene_mrnas.setdefault(parent, set()).add(mid)
+        elif ftype in ("exon", "CDS"):
+            parent_ids = normalize_attribute_ids(_attr(attrs, "Parent"), prefixes=("transcript:",))
+            for parent in parent_ids:
+                mrna_has_locus_evidence[parent] = True
+
+    mrna_scope_genes = {
+        gid for gid in gene_ids
+        if gene_mrnas.get(gid)
+    }
+    locus_supported_genes = {
+        gid for gid in mrna_scope_genes
+        if any(mrna_has_locus_evidence.get(mid, False) for mid in gene_mrnas.get(gid, ()))
+    }
+    return len(mrna_scope_genes - locus_supported_genes)
+
+
 def build_validation_table(results_dir: Path = RESULTS_DIR) -> pd.DataFrame:
+    analysis_dir = results_dir.parent
     stats = _read_csv(results_dir / "summary_stats.csv")
     compare = _read_csv(results_dir / "comparison_matrix.csv")
     compare_all = _read_csv(results_dir / "comparison_matrix_all_gene_types.csv")
@@ -76,6 +123,12 @@ def build_validation_table(results_dir: Path = RESULTS_DIR) -> pd.DataFrame:
             "species": sp.id,
             "label": SPECIES_LABELS[sp.id],
         }
+        row["locus_evidence_filtered_before"] = count_genes_filtered_by_locus_evidence(
+            find_annotation(sp.id, "before", analysis_dir)
+        )
+        row["locus_evidence_filtered_after"] = count_genes_filtered_by_locus_evidence(
+            find_annotation(sp.id, "after", analysis_dir)
+        )
 
         stats_row = stats[stats["species"] == sp.id] if not stats.empty else pd.DataFrame()
         if not stats_row.empty:
@@ -111,6 +164,13 @@ def build_validation_table(results_dir: Path = RESULTS_DIR) -> pd.DataFrame:
         ]:
             if lhs in row and rhs in row and pd.notna(row[lhs]) and pd.notna(row[rhs]):
                 row[name] = row[lhs] - row[rhs]
+
+        for state in ("before", "after"):
+            delta_name = f"stats_vs_locus_{state}_delta"
+            filtered_name = f"locus_evidence_filtered_{state}"
+            unexplained_name = f"stats_vs_locus_{state}_unexplained_delta"
+            if delta_name in row:
+                row[unexplained_name] = row[delta_name] - row.get(filtered_name, 0)
 
         rows.append(row)
 
@@ -356,23 +416,32 @@ def run_integrity_checks(results_dir: Path = RESULTS_DIR) -> list[str]:
 
 def write_markdown_report(df: pd.DataFrame, path: Path, integrity_issues=None) -> None:
     delta_cols = [c for c in df.columns if c.endswith("_delta")]
-    flagged = df[df[delta_cols].fillna(0).abs().sum(axis=1) > 0] if delta_cols else pd.DataFrame()
+    unexplained_cols = [c for c in df.columns if c.endswith("_unexplained_delta")]
+    flagged = (
+        df[df[unexplained_cols].fillna(0).abs().sum(axis=1) > 0]
+        if unexplained_cols else pd.DataFrame()
+    )
     integrity_issues = integrity_issues or []
 
     lines = [
         "# Validation Report",
         "",
         "This report compares mRNA/transcript-scope AGAT stats, AGAT compare, and locus totals.",
-        "Non-zero deltas require either a documented feature-type explanation or a parser fix.",
+        "Locus totals exclude genes whose mRNA/transcript records have no explicit exon or CDS evidence.",
+        "Non-zero unexplained deltas require either a documented feature-type explanation or a parser fix.",
         "",
         f"Species checked: {len(df)}",
-        f"Species with non-zero deltas: {len(flagged)}",
+        f"Species with non-zero unexplained deltas: {len(flagged)}",
         f"Integrity issues: {len(integrity_issues)}",
         "",
     ]
 
     if not flagged.empty:
-        cols = ["species"] + delta_cols
+        cols = [
+            "species",
+            "locus_evidence_filtered_before",
+            "locus_evidence_filtered_after",
+        ] + unexplained_cols
         lines.append("| " + " | ".join(cols) + " |")
         lines.append("| " + " | ".join(["---"] * len(cols)) + " |")
         for _, row in flagged[cols].iterrows():

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Session genome="Pineapple.genome.fasta" locus="contig01:1087374-1106622" version="8">
+    <Resources>
+        <Resource path="results/tracks/Pineapple_annotation_changes.bed" type="bed"/>
+        <Resource path="Pineapple.before.gff3" type="gff3"/>
+        <Resource path="Pineapple.after.gff3" type="gff3"/>
+    </Resources>
+    <Panel height="260" name="ChangeEvents">
+        <Track attributeKey="Pineapple_annotation_changes.bed" clazz="org.broad.igv.track.FeatureTrack" displayMode="EXPANDED" fontSize="10" groupByStrand="false" id="results/tracks/Pineapple_annotation_changes.bed" name="Pineapple annotation changes" visible="true"/>
+    </Panel>
+    <Panel height="180" name="BeforeAnnotation">
+        <Track attributeKey="Pineapple.before.gff3" clazz="org.broad.igv.track.FeatureTrack" displayMode="EXPANDED" fontSize="10" groupByStrand="false" id="Pineapple.before.gff3" name="Pineapple before GFF3" visible="true"/>
+    </Panel>
+    <Panel height="180" name="AfterAnnotation">
+        <Track attributeKey="Reference sequence" clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" sequenceTranslationStrandValue="POSITIVE" shouldShowTranslation="true" visible="true"/>
+        <Track attributeKey="Pineapple.after.gff3" clazz="org.broad.igv.track.FeatureTrack" displayMode="EXPANDED" fontSize="10" groupByStrand="false" id="Pineapple.after.gff3" name="Pineapple after GFF3" visible="true"/>
+    </Panel>
+    <PanelLayout dividerFractions="0.33,0.66"/>
+</Session>

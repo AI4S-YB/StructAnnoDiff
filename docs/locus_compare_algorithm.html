@@ -330,6 +330,7 @@
       <p class="callout-title">默认分析对象</p>
       <p>
         <code>run_locus_comparisons.py</code> 默认使用 <code>--gene-scope mrna</code>，即只比较含 mRNA/transcript 的基因模型。
+        但 mRNA 必须在输入文件中至少有显式 exon 或 CDS；只有 gene/mRNA/UTR 而没有 exon/CDS 证据的记录会被剔除，不进入 overlap 分析。
         ncRNA、tRNA 等非 mRNA 基因类型不进入当前目标图与核心统计，这是为了与本项目的 mRNA 结构校准目标保持一致。
       </p>
     </div>
@@ -344,11 +345,11 @@
       </div>
       <div class="step s2">
         <b>补全结构</b>
-        <p>保留原始 gene 边界，并从 exon/CDS/mRNA 范围推导缺失的 UTR 或 exon。</p>
+        <p>保留原始 gene 边界用于审计；只从真实子特征推导缺失的 UTR 或 exon，并剔除无 exon/CDS 证据的转录本。</p>
       </div>
       <div class="step s3">
         <b>坐标匹配</b>
-        <p>按 seqid 和 strand 分组，用扫描算法寻找满足互逆重叠阈值的候选基因对。</p>
+        <p>按 seqid 和 strand 分组，用扫描算法寻找候选基因对；打分取基因内最佳转录本对的 exon footprint overlap。</p>
       </div>
       <div class="step s4">
         <b>基因座归类</b>
@@ -406,8 +407,9 @@
         <!-- Derive -->
         <rect class="node" x="530" y="70" width="210" height="92" rx="10" fill="#fff2df" stroke="#ffd19a"/>
         <text x="635" y="98" text-anchor="middle" class="label">补全缺失结构</text>
-        <text x="635" y="121" text-anchor="middle" class="sub">UTR: exon/CDS 或 mRNA/CDS</text>
-        <text x="635" y="140" text-anchor="middle" class="sub">exon: CDS + UTR 区间并集</text>
+        <text x="635" y="121" text-anchor="middle" class="sub">UTR: 仅由 exon/CDS 推导</text>
+        <text x="635" y="140" text-anchor="middle" class="sub">缺 exon: CDS + 显式 UTR 并集</text>
+        <text x="635" y="158" text-anchor="middle" class="sub">无 exon/CDS 证据则剔除</text>
 
         <!-- Group -->
         <rect class="node" x="790" y="70" width="170" height="92" rx="10" fill="#f2ecff" stroke="#d2c3ff"/>
@@ -428,9 +430,9 @@
 
         <!-- Threshold -->
         <rect class="node" x="975" y="222" width="210" height="88" rx="10" fill="#fff" stroke="#d8dee8"/>
-        <text x="1080" y="248" text-anchor="middle" class="label">reciprocal overlap 过滤</text>
-        <text x="1080" y="272" text-anchor="middle" class="sub">overlap / max(lenA, lenB)</text>
-        <text x="1080" y="292" text-anchor="middle" class="sub">默认阈值 >= 0.5</text>
+        <text x="1080" y="248" text-anchor="middle" class="label">最佳转录本 overlap</text>
+        <text x="1080" y="272" text-anchor="middle" class="sub">overlap / min(txLenA, txLenB)</text>
+        <text x="1080" y="292" text-anchor="middle" class="sub">txLen = sum(merged exons)</text>
 
         <path class="line" d="M1080 162 V215"/>
 
@@ -535,10 +537,12 @@ MRNAModel
   raw_start, raw_end
   exons: list[ExonFeature]
   cds:   list[CDSFeature]
-  utrs:  list[UTRFeature]</pre>
+  utrs:  list[UTRFeature]
+  has_explicit_exon: bool
+  exons_are_inferred: bool</pre>
         <p>
-          <code>start/end</code> 是用于基因座重叠匹配的模型跨度，可能由子特征扩展；
-          <code>raw_start/raw_end</code> 保存 GFF 中原始 gene 或 mRNA 行的边界，用于判断人工校准是否改变了 gene 边界。
+          <code>start/end</code> 是由 exon/CDS/UTR 子特征得到的模型跨度；
+          <code>raw_start/raw_end</code> 保存 GFF 中原始 gene 行的边界，仅用于审计输出，不参与匹配和结构变化判定。
         </p>
       </div>
       <div class="box">
@@ -568,24 +572,29 @@ gene_structure_signature =
       </thead>
       <tbody>
         <tr>
+          <td>mRNA/gene 没有显式 exon，也没有 CDS</td>
+          <td>该 mRNA 不参与 overlap；若 gene 没有剩余有效 mRNA，则整个 gene 从比较模型中剔除。仅有 UTR 但无 exon/CDS 的转录本同样剔除。</td>
+          <td>避免错误或未完成的 gene/mRNA 原始 span 制造超长假 overlap、假 split/merge/complex 或假 unresolved。</td>
+        </tr>
+        <tr>
           <td>UTR 行缺失，但有 exon 和 CDS</td>
           <td>用 exon 中落在 CDS 区间外的部分推导 5' 或 3' UTR；负链会交换基因组坐标方向上的 5'/3' 判定。</td>
           <td>避免仅因输入文件未显式写 UTR 而漏掉 UTR 变化。</td>
         </tr>
         <tr>
           <td>UTR 行缺失，且没有 exon</td>
-          <td>用 mRNA 原始边界或 gene 原始边界与 CDS 范围的差异推导末端 UTR。</td>
-          <td>兼容只提供 mRNA/CDS 的 GFF。</td>
+          <td>不再用 mRNA 或 gene 原始边界合成 UTR；没有真实 exon 时，只保留 CDS 和显式 UTR 证据。</td>
+          <td>避免错误的原始 gene/mRNA span 制造假 UTR 或假 exon。</td>
         </tr>
         <tr>
           <td>exon 行缺失</td>
-          <td>用 CDS 与 UTR 区间的并集合并为 exon 区间。</td>
-          <td>保证 exon 计数和边界比较有稳定输入。</td>
+          <td>用 CDS 与显式 UTR 区间的并集合并为推断 exon，并标记 <code>exons_are_inferred</code>。</td>
+          <td>CDS 是 exon 的一部分；推断 exon 只是下限证据，不等同于完整 exon 注释。</td>
         </tr>
         <tr>
           <td>gene 边界与子特征不一致</td>
-          <td>模型跨度扩展到所有 mRNA 子特征的最外侧；原始 gene 边界仍保留。</td>
-          <td>匹配使用更完整的 locus span，边界变化评估仍基于原始 gene 行。</td>
+          <td>模型跨度改用所有 mRNA 子特征的最外侧；原始 gene 边界仍保留。</td>
+          <td>匹配和边界变化评估都基于真实子特征，原始 gene 边界只作为审计列输出。</td>
         </tr>
       </tbody>
     </table>
@@ -594,22 +603,33 @@ gene_structure_signature =
   <section id="match">
     <h2>4. 基因座匹配算法</h2>
     <p>
-      校准前后 ID 不可靠，因此匹配只依赖基因组坐标、染色体/scaffold 和链向。当前默认模式是严格的 reciprocal overlap。
+      校准前后 ID 不可靠，因此匹配只依赖基因组坐标、染色体/scaffold 和链向。当前默认模式是
+      <code>hybrid</code>：严格 1:1 和 split/merge/complex 构图都先在基因内寻找最佳转录本对，
+      再用该转录本对的 exon footprint overlap 作为基因对得分。
     </p>
     <div class="formula">
-      <pre>overlap(A, B) =
-  max(0, min(A.end, B.end) - max(A.start, B.start) + 1)</pre>
-      <pre>reciprocal_overlap(A, B) =
-  overlap(A, B) / max(length(A), length(B))
+      <pre>tx_length(t) =
+  sum(length of merged exon intervals in transcript t)
 
-等价于：
-  min(overlap/length(A), overlap/length(B))</pre>
+tx_overlap_score(t_before, t_after) =
+  overlap(exons(t_before), exons(t_after))
+  / min(tx_length(t_before), tx_length(t_after))
+
+gene_pair_score(g_before, g_after) =
+  max(tx_overlap_score(t_before, t_after)
+      for all transcript pairs)</pre>
     </div>
     <div class="note ok">
       <p class="callout-title">关键点</p>
       <p>
-        当前代码使用 <code>overlap / max(length_before, length_after)</code>，默认阈值为 <code>0.5</code>。
-        这比 <code>overlap / min(length)</code> 更严格，可避免短片段被错误匹配到长基因的一小段。
+        当前代码使用 <code>overlap / min(tx_length_before, tx_length_after)</code>，默认阈值为 <code>0.5</code>。
+        <code>tx_length</code> 是单个转录本的 exon 总长度，不是 raw gene span，也不是一个基因内所有 isoform 的合并长度。
+        因此只要较短转录本被较长转录本充分包含，就视为强基因座对应证据。
+      </p>
+      <p>
+        但当任一侧没有显式 exon、exon 是从 CDS/UTR 推断而来时，算法还会计算 CDS-to-CDS reciprocal overlap。
+        严格 1:1 证据取 feature reciprocal 与 CDS reciprocal 的较高值。原因是 CDS 本身就是 exon 的一部分，
+        CDS-only 注释不能因为另一侧补充了 UTR/exon 长度而被错误降级为 unresolved。
       </p>
     </div>
 
@@ -617,19 +637,26 @@ gene_structure_signature =
     <ol>
       <li><code>seqid</code> 相同；没有公共 <code>seqid</code> 时该物种比较返回空结果。</li>
       <li><code>strand</code> 相同；反义重叠不会视为同一基因座。</li>
-      <li><code>reciprocal_overlap >= 0.5</code>，阈值可由 <code>--reciprocal-overlap</code> 修改。</li>
+      <li>最佳转录本对的 <code>gene_pair_score >= 0.5</code>，阈值可由 <code>--reciprocal-overlap</code> 修改；缺显式 exon 的 coding 模型允许 CDS 兼容性救援。</li>
     </ol>
     <p>
       搜索实现采用每个 <code>seqid x strand</code> 内按起点排序的双指针扫描。该策略保留所有满足阈值的候选对，
       后续再由连通分量决定是 1:1、拆分、合并还是复杂事件。
     </p>
+    <div class="note ok">
+      <p class="callout-title">Containment 图的弱桥接边剪枝</p>
+      <p>
+        如果一条弱桥接边只是把两个已经各自拥有强 1:1 锚点的相邻基因连接到同一个分量，算法会剪掉这条桥接边。
+        互为最佳锚点由最佳转录本对 score、feature Jaccard 和 CDS overlap 共同确定。
+        弱桥接边需要同时满足：两端都有不同的互为最佳锚点、桥接边没有足够 CDS overlap、feature Jaccard 很低。
+        这用来避免把两个独立 1:1 误升为 complex，同时保留真正的 split/merge/complex。
+      </p>
+    </div>
     <div class="note warn">
       <p class="callout-title">Strict unmatched 的保守口径</p>
       <p>
-        如果一个基因未进入 reciprocal overlap 候选对，但存在 <code>overlap / min(length_before, length_after) >= 0.5</code>
-        的 containment 风格重叠，当前不会把它计为严格未匹配 before/after 基因。
-        这类基因单独输出为 <code>unresolved_overlap_after</code> 或 <code>unresolved_overlap_before</code>，
-        表示坐标上有关联但一一对应关系不足以确认。
+        使用最佳转录本对的 <code>overlap / min(tx_length_before, tx_length_after)</code> 后，完整或高比例包含关系会直接进入候选匹配图。
+        因而 <code>unresolved_overlap_after</code> / <code>unresolved_overlap_before</code> 只保留低于阈值但仍有坐标关联的边缘情况。
       </p>
     </div>
 
@@ -650,6 +677,8 @@ gene_structure_signature =
     </table>
     <p>
       采用连通分量而不是贪心最佳匹配，是为了避免把真实的 split/merge 事件误拆成多个局部 1:1 匹配。
+      对 <code>complex</code> 分量，change log 和 IGV track 只输出分量内真实存在 overlap edge 的 before-after 对；
+      不再输出完整的 before × after 笛卡尔组合。
     </p>
   </section>
 
@@ -774,7 +803,7 @@ Isoform_change</pre>
         <tr>
           <td><code>results/locus/{Species}_change_log.csv</code></td>
           <td><code>locus_compare.py</code></td>
-          <td>每个事件一行：before/after gene、match type、change subtype、坐标和结构字段。</td>
+          <td>每个事件一行：before/after gene、match type、change subtype、坐标和结构字段；complex 只输出真实 overlap edge。</td>
         </tr>
         <tr>
           <td><code>results/locus_comparison_summary.csv</code></td>
@@ -789,7 +818,7 @@ Isoform_change</pre>
         <tr>
           <td><code>results/locus_diagnostics.csv</code></td>
           <td><code>generate_tables.py</code></td>
-          <td>重叠模式、候选对数量、同链重叠数量、被 reciprocal 阈值过滤的 containment 风格候选数。</td>
+          <td>重叠模式、候选对数量、同链重叠数量、被 reciprocal 阈值过滤的 containment 风格候选数，以及被剪掉的弱桥接边数量。</td>
         </tr>
         <tr>
           <td><code>results/curation_core_metrics.csv</code></td>

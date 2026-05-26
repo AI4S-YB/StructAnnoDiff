@@ -19,38 +19,38 @@ A,Global annotation quantity,Median gene length (bp),median,"2,883","3,028",145,
 ## Figure B table: locus fate
 
 figure,layer,category,before_genes,before_pct,after_genes,after_pct
-B,Locus fate,Syntenic 1:1,"19,965",82.10,"19,965",82.69
-B,Locus fate,Split,4,0.02,8,0.03
-B,Locus fate,Merge,2,0.01,1,0.00
-B,Locus fate,Complex,0,0,0,0
-B,Locus fate,Unresolved weak-overlap,"2,300",9.46,"2,092",8.66
-B,Locus fate,Strict unmatched,"2,046",8.41,"2,079",8.61
+B,Locus fate,Syntenic 1:1,"20,523",84.40,"20,523",85.00
+B,Locus fate,Split,274,1.13,559,2.32
+B,Locus fate,Merge,"1,208",4.97,591,2.45
+B,Locus fate,Complex,24,0.10,24,0.10
+B,Locus fate,Unresolved weak-overlap,0,0,0,0
+B,Locus fate,Strict unmatched,"2,288",9.41,"2,448",10.14
 
 
 ## Figure C table: 1:1 structural attributes
 
 figure,layer,attribute,count,pct_of_syntenic
-C,Confirmed 1:1 structural attributes,Exact 1:1,"15,508",77.68
-C,Confirmed 1:1 structural attributes,Gene boundary changed,"4,285",21.46
-C,Confirmed 1:1 structural attributes,UTR added,"1,940",9.72
-C,Confirmed 1:1 structural attributes,UTR lost,2,0.01
-C,Confirmed 1:1 structural attributes,UTR exon gained,"1,206",6.04
-C,Confirmed 1:1 structural attributes,UTR exon removed,770,3.86
-C,Confirmed 1:1 structural attributes,UTR refined,"1,778",8.91
-C,Confirmed 1:1 structural attributes,Coding exon gain,320,1.60
-C,Confirmed 1:1 structural attributes,Coding exon loss,"1,076",5.39
-C,Confirmed 1:1 structural attributes,Exon boundary refined,762,3.82
-C,Confirmed 1:1 structural attributes,CDS changed,"1,792",8.98
-C,Confirmed 1:1 structural attributes,CDS boundary refined,36,0.18
+C,Confirmed 1:1 structural attributes,Exact 1:1,"16,381",79.82
+C,Confirmed 1:1 structural attributes,Gene boundary changed,"3,931",19.15
+C,Confirmed 1:1 structural attributes,UTR added,"2,381",11.60
+C,Confirmed 1:1 structural attributes,UTR lost,4,0.02
+C,Confirmed 1:1 structural attributes,UTR exon gained,"1,101",5.36
+C,Confirmed 1:1 structural attributes,UTR exon removed,808,3.94
+C,Confirmed 1:1 structural attributes,UTR refined,"1,934",9.42
+C,Confirmed 1:1 structural attributes,Coding exon gain,360,1.75
+C,Confirmed 1:1 structural attributes,Coding exon loss,"1,390",6.77
+C,Confirmed 1:1 structural attributes,Exon boundary refined,"1,102",5.37
+C,Confirmed 1:1 structural attributes,CDS changed,"2,314",11.28
+C,Confirmed 1:1 structural attributes,CDS boundary refined,49,0.24
 C,Confirmed 1:1 structural attributes,Isoform changed,0,0
 
 
 ## Figure D table: paired change magnitude
 
 figure,layer,metric,n_pairs,mean_before,mean_after,mean_delta,median_delta,p05_delta,p95_delta,mean_pct_delta,decreased,unchanged,increased,changed,changed_pct
-D,Confirmed 1:1 change magnitude,Gene span length,"19,965","4,537.74","4,490.16",-47.58,0,-614.60,642.80,1.28,"2,574","15,582","1,809","4,383",21.95
-D,Confirmed 1:1 change magnitude,Model span length,"19,965","4,460.69","4,489.89",29.20,0,-207.80,730.80,2.28,"1,257","16,599","2,109","3,366",16.86
-D,Confirmed 1:1 change magnitude,CDS length,"19,965","1,262.12","1,251.26",-10.85,0,0,0,-0.52,985,"18,209",771,"1,756",8.80
-D,Confirmed 1:1 change magnitude,Exon count,"19,965",5.86,5.83,-0.03,0,-1,1,-0.32,"1,534","17,368","1,063","2,597",13.01
-D,Confirmed 1:1 change magnitude,mRNA count,"19,965",1,1,0,0,0,0,0,0,"19,965",0,0,0
+D,Confirmed 1:1 change magnitude,Gene span length,"20,523","4,410.18","4,291.24",-118.94,0,"-1,013",693.90,10.07,"2,940","15,545","2,038","4,978",24.26
+D,Confirmed 1:1 change magnitude,Model span length,"20,523","4,332.07","4,290.98",-41.09,0,-647.70,762.80,11.76,"1,620","16,560","2,343","3,963",19.31
+D,Confirmed 1:1 change magnitude,CDS length,"20,523","1,213.77","1,206.57",-7.20,0,-39,0.90,0.08,"1,238","18,258","1,027","2,265",11.04
+D,Confirmed 1:1 change magnitude,Exon count,"20,523",5.61,5.57,-0.05,0,-1,0,-0.08,"1,836","17,689",998,"2,834",13.81
+D,Confirmed 1:1 change magnitude,mRNA count,"20,523",1,1,0,0,0,0,0,0,"20,523",0,0,0
 

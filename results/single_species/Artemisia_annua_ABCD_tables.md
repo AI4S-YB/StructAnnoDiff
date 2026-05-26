@@ -19,38 +19,38 @@ A,Global annotation quantity,Median gene length (bp),median,"2,676","3,284",608,
 ## Figure B table: locus fate
 
 figure,layer,category,before_genes,before_pct,after_genes,after_pct
-B,Locus fate,Syntenic 1:1,"33,523",61.68,"33,523",85.25
-B,Locus fate,Split,4,0.01,8,0.02
-B,Locus fate,Merge,0,0,0,0
-B,Locus fate,Complex,0,0,0,0
-B,Locus fate,Unresolved weak-overlap,"5,364",9.87,"2,688",6.84
-B,Locus fate,Strict unmatched,"15,456",28.44,"3,103",7.89
+B,Locus fate,Syntenic 1:1,"34,444",63.38,"34,444",87.59
+B,Locus fate,Split,28,0.05,56,0.14
+B,Locus fate,Merge,"2,805",5.16,"1,325",3.37
+B,Locus fate,Complex,81,0.15,76,0.19
+B,Locus fate,Unresolved weak-overlap,0,0,0,0
+B,Locus fate,Strict unmatched,"16,989",31.26,"3,421",8.70
 
 
 ## Figure C table: 1:1 structural attributes
 
 figure,layer,attribute,count,pct_of_syntenic
-C,Confirmed 1:1 structural attributes,Exact 1:1,"18,953",56.54
-C,Confirmed 1:1 structural attributes,Gene boundary changed,"11,296",33.70
-C,Confirmed 1:1 structural attributes,UTR added,"1,552",4.63
-C,Confirmed 1:1 structural attributes,UTR lost,364,1.09
-C,Confirmed 1:1 structural attributes,UTR exon gained,"1,535",4.58
-C,Confirmed 1:1 structural attributes,UTR exon removed,951,2.84
-C,Confirmed 1:1 structural attributes,UTR refined,"11,816",35.25
-C,Confirmed 1:1 structural attributes,Coding exon gain,"1,983",5.92
-C,Confirmed 1:1 structural attributes,Coding exon loss,438,1.31
-C,Confirmed 1:1 structural attributes,Exon boundary refined,"9,012",26.88
-C,Confirmed 1:1 structural attributes,CDS changed,"3,545",10.57
-C,Confirmed 1:1 structural attributes,CDS boundary refined,113,0.34
-C,Confirmed 1:1 structural attributes,Isoform changed,"4,136",12.34
+C,Confirmed 1:1 structural attributes,Exact 1:1,"18,932",54.96
+C,Confirmed 1:1 structural attributes,Gene boundary changed,"12,225",35.49
+C,Confirmed 1:1 structural attributes,UTR added,"1,940",5.63
+C,Confirmed 1:1 structural attributes,UTR lost,401,1.16
+C,Confirmed 1:1 structural attributes,UTR exon gained,"1,824",5.30
+C,Confirmed 1:1 structural attributes,UTR exon removed,"1,054",3.06
+C,Confirmed 1:1 structural attributes,UTR refined,"12,487",36.25
+C,Confirmed 1:1 structural attributes,Coding exon gain,"2,146",6.23
+C,Confirmed 1:1 structural attributes,Coding exon loss,467,1.36
+C,Confirmed 1:1 structural attributes,Exon boundary refined,"9,412",27.33
+C,Confirmed 1:1 structural attributes,CDS changed,"3,836",11.14
+C,Confirmed 1:1 structural attributes,CDS boundary refined,182,0.53
+C,Confirmed 1:1 structural attributes,Isoform changed,"4,249",12.34
 
 
 ## Figure D table: paired change magnitude
 
 figure,layer,metric,n_pairs,mean_before,mean_after,mean_delta,median_delta,p05_delta,p95_delta,mean_pct_delta,decreased,unchanged,increased,changed,changed_pct
-D,Confirmed 1:1 change magnitude,Gene span length,"33,523","4,021.53","4,094.79",73.27,0,-274.90,859.80,2.89,"3,527","20,629","9,367","12,894",38.46
-D,Confirmed 1:1 change magnitude,Model span length,"33,523","4,021.09","4,094.79",73.70,0,-271,860,2.91,"3,494","20,651","9,378","12,872",38.40
-D,Confirmed 1:1 change magnitude,CDS length,"33,523","1,268.34","1,525.43",257.10,0,0,"1,764",18.48,926,"26,257","6,340","7,266",21.67
-D,Confirmed 1:1 change magnitude,Exon count,"33,523",5.18,6.52,1.34,0,0,9,20.08,607,"26,281","6,635","7,242",21.60
-D,Confirmed 1:1 change magnitude,mRNA count,"33,523",1,1.15,0.15,0,0,1,15.03,0,"29,387","4,136","4,136",12.34
+D,Confirmed 1:1 change magnitude,Gene span length,"34,444","3,993.50","4,231.96",238.46,0,-608,"1,585.70",18.14,"4,065","20,604","9,775","13,840",40.18
+D,Confirmed 1:1 change magnitude,Model span length,"34,444","3,993.01","4,231.96",238.95,0,-603,"1,586.85",18.19,"4,032","20,626","9,786","13,818",40.12
+D,Confirmed 1:1 change magnitude,CDS length,"34,444","1,255.16","1,510.40",255.24,0,0,"1,755",18.78,"1,106","26,820","6,518","7,624",22.13
+D,Confirmed 1:1 change magnitude,Exon count,"34,444",5.10,6.45,1.36,0,0,9,22.63,754,"26,610","7,080","7,834",22.74
+D,Confirmed 1:1 change magnitude,mRNA count,"34,444",1,1.15,0.15,0,0,1,15.20,0,"30,195","4,249","4,249",12.34
 

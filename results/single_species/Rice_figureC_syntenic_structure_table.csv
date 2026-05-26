@@ -1,14 +1,14 @@
 figure,layer,attribute,count,pct_of_syntenic
-C,Confirmed 1:1 structural attributes,Exact 1:1,17711.0,55.06638062369804
-C,Confirmed 1:1 structural attributes,Gene boundary changed,10394.0,32.31663712962099
-C,Confirmed 1:1 structural attributes,UTR added,5156.0,16.030842894008643
-C,Confirmed 1:1 structural attributes,UTR lost,65.0,0.20209557566147435
-C,Confirmed 1:1 structural attributes,UTR exon gained,2002.0,6.22454373037341
-C,Confirmed 1:1 structural attributes,UTR exon removed,885.0,2.751608991698536
-C,Confirmed 1:1 structural attributes,UTR refined,6565.0,20.411653141808912
-C,Confirmed 1:1 structural attributes,Coding exon gain,702.0,2.182632217143923
-C,Confirmed 1:1 structural attributes,Coding exon loss,3209.0,9.977303112271866
-C,Confirmed 1:1 structural attributes,Exon boundary refined,6339.0,19.708982371047476
-C,Confirmed 1:1 structural attributes,CDS changed,5846.0,18.176165158722757
-C,Confirmed 1:1 structural attributes,CDS boundary refined,56.0,0.1741131113391164
-C,Confirmed 1:1 structural attributes,Isoform changed,6927.0,21.5371700401082
+C,Confirmed 1:1 structural attributes,Exact 1:1,17415.0,53.620912617772035
+C,Confirmed 1:1 structural attributes,Gene boundary changed,11144.0,34.31245766364924
+C,Confirmed 1:1 structural attributes,UTR added,5872.0,18.07993103023585
+C,Confirmed 1:1 structural attributes,UTR lost,64.0,0.1970564689943962
+C,Confirmed 1:1 structural attributes,UTR exon gained,2263.0,6.967793583348729
+C,Confirmed 1:1 structural attributes,UTR exon removed,880.0,2.7095264486729476
+C,Confirmed 1:1 structural attributes,UTR refined,6541.0,20.1397869326929
+C,Confirmed 1:1 structural attributes,Coding exon gain,785.0,2.4170207525093907
+C,Confirmed 1:1 structural attributes,Coding exon loss,3413.0,10.508652010591785
+C,Confirmed 1:1 structural attributes,Exon boundary refined,6538.0,20.130549910708787
+C,Confirmed 1:1 structural attributes,CDS changed,6213.0,19.12987252909662
+C,Confirmed 1:1 structural attributes,CDS boundary refined,34.0,0.10468624915327299
+C,Confirmed 1:1 structural attributes,Isoform changed,6863.0,21.131227292320958

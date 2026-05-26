@@ -52,12 +52,19 @@ class GffParsingTests(unittest.TestCase):
         self.assertEqual(genes["Gene1"].total_exon_count, 1)
         self.assertEqual(genes["Gene1"].total_cds_length, 81)
 
-    def test_locus_default_scope_excludes_genes_without_mrna(self):
+    def test_locus_models_exclude_genes_without_exon_or_cds_evidence(self):
         gff = "\n".join([
             "chr1\tsrc\tgene\t1\t100\t.\t+\t.\tID=Gene1",
             "chr1\tsrc\tgene\t200\t300\t.\t+\t.\tID=Gene2",
+            "chr1\tsrc\tgene\t400\t500\t.\t+\t.\tID=Gene3",
+            "chr1\tsrc\tgene\t600\t700\t.\t+\t.\tID=Gene4",
             "chr1\tsrc\tmRNA\t1\t100\t.\t+\t.\tID=Tx1;Parent=Gene1",
+            "chr1\tsrc\tmRNA\t200\t300\t.\t+\t.\tID=Tx2;Parent=Gene2",
+            "chr1\tsrc\tmRNA\t400\t500\t.\t+\t.\tID=Tx3;Parent=Gene3",
+            "chr1\tsrc\tmRNA\t600\t700\t.\t+\t.\tID=Tx4;Parent=Gene4",
             "chr1\tsrc\texon\t1\t100\t.\t+\t.\tParent=Tx1",
+            "chr1\tsrc\tfive_prime_UTR\t400\t450\t.\t+\t.\tParent=Tx3",
+            "chr1\tsrc\tCDS\t620\t680\t.\t+\t0\tParent=Tx4",
             "",
         ])
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -66,8 +73,27 @@ class GffParsingTests(unittest.TestCase):
             mrna_scope = parse_gff3_to_models(path)
             all_scope = parse_gff3_to_models(path, gene_scope="all")
 
-        self.assertEqual(set(mrna_scope), {"Gene1"})
-        self.assertEqual(set(all_scope), {"Gene1", "Gene2"})
+        self.assertEqual(set(mrna_scope), {"Gene1", "Gene4"})
+        self.assertEqual(set(all_scope), {"Gene1", "Gene4"})
+        self.assertEqual(mrna_scope["Gene4"].mrnas[0].exon_count, 1)
+        self.assertTrue(mrna_scope["Gene4"].mrnas[0].exons_are_inferred)
+
+    def test_invalid_transcripts_are_removed_before_gene_span_is_recomputed(self):
+        gff = "\n".join([
+            "chr1\tsrc\tgene\t1\t1000\t.\t+\t.\tID=Gene1",
+            "chr1\tsrc\tmRNA\t1\t1000\t.\t+\t.\tID=BadTx;Parent=Gene1",
+            "chr1\tsrc\tmRNA\t500\t700\t.\t+\t.\tID=GoodTx;Parent=Gene1",
+            "chr1\tsrc\texon\t500\t700\t.\t+\t.\tParent=GoodTx",
+            "",
+        ])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "test.gff3"
+            path.write_text(gff, encoding="utf-8")
+            genes = parse_gff3_to_models(path)
+
+        self.assertEqual(set(genes), {"Gene1"})
+        self.assertEqual([m.mrna_id for m in genes["Gene1"].mrnas], ["GoodTx"])
+        self.assertEqual((genes["Gene1"].start, genes["Gene1"].end), (500, 700))
 
     def test_multi_parent_children_are_assigned_to_all_transcripts(self):
         gff = "\n".join([

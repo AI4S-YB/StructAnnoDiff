@@ -166,15 +166,20 @@
         <h3>基因模型范围</h3>
         <p>
           默认使用 <code>gene_scope=mrna</code>，即只纳入带有 mRNA/transcript 子特征的 gene。
-          gene span 会扩展到其 mRNA 子特征覆盖范围，用于坐标重叠匹配。
+          其中 mRNA 还必须在输入文件中至少包含显式 exon 或 CDS；没有 exon/CDS 证据的 mRNA 会被剔除，没有剩余有效 mRNA 的 gene 不进入 overlap。
+          匹配范围来自转录本 exon footprint；原始 gene 行边界只保留为审计列。
         </p>
       </div>
       <div class="card">
         <h3>候选重叠</h3>
         <p>
           当前批处理默认 <code>overlap_mode=hybrid</code>、
-          <code>min_reciprocal=0.5</code>。严格 1:1 结构比较使用 reciprocal overlap，
-          split/merge/complex 事件解析使用 containment overlap 构图。
+          <code>min_reciprocal=0.5</code>。候选基因对先在基因内寻找最佳 before/after 转录本对，
+          当前 overlap 定义为 <code>overlap / min(tx_length_before, tx_length_after)</code>，
+          其中 <code>tx_length</code> 是单个转录本的 merged exon 总长度。
+          如果任一侧缺少显式 exon 且两侧都有 CDS，严格 1:1 判定同时允许 CDS-to-CDS reciprocal overlap 作为救援证据，
+          因为 CDS 是 exon 的一部分，CDS-only 注释不应被另一侧新增 UTR/exon 长度稀释成 unresolved。
+          overlap 图还会剪掉连接两个独立强 1:1 锚点的弱桥接边；该剪枝同时要求桥接边 CDS 支持低、feature Jaccard 低。
         </p>
       </div>
       <div class="card">
@@ -182,7 +187,7 @@
         <p>
           将 before/after gene 作为二部图节点，候选重叠作为边。每个连通分量按
           <code>1:1</code>、<code>1:N</code>、<code>N:1</code>、<code>M:N</code>
-          分别归为 syntenic、split、merge、complex。
+          分别归为 syntenic、split、merge、complex。complex 输出只保留真实 overlap edge，不做 before × after 笛卡尔展开。
         </p>
       </div>
     </div>

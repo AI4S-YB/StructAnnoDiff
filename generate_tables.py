@@ -224,6 +224,8 @@ def build_locus_diagnostics_table():
             'Overlap_threshold': row.get('overlap_threshold', ''),
             'Candidate_pairs': row.get('candidate_pairs', ''),
             'Same_strand_overlaps': row.get('same_strand_overlaps', ''),
+            'Containment_candidate_pairs': row.get('containment_candidate_pairs', ''),
+            'Containment_bridge_edges_pruned': row.get('containment_bridge_edges_pruned', ''),
             'Containment_pairs_filtered_by_reciprocal': row.get(
                 'containment_pairs_filtered_by_reciprocal', ''
             ),

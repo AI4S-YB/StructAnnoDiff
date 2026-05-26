@@ -1,14 +1,14 @@
 figure,layer,attribute,count,pct_of_syntenic
-C,Confirmed 1:1 structural attributes,Exact 1:1,15508.0,77.67593288254446
-C,Confirmed 1:1 structural attributes,Gene boundary changed,4285.0,21.462559479088405
-C,Confirmed 1:1 structural attributes,UTR added,1940.0,9.717004758327072
-C,Confirmed 1:1 structural attributes,UTR lost,2.0,0.010017530678687703
-C,Confirmed 1:1 structural attributes,UTR exon gained,1206.0,6.040570999248685
-C,Confirmed 1:1 structural attributes,UTR exon removed,770.0,3.8567493112947657
-C,Confirmed 1:1 structural attributes,UTR refined,1778.0,8.905584773353368
-C,Confirmed 1:1 structural attributes,Coding exon gain,320.0,1.6028049085900324
-C,Confirmed 1:1 structural attributes,Coding exon loss,1076.0,5.3894315051339845
-C,Confirmed 1:1 structural attributes,Exon boundary refined,762.0,3.816679188580015
-C,Confirmed 1:1 structural attributes,CDS changed,1792.0,8.975707488104183
-C,Confirmed 1:1 structural attributes,CDS boundary refined,36.0,0.18031555221637866
+C,Confirmed 1:1 structural attributes,Exact 1:1,16381.0,79.81776543390342
+C,Confirmed 1:1 structural attributes,Gene boundary changed,3931.0,19.154119768065097
+C,Confirmed 1:1 structural attributes,UTR added,2381.0,11.601617697217756
+C,Confirmed 1:1 structural attributes,UTR lost,4.0,0.019490327924767334
+C,Confirmed 1:1 structural attributes,UTR exon gained,1101.0,5.364712761292209
+C,Confirmed 1:1 structural attributes,UTR exon removed,808.0,3.9370462408030016
+C,Confirmed 1:1 structural attributes,UTR refined,1934.0,9.423573551625006
+C,Confirmed 1:1 structural attributes,Coding exon gain,360.0,1.75412951322906
+C,Confirmed 1:1 structural attributes,Coding exon loss,1390.0,6.772888953856649
+C,Confirmed 1:1 structural attributes,Exon boundary refined,1102.0,5.369585343273401
+C,Confirmed 1:1 structural attributes,CDS changed,2314.0,11.275154704477904
+C,Confirmed 1:1 structural attributes,CDS boundary refined,49.0,0.23875651707839984
 C,Confirmed 1:1 structural attributes,Isoform changed,0.0,0.0
