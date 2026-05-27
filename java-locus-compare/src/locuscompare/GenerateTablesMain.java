@@ -1,11 +1,13 @@
 package locuscompare;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public final class GenerateTablesMain {
@@ -29,6 +31,20 @@ public final class GenerateTablesMain {
             "rep_exon_changed", "rep_exon_changed_before_pct", "rep_exon_changed_after_pct",
             "rep_exon_count_changed", "rep_exon_boundary_changed_same_count",
             "rep_cds_count_changed", "rep_cds_boundary_changed_same_count"
+    );
+
+    private static final List<String> CURATION_PANEL_COLUMNS = Arrays.asList(
+            "species_id", "Species", "panel", "panel_title", "metric", "bar_label",
+            "axis_value", "axis_unit", "count", "denominator", "percent"
+    );
+
+    private static final List<String> CURATION_SUMMARY_COLUMNS = Arrays.asList(
+            "input_file_1", "input_file_2", "deleted_loci", "new_loci", "split_events", "merge_events",
+            "exon_changes_in_file_1", "exon_changes_in_file_2"
+    );
+
+    private static final List<String> CURATION_SUMMARY_COLUMN_INFO_COLUMNS = Arrays.asList(
+            "column", "description"
     );
 
     private static final LinkedHashMap<String, String> DIRECT_COUNTS = new LinkedHashMap<>();
@@ -72,10 +88,23 @@ public final class GenerateTablesMain {
         List<LinkedHashMap<String, Object>> curationCoreRows = buildCurationCoreMetricsTable(species, locusDir);
         Core.writeCsv(javaResults.resolve("curation_core_metrics.csv"), CURATION_CORE_COLUMNS, curationCoreRows);
 
+        List<LinkedHashMap<String, Object>> curationSummaryRows =
+                buildCurationSummaryTable(species, analysisDir, locusDir);
+        Core.writeCsv(javaResults.resolve("curation_summary_table.csv"),
+                CURATION_SUMMARY_COLUMNS, curationSummaryRows);
+        Core.writeCsv(javaResults.resolve("curation_summary_table_columns.csv"),
+                CURATION_SUMMARY_COLUMN_INFO_COLUMNS, buildCurationSummaryColumnInfoTable());
+
+        List<LinkedHashMap<String, Object>> curationPanelRows = buildCurationPanelMetricsTable(curationCoreRows);
+        writeOptionalCsv(javaResults.resolve("curation_core_panel_metrics.csv"),
+                CURATION_PANEL_COLUMNS, curationPanelRows);
+
         System.out.println("Saved: " + javaResults.resolve("locus_comparison_summary.csv"));
         System.out.println("Saved: " + javaResults.resolve("locus_comparison_multilabel.csv"));
         System.out.println("Saved: " + javaResults.resolve("locus_diagnostics.csv"));
         System.out.println("Saved: " + javaResults.resolve("curation_core_metrics.csv"));
+        System.out.println("Saved: " + javaResults.resolve("curation_summary_table.csv"));
+        System.out.println("Saved: " + javaResults.resolve("curation_summary_table_columns.csv"));
     }
 
     static List<LinkedHashMap<String, Object>> buildMasterTable(List<Core.Species> species, Path locusDir) throws Exception {
@@ -253,6 +282,9 @@ public final class GenerateTablesMain {
             out.put("Same_strand_overlaps", row.getOrDefault("same_strand_overlaps", ""));
             out.put("Containment_pairs_filtered_by_reciprocal",
                     row.getOrDefault("containment_pairs_filtered_by_reciprocal", ""));
+            out.put("Containment_candidate_pairs", row.getOrDefault("containment_candidate_pairs", ""));
+            out.put("Containment_bridge_edges_pruned",
+                    row.getOrDefault("containment_bridge_edges_pruned", ""));
             rows.add(out);
         }
         return rows;
@@ -307,6 +339,115 @@ public final class GenerateTablesMain {
         return rows;
     }
 
+    static List<LinkedHashMap<String, Object>> buildCurationPanelMetricsTable(
+            List<LinkedHashMap<String, Object>> coreRows) {
+        List<LinkedHashMap<String, Object>> rows = new ArrayList<>();
+        for (LinkedHashMap<String, Object> row : coreRows) {
+            String speciesId = String.valueOf(row.get("species_id"));
+            String species = String.valueOf(row.get("Species"));
+            int totalBefore = asInt(row.get("total_before_genes"));
+            int totalAfter = asInt(row.get("total_after_genes"));
+            int deleted = asInt(row.get("deleted_loci_no_overlap"));
+            int novel = asInt(row.get("new_loci_no_overlap"));
+            int split = asInt(row.get("split_events"));
+            int merge = asInt(row.get("merge_events"));
+            int repExonChanged = asInt(row.get("rep_exon_changed"));
+
+            rows.add(panelRow(speciesId, species, "A", "Locus gain/loss",
+                    "deleted_loci_no_overlap", "Deleted loci", deleted, "loci",
+                    deleted, totalBefore));
+            rows.add(panelRow(speciesId, species, "A", "Locus gain/loss",
+                    "new_loci_no_overlap", "New loci", novel, "loci",
+                    novel, totalAfter));
+            rows.add(panelRow(speciesId, species, "B", "Split and merge events",
+                    "split_events", "Split", split, "events",
+                    split, null));
+            rows.add(panelRow(speciesId, species, "B", "Split and merge events",
+                    "merge_events", "Merge", merge, "events",
+                    merge, null));
+            rows.add(panelRow(speciesId, species, "C", "Representative exon changes",
+                    "rep_exon_changed_before_pct", "Before ref.",
+                    totalBefore == 0 ? 0.0 : repExonChanged / (double) totalBefore * 100.0,
+                    "percent", repExonChanged, totalBefore));
+            rows.add(panelRow(speciesId, species, "C", "Representative exon changes",
+                    "rep_exon_changed_after_pct", "After ref.",
+                    totalAfter == 0 ? 0.0 : repExonChanged / (double) totalAfter * 100.0,
+                    "percent", repExonChanged, totalAfter));
+        }
+        return rows;
+    }
+
+    static List<LinkedHashMap<String, Object>> buildCurationSummaryTable(
+            List<Core.Species> species, Path analysisDir, Path locusDir) throws Exception {
+        List<LinkedHashMap<String, Object>> rows = new ArrayList<>();
+        for (Core.Species sp : species) {
+            Path path = locusDir.resolve(sp.id + "_change_summary.csv");
+            if (!Files.exists(path)) {
+                continue;
+            }
+            Map<String, String> row = Core.readCsv(path).get(0);
+            int totalBefore = Core.intValue(row, "total_before_genes");
+            int totalAfter = Core.intValue(row, "total_after_genes");
+            int repExonChanged = Core.intValue(row, "rep_exon_count_changed")
+                    + Core.intValue(row, "rep_exon_boundary_changed_same_count");
+            Path before = Core.findAnnotation(sp.id, "before", analysisDir);
+            Path after = Core.findAnnotation(sp.id, "after", analysisDir);
+
+            LinkedHashMap<String, Object> out = new LinkedHashMap<>();
+            out.put("input_file_1", fileName(before));
+            out.put("input_file_2", fileName(after));
+            out.put("deleted_loci", Core.intValue(row, "no_overlap_before_loci"));
+            out.put("new_loci", Core.intValue(row, "no_overlap_after_loci"));
+            out.put("split_events", Core.intValue(row, "split_events"));
+            out.put("merge_events", Core.intValue(row, "merge_events"));
+            out.put("exon_changes_in_file_1", formatRatio(repExonChanged, totalBefore));
+            out.put("exon_changes_in_file_2", formatRatio(repExonChanged, totalAfter));
+            rows.add(out);
+        }
+        return rows;
+    }
+
+    static List<LinkedHashMap<String, Object>> buildCurationSummaryColumnInfoTable() {
+        List<LinkedHashMap<String, Object>> rows = new ArrayList<>();
+        rows.add(columnInfo("input_file_1", "File name of the original annotation input."));
+        rows.add(columnInfo("input_file_2", "File name of the revised annotation input."));
+        rows.add(columnInfo("deleted_loci", "Number of loci in input_file_1 with no feature overlap in input_file_2."));
+        rows.add(columnInfo("new_loci", "Number of loci in input_file_2 with no feature overlap in input_file_1."));
+        rows.add(columnInfo("split_events", "Number of non-1:1 events where one input_file_1 locus maps to multiple input_file_2 loci."));
+        rows.add(columnInfo("merge_events", "Number of non-1:1 events where multiple input_file_1 loci map to one input_file_2 locus."));
+        rows.add(columnInfo("exon_changes_in_file_1",
+                "Representative-transcript exon changes formatted as percent (changed loci / total input_file_1 loci)."));
+        rows.add(columnInfo("exon_changes_in_file_2",
+                "Representative-transcript exon changes formatted as percent (changed loci / total input_file_2 loci)."));
+        return rows;
+    }
+
+    private static LinkedHashMap<String, Object> columnInfo(String column, String description) {
+        LinkedHashMap<String, Object> row = new LinkedHashMap<>();
+        row.put("column", column);
+        row.put("description", description);
+        return row;
+    }
+
+    private static LinkedHashMap<String, Object> panelRow(
+            String speciesId, String species, String panel, String panelTitle,
+            String metric, String barLabel, Object axisValue, String axisUnit,
+            int count, Integer denominator) {
+        LinkedHashMap<String, Object> out = new LinkedHashMap<>();
+        out.put("species_id", speciesId);
+        out.put("Species", species);
+        out.put("panel", panel);
+        out.put("panel_title", panelTitle);
+        out.put("metric", metric);
+        out.put("bar_label", barLabel);
+        out.put("axis_value", axisValue);
+        out.put("axis_unit", axisUnit);
+        out.put("count", count);
+        out.put("denominator", denominator == null ? "" : denominator);
+        out.put("percent", denominator == null || denominator == 0 ? "" : count / (double) denominator * 100.0);
+        return out;
+    }
+
     private static List<String> multilabelColumns() {
         List<String> cols = new ArrayList<>();
         cols.add("Species");
@@ -331,7 +472,8 @@ public final class GenerateTablesMain {
     private static List<String> diagnosticsColumns() {
         return Arrays.asList(
                 "Species", "Overlap_mode", "Overlap_threshold", "Candidate_pairs",
-                "Same_strand_overlaps", "Containment_pairs_filtered_by_reciprocal"
+                "Same_strand_overlaps", "Containment_candidate_pairs",
+                "Containment_bridge_edges_pruned", "Containment_pairs_filtered_by_reciprocal"
         );
     }
 
@@ -340,5 +482,34 @@ public final class GenerateTablesMain {
             return 0;
         }
         return (int) Double.parseDouble(value);
+    }
+
+    private static int asInt(Object value) {
+        if (value == null || String.valueOf(value).isEmpty()) {
+            return 0;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return (int) Double.parseDouble(String.valueOf(value));
+    }
+
+    private static String fileName(Path path) {
+        return path == null ? "" : path.getFileName().toString();
+    }
+
+    static String formatRatio(int count, int denominator) {
+        double percent = denominator == 0 ? 0.0 : count / (double) denominator * 100.0;
+        return String.format(Locale.ROOT, "%.2f%% (%d/%d)", percent, count, denominator);
+    }
+
+    private static void writeOptionalCsv(Path path, List<String> columns,
+                                         List<? extends Map<String, ?>> rows) throws IOException {
+        try {
+            Core.writeCsv(path, columns, rows);
+            System.out.println("Saved: " + path);
+        } catch (IOException ex) {
+            System.err.println("Warning: could not write optional table " + path + ": " + ex.getMessage());
+        }
     }
 }

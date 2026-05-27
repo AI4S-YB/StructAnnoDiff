@@ -114,6 +114,8 @@ public final class Core {
         public final List<UTRFeature> utrs = new ArrayList<>();
         public Integer rawStart;
         public Integer rawEnd;
+        public boolean hasExplicitExon = false;
+        public boolean exonsAreInferred = false;
         private final int order;
 
         public MRNAModel(String mrnaId, Integer rawStart, Integer rawEnd, int order) {
@@ -263,6 +265,48 @@ public final class Core {
         }
     }
 
+    public static final class TranscriptOverlapMetrics {
+        public final double score;
+        public final double jaccard;
+        public final int overlap;
+        public final int leftLength;
+        public final int rightLength;
+        public final MRNAModel leftMrna;
+        public final MRNAModel rightMrna;
+
+        TranscriptOverlapMetrics(double score, double jaccard, int overlap,
+                                 int leftLength, int rightLength,
+                                 MRNAModel leftMrna, MRNAModel rightMrna) {
+            this.score = score;
+            this.jaccard = jaccard;
+            this.overlap = overlap;
+            this.leftLength = leftLength;
+            this.rightLength = rightLength;
+            this.leftMrna = leftMrna;
+            this.rightMrna = rightMrna;
+        }
+    }
+
+    private static final class TranscriptIntervals {
+        final MRNAModel mrna;
+        final List<int[]> intervals;
+
+        TranscriptIntervals(MRNAModel mrna, List<int[]> intervals) {
+            this.mrna = mrna;
+            this.intervals = intervals;
+        }
+    }
+
+    private static final class PruneResult {
+        final List<Pair> pairs;
+        final int prunedCount;
+
+        PruneResult(List<Pair> pairs, int prunedCount) {
+            this.pairs = pairs;
+            this.prunedCount = prunedCount;
+        }
+    }
+
     public static final class ResolvedMatches {
         public final List<GenePair> syntenic = new ArrayList<>();
         public final List<SplitEvent> split = new ArrayList<>();
@@ -305,10 +349,12 @@ public final class Core {
     public static final class ComplexEvent {
         public final List<GeneModel> befores;
         public final List<GeneModel> afters;
+        public final List<GenePair> edgePairs;
 
-        ComplexEvent(List<GeneModel> befores, List<GeneModel> afters) {
+        ComplexEvent(List<GeneModel> befores, List<GeneModel> afters, List<GenePair> edgePairs) {
             this.befores = befores;
             this.afters = afters;
+            this.edgePairs = edgePairs;
         }
     }
 
@@ -525,6 +571,7 @@ public final class Core {
                 }
                 if ("exon".equals(feature.type)) {
                     mrna.exons.add(new ExonFeature(feature.start, feature.end));
+                    mrna.hasExplicitExon = true;
                 } else if ("CDS".equals(feature.type)) {
                     mrna.cds.add(new CDSFeature(feature.start, feature.end, feature.phase));
                 } else {
@@ -550,6 +597,8 @@ public final class Core {
                 sortMrnaFeatures(mrna);
             }
 
+            gene.mrnas.removeIf(mrna -> !(mrna.hasExplicitExon || !mrna.cds.isEmpty()));
+
             List<Integer> starts = new ArrayList<>();
             List<Integer> ends = new ArrayList<>();
             for (MRNAModel mrna : gene.mrnas) {
@@ -573,6 +622,9 @@ public final class Core {
         LinkedHashMap<String, GeneModel> filtered = new LinkedHashMap<>();
         for (Map.Entry<String, GeneModel> entry : genes.entrySet()) {
             GeneModel gene = entry.getValue();
+            if (gene.mrnaCount() == 0) {
+                continue;
+            }
             boolean keep;
             if ("mrna".equals(geneScope)) {
                 keep = gene.mrnaCount() > 0;
@@ -621,22 +673,18 @@ public final class Core {
             presentUtrTypes.add(u.utrType);
         }
         List<UTRFeature> missing = new ArrayList<>();
-        if (!mrna.exons.isEmpty()) {
-            for (ExonFeature e : mrna.exons) {
-                if (e.end < cdsStart) {
-                    addMissingUtr(missing, presentUtrTypes, e.start, e.end, beforeCdsType);
-                } else if (e.start > cdsEnd) {
-                    addMissingUtr(missing, presentUtrTypes, e.start, e.end, afterCdsType);
-                } else {
-                    addMissingUtr(missing, presentUtrTypes, e.start, cdsStart - 1, beforeCdsType);
-                    addMissingUtr(missing, presentUtrTypes, cdsEnd + 1, e.end, afterCdsType);
-                }
+        if (mrna.exons.isEmpty()) {
+            return;
+        }
+        for (ExonFeature e : mrna.exons) {
+            if (e.end < cdsStart) {
+                addMissingUtr(missing, presentUtrTypes, e.start, e.end, beforeCdsType);
+            } else if (e.start > cdsEnd) {
+                addMissingUtr(missing, presentUtrTypes, e.start, e.end, afterCdsType);
+            } else {
+                addMissingUtr(missing, presentUtrTypes, e.start, cdsStart - 1, beforeCdsType);
+                addMissingUtr(missing, presentUtrTypes, cdsEnd + 1, e.end, afterCdsType);
             }
-        } else {
-            int transcriptStart = mrna.rawStart != null ? mrna.rawStart : geneBoundaryStart(gene);
-            int transcriptEnd = mrna.rawEnd != null ? mrna.rawEnd : geneBoundaryEnd(gene);
-            addMissingUtr(missing, presentUtrTypes, transcriptStart, cdsStart - 1, beforeCdsType);
-            addMissingUtr(missing, presentUtrTypes, cdsEnd + 1, transcriptEnd, afterCdsType);
         }
         mrna.utrs.addAll(missing);
         sortMrnaFeatures(mrna);
@@ -678,18 +726,31 @@ public final class Core {
         for (int[] interval : merged) {
             mrna.exons.add(new ExonFeature(interval[0], interval[1]));
         }
+        mrna.exonsAreInferred = true;
     }
 
     public static int geneBoundaryStart(GeneModel gene) {
-        return gene.rawStart != null ? gene.rawStart : gene.start;
+        return gene.start;
     }
 
     public static int geneBoundaryEnd(GeneModel gene) {
-        return gene.rawEnd != null ? gene.rawEnd : gene.end;
+        return gene.end;
     }
 
     public static int geneBoundaryLength(GeneModel gene) {
         return geneBoundaryEnd(gene) - geneBoundaryStart(gene) + 1;
+    }
+
+    public static int rawGeneBoundaryStart(GeneModel gene) {
+        return gene.rawStart != null ? gene.rawStart : gene.start;
+    }
+
+    public static int rawGeneBoundaryEnd(GeneModel gene) {
+        return gene.rawEnd != null ? gene.rawEnd : gene.end;
+    }
+
+    public static int rawGeneBoundaryLength(GeneModel gene) {
+        return rawGeneBoundaryEnd(gene) - rawGeneBoundaryStart(gene) + 1;
     }
 
     public static boolean geneBoundaryChanged(GeneModel before, GeneModel after, int boundaryTol) {
@@ -701,29 +762,223 @@ public final class Core {
         return Math.max(0, Math.min(aEnd, bEnd) - Math.max(aStart, bStart) + 1);
     }
 
-    public static double reciprocalOverlap(GeneModel a, GeneModel b) {
-        int overlap = overlapLen(a.start, a.end, b.start, b.end);
-        if (overlap == 0) {
+    public static List<int[]> mergeIntervals(List<int[]> intervals) {
+        List<int[]> valid = new ArrayList<>();
+        for (int[] interval : intervals) {
+            if (interval[0] > 0 && interval[1] > 0 && interval[0] <= interval[1]) {
+                valid.add(Arrays.copyOf(interval, 2));
+            }
+        }
+        valid.sort(Comparator.<int[]>comparingInt(a -> a[0]).thenComparingInt(a -> a[1]));
+        if (valid.isEmpty()) {
+            return valid;
+        }
+        List<int[]> merged = new ArrayList<>();
+        merged.add(valid.get(0));
+        for (int i = 1; i < valid.size(); i++) {
+            int[] current = valid.get(i);
+            int[] last = merged.get(merged.size() - 1);
+            if (current[0] <= last[1] + 1) {
+                last[1] = Math.max(last[1], current[1]);
+            } else {
+                merged.add(current);
+            }
+        }
+        return merged;
+    }
+
+    public static int intervalTotalLength(List<int[]> intervals) {
+        int total = 0;
+        for (int[] interval : mergeIntervals(intervals)) {
+            total += interval[1] - interval[0] + 1;
+        }
+        return total;
+    }
+
+    public static int intervalOverlapLength(List<int[]> leftIntervals, List<int[]> rightIntervals) {
+        List<int[]> left = mergeIntervals(leftIntervals);
+        List<int[]> right = mergeIntervals(rightIntervals);
+        int total = 0;
+        int i = 0;
+        int j = 0;
+        while (i < left.size() && j < right.size()) {
+            int[] l = left.get(i);
+            int[] r = right.get(j);
+            total += overlapLen(l[0], l[1], r[0], r[1]);
+            if (l[1] < r[1]) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+        return total;
+    }
+
+    public static List<int[]> mrnaFeatureIntervals(MRNAModel mrna) {
+        List<int[]> intervals = new ArrayList<>();
+        if (!mrna.exons.isEmpty()) {
+            for (ExonFeature exon : mrna.exons) {
+                intervals.add(new int[]{exon.start, exon.end});
+            }
+            return intervals;
+        }
+        for (CDSFeature cds : mrna.cds) {
+            intervals.add(new int[]{cds.start, cds.end});
+        }
+        for (UTRFeature utr : mrna.utrs) {
+            intervals.add(new int[]{utr.start, utr.end});
+        }
+        return intervals;
+    }
+
+    public static int transcriptFeatureLength(MRNAModel mrna) {
+        return intervalTotalLength(mrnaFeatureIntervals(mrna));
+    }
+
+    public static List<int[]> geneFeatureIntervals(GeneModel gene) {
+        List<int[]> intervals = new ArrayList<>();
+        for (MRNAModel mrna : gene.mrnas) {
+            intervals.addAll(mrnaFeatureIntervals(mrna));
+        }
+        if (!intervals.isEmpty()) {
+            return mergeIntervals(intervals);
+        }
+        return Collections.singletonList(new int[]{gene.start, gene.end});
+    }
+
+    public static List<int[]> mrnaCdsIntervals(MRNAModel mrna) {
+        List<int[]> intervals = new ArrayList<>();
+        for (CDSFeature cds : mrna.cds) {
+            intervals.add(new int[]{cds.start, cds.end});
+        }
+        return intervals;
+    }
+
+    public static boolean geneLacksExplicitExons(GeneModel gene) {
+        for (MRNAModel mrna : gene.mrnas) {
+            if (!mrna.exons.isEmpty() && !mrna.exonsAreInferred) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static List<TranscriptIntervals> geneTranscriptIntervalSets(
+            GeneModel gene, boolean cdsOnly, boolean fallbackToGeneSpan) {
+        List<TranscriptIntervals> sets = new ArrayList<>();
+        for (MRNAModel mrna : gene.mrnas) {
+            List<int[]> intervals = cdsOnly ? mrnaCdsIntervals(mrna) : mrnaFeatureIntervals(mrna);
+            intervals = mergeIntervals(intervals);
+            if (!intervals.isEmpty()) {
+                sets.add(new TranscriptIntervals(mrna, intervals));
+            }
+        }
+        if (!sets.isEmpty() || !fallbackToGeneSpan) {
+            return sets;
+        }
+        sets.add(new TranscriptIntervals(null, Collections.singletonList(new int[]{gene.start, gene.end})));
+        return sets;
+    }
+
+    public static TranscriptOverlapMetrics bestTranscriptOverlapMetrics(GeneModel a, GeneModel b) {
+        return bestTranscriptOverlapMetrics(a, b, false, true);
+    }
+
+    public static TranscriptOverlapMetrics bestTranscriptOverlapMetrics(
+            GeneModel a, GeneModel b, boolean cdsOnly, boolean fallbackToGeneSpan) {
+        TranscriptOverlapMetrics best = new TranscriptOverlapMetrics(0.0, 0.0, 0, 0, 0, null, null);
+        for (TranscriptIntervals left : geneTranscriptIntervalSets(a, cdsOnly, fallbackToGeneSpan)) {
+            int leftLength = intervalTotalLength(left.intervals);
+            if (leftLength == 0) {
+                continue;
+            }
+            for (TranscriptIntervals right : geneTranscriptIntervalSets(b, cdsOnly, fallbackToGeneSpan)) {
+                int rightLength = intervalTotalLength(right.intervals);
+                if (rightLength == 0) {
+                    continue;
+                }
+                int overlap = intervalOverlapLength(left.intervals, right.intervals);
+                if (overlap == 0) {
+                    continue;
+                }
+                double score = overlap / (double) Math.min(leftLength, rightLength);
+                int union = leftLength + rightLength - overlap;
+                double jaccard = union == 0 ? 0.0 : overlap / (double) union;
+                TranscriptOverlapMetrics candidate = new TranscriptOverlapMetrics(
+                        score, jaccard, overlap, leftLength, rightLength, left.mrna, right.mrna);
+                if (compareTranscriptOverlapMetrics(candidate, best) > 0) {
+                    best = candidate;
+                }
+            }
+        }
+        return best;
+    }
+
+    private static int compareTranscriptOverlapMetrics(TranscriptOverlapMetrics a, TranscriptOverlapMetrics b) {
+        int c;
+        c = Double.compare(a.score, b.score);
+        if (c != 0) return c;
+        c = Double.compare(a.jaccard, b.jaccard);
+        if (c != 0) return c;
+        c = Integer.compare(a.overlap, b.overlap);
+        if (c != 0) return c;
+        c = Integer.compare(-Math.abs(a.leftLength - a.rightLength), -Math.abs(b.leftLength - b.rightLength));
+        if (c != 0) return c;
+        c = mrnaId(a.leftMrna).compareTo(mrnaId(b.leftMrna));
+        if (c != 0) return c;
+        return mrnaId(a.rightMrna).compareTo(mrnaId(b.rightMrna));
+    }
+
+    private static String mrnaId(MRNAModel mrna) {
+        return mrna == null ? "" : mrna.mrnaId;
+    }
+
+    public static double cdsCompatibleReciprocalOverlap(GeneModel a, GeneModel b) {
+        if (!(geneLacksExplicitExons(a) || geneLacksExplicitExons(b))) {
             return 0.0;
         }
-        return overlap / (double) Math.max(a.length(), b.length());
+        return bestTranscriptOverlapMetrics(a, b, true, false).score;
+    }
+
+    public static double cdsOverlapRatio(GeneModel a, GeneModel b) {
+        return bestTranscriptOverlapMetrics(a, b, true, false).score;
+    }
+
+    public static int anyFeatureOverlapLen(GeneModel a, GeneModel b) {
+        return intervalOverlapLength(geneFeatureIntervals(a), geneFeatureIntervals(b));
+    }
+
+    public static int featureOverlapLen(GeneModel a, GeneModel b) {
+        return bestTranscriptOverlapMetrics(a, b).overlap;
+    }
+
+    public static double reciprocalOverlap(GeneModel a, GeneModel b) {
+        return Math.max(bestTranscriptOverlapMetrics(a, b).score, cdsCompatibleReciprocalOverlap(a, b));
     }
 
     public static double containmentOverlap(GeneModel a, GeneModel b) {
-        int overlap = overlapLen(a.start, a.end, b.start, b.end);
-        if (overlap == 0) {
-            return 0.0;
-        }
-        return overlap / (double) Math.min(a.length(), b.length());
+        return bestTranscriptOverlapMetrics(a, b).score;
     }
 
     public static double jaccardOverlap(GeneModel a, GeneModel b) {
-        int overlap = overlapLen(a.start, a.end, b.start, b.end);
-        if (overlap == 0) {
-            return 0.0;
+        return bestTranscriptOverlapMetrics(a, b).jaccard;
+    }
+
+    public static double containmentRatio(GeneModel a, GeneModel b) {
+        double best = 0.0;
+        for (TranscriptIntervals left : geneTranscriptIntervalSets(a, false, true)) {
+            int leftLength = intervalTotalLength(left.intervals);
+            if (leftLength == 0) {
+                continue;
+            }
+            for (TranscriptIntervals right : geneTranscriptIntervalSets(b, false, true)) {
+                int overlap = intervalOverlapLength(left.intervals, right.intervals);
+                if (overlap > 0) {
+                    best = Math.max(best, overlap / (double) leftLength);
+                }
+            }
         }
-        int union = a.length() + b.length() - overlap;
-        return overlap / (double) union;
+        return best;
     }
 
     public static List<Pair> findOverlappingPairs(List<GeneModel> beforeGenes, List<GeneModel> afterGenes,
@@ -754,7 +1009,7 @@ public final class Core {
                 if (!before.strand.equals(after.strand)) {
                     continue;
                 }
-                if (overlapLen(before.start, before.end, after.start, after.end) == 0) {
+                if (featureOverlapLen(before, after) == 0) {
                     continue;
                 }
                 double ro = reciprocalOverlap(before, after);
@@ -791,6 +1046,82 @@ public final class Core {
         return counts;
     }
 
+    private static PruneResult pruneContainmentBridgeEdges(List<Pair> containmentPairs, List<Pair> reciprocalPairs) {
+        List<Pair> allPairs = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+        for (Pair pair : concatPairs(containmentPairs, reciprocalPairs)) {
+            String key = pair.before.geneId + "\u0000" + pair.after.geneId;
+            if (seen.add(key)) {
+                allPairs.add(pair);
+            }
+        }
+
+        Map<String, Pair> bestAfterByBefore = new HashMap<>();
+        Map<String, Pair> bestBeforeByAfter = new HashMap<>();
+        for (Pair pair : allPairs) {
+            Pair bestAfter = bestAfterByBefore.get(pair.before.geneId);
+            if (bestAfter == null || comparePairQuality(pair, bestAfter) > 0) {
+                bestAfterByBefore.put(pair.before.geneId, pair);
+            }
+            Pair bestBefore = bestBeforeByAfter.get(pair.after.geneId);
+            if (bestBefore == null || comparePairQuality(pair, bestBefore) > 0) {
+                bestBeforeByAfter.put(pair.after.geneId, pair);
+            }
+        }
+
+        Map<String, String> mutualAnchorAfterByBefore = new HashMap<>();
+        Map<String, String> mutualAnchorBeforeByAfter = new HashMap<>();
+        for (Pair pair : allPairs) {
+            if (bestAfterByBefore.get(pair.before.geneId) == pair
+                    && bestBeforeByAfter.get(pair.after.geneId) == pair
+                    && (cdsOverlapRatio(pair.before, pair.after) >= 0.5
+                    || pair.jaccard >= 0.5
+                    || pair.score >= 0.95)) {
+                mutualAnchorAfterByBefore.put(pair.before.geneId, pair.after.geneId);
+                mutualAnchorBeforeByAfter.put(pair.after.geneId, pair.before.geneId);
+            }
+        }
+
+        List<Pair> pruned = new ArrayList<>();
+        int prunedCount = 0;
+        for (Pair pair : containmentPairs) {
+            String beforeAnchor = mutualAnchorAfterByBefore.get(pair.before.geneId);
+            String afterAnchor = mutualAnchorBeforeByAfter.get(pair.after.geneId);
+            boolean bridgesTwoIndependentAnchors = beforeAnchor != null
+                    && afterAnchor != null
+                    && !beforeAnchor.equals(pair.after.geneId)
+                    && !afterAnchor.equals(pair.before.geneId);
+            boolean lowSupportBridge = cdsOverlapRatio(pair.before, pair.after) < 0.5
+                    && pair.jaccard < 0.25;
+            if (bridgesTwoIndependentAnchors && lowSupportBridge) {
+                prunedCount++;
+                continue;
+            }
+            pruned.add(pair);
+        }
+        return new PruneResult(pruned, prunedCount);
+    }
+
+    private static List<Pair> concatPairs(List<Pair> left, List<Pair> right) {
+        List<Pair> out = new ArrayList<>(left.size() + right.size());
+        out.addAll(left);
+        out.addAll(right);
+        return out;
+    }
+
+    private static int comparePairQuality(Pair a, Pair b) {
+        int c;
+        double aCds = cdsOverlapRatio(a.before, a.after);
+        double bCds = cdsOverlapRatio(b.before, b.after);
+        c = Boolean.compare(aCds >= 0.5, bCds >= 0.5);
+        if (c != 0) return c;
+        c = Double.compare(aCds, bCds);
+        if (c != 0) return c;
+        c = Double.compare(a.jaccard, b.jaccard);
+        if (c != 0) return c;
+        return Double.compare(a.score, b.score);
+    }
+
     private static Map<String, List<GeneModel>> groupBySeqid(LinkedHashMap<String, GeneModel> genes) {
         Map<String, List<GeneModel>> groups = new LinkedHashMap<>();
         for (GeneModel gene : genes.values()) {
@@ -819,7 +1150,7 @@ public final class Core {
                 }
                 boolean hasOverlap = false;
                 for (GeneModel target : active) {
-                    if (overlapLen(query.start, query.end, target.start, target.end) > 0) {
+                    if (anyFeatureOverlapLen(query, target) > 0) {
                         hasOverlap = true;
                         break;
                     }
@@ -838,6 +1169,7 @@ public final class Core {
         Map<Node, Set<Node>> adj = new HashMap<>();
         Set<Node> beforeNodes = new LinkedHashSet<>();
         Set<Node> afterNodes = new LinkedHashSet<>();
+        Set<String> directPairIds = new HashSet<>();
         for (Pair pair : pairs) {
             Node before = new Node("before", pair.before.geneId);
             Node after = new Node("after", pair.after.geneId);
@@ -845,6 +1177,7 @@ public final class Core {
             adj.computeIfAbsent(after, k -> new LinkedHashSet<>()).add(before);
             beforeNodes.add(before);
             afterNodes.add(after);
+            directPairIds.add(pair.before.geneId + "\u0000" + pair.after.geneId);
         }
 
         Set<Node> allNodes = new LinkedHashSet<>();
@@ -931,7 +1264,15 @@ public final class Core {
                     afters.add(afterGenes.get(id));
                     matchedAfter.add(id);
                 }
-                resolved.complex.add(new ComplexEvent(befores, afters));
+                List<GenePair> edgePairs = new ArrayList<>();
+                for (String beforeId : compBefore) {
+                    for (String afterId : compAfter) {
+                        if (directPairIds.contains(beforeId + "\u0000" + afterId)) {
+                            edgePairs.add(new GenePair(beforeGenes.get(beforeId), afterGenes.get(afterId)));
+                        }
+                    }
+                }
+                resolved.complex.add(new ComplexEvent(befores, afters, edgePairs));
             }
         }
 
@@ -1438,13 +1779,18 @@ public final class Core {
         }
         List<Pair> graphPairs;
         Set<String> reciprocalPairKeys = new HashSet<>();
+        int prunedContainmentBridgeEdges = 0;
         if ("hybrid".equals(overlapMode)) {
-            graphPairs = containmentPairs;
-            for (Pair pair : reciprocalPairs) {
+            PruneResult pruneResult = pruneContainmentBridgeEdges(containmentPairs, reciprocalPairs);
+            graphPairs = pruneResult.pairs;
+            prunedContainmentBridgeEdges = pruneResult.prunedCount;
+            for (Pair pair : graphPairs) {
                 reciprocalPairKeys.add(pair.before.geneId + "\u0000" + pair.after.geneId);
             }
             System.out.println("  Found " + reciprocalPairs.size() + " strict reciprocal candidate pairs");
             System.out.println("  Found " + containmentPairs.size() + " containment candidate pairs");
+            System.out.println("  Pruned weak bridge edges between strong 1:1 anchors: "
+                    + prunedContainmentBridgeEdges);
         } else {
             graphPairs = reciprocalPairs;
             System.out.println("  Found " + graphPairs.size() + " candidate matching pairs");
@@ -1531,11 +1877,9 @@ public final class Core {
             }
         }
         for (ComplexEvent event : resolved.complex) {
-            for (GeneModel before : event.befores) {
-                for (GeneModel after : event.afters) {
-                    changeLog.add(makeChangeLogRow(before, after, "complex",
-                            "complex_" + event.befores.size() + "x" + event.afters.size()));
-                }
+            for (GenePair pair : event.edgePairs) {
+                changeLog.add(makeChangeLogRow(pair.before, pair.after, "complex",
+                        "complex_" + event.befores.size() + "x" + event.afters.size()));
             }
         }
         for (GeneModel after : strictNovel) {
@@ -1563,6 +1907,7 @@ public final class Core {
         summary.put("containment_pairs_filtered_by_reciprocal",
                 diagnostics.getOrDefault("containment_pairs_filtered_by_reciprocal", 0));
         summary.put("containment_candidate_pairs", "hybrid".equals(overlapMode) ? containmentPairs.size() : "");
+        summary.put("containment_bridge_edges_pruned", prunedContainmentBridgeEdges);
         summary.put("total_before_genes", beforeGenes.size());
         summary.put("total_after_genes", afterGenes.size());
         summary.put("syntenic_total", resolved.syntenic.size());
@@ -1639,17 +1984,17 @@ public final class Core {
         row.put("before_end", before != null ? before.end : 0);
         row.put("after_start", after != null ? after.start : 0);
         row.put("after_end", after != null ? after.end : 0);
-        row.put("before_gene_start", before != null ? geneBoundaryStart(before) : 0);
-        row.put("before_gene_end", before != null ? geneBoundaryEnd(before) : 0);
-        row.put("after_gene_start", after != null ? geneBoundaryStart(after) : 0);
-        row.put("after_gene_end", after != null ? geneBoundaryEnd(after) : 0);
+        row.put("before_gene_start", before != null ? rawGeneBoundaryStart(before) : 0);
+        row.put("before_gene_end", before != null ? rawGeneBoundaryEnd(before) : 0);
+        row.put("after_gene_start", after != null ? rawGeneBoundaryStart(after) : 0);
+        row.put("after_gene_end", after != null ? rawGeneBoundaryEnd(after) : 0);
         row.put("strand", anchor != null ? anchor.strand : "");
         row.put("match_type", matchType);
         row.put("change_subtype", changeSubtype);
         row.put("before_length", before != null ? before.length() : 0);
         row.put("after_length", after != null ? after.length() : 0);
-        row.put("before_gene_length", before != null ? geneBoundaryLength(before) : 0);
-        row.put("after_gene_length", after != null ? geneBoundaryLength(after) : 0);
+        row.put("before_gene_length", before != null ? rawGeneBoundaryLength(before) : 0);
+        row.put("after_gene_length", after != null ? rawGeneBoundaryLength(after) : 0);
         row.put("before_exons", before != null ? before.totalExonCount() : 0);
         row.put("after_exons", after != null ? after.totalExonCount() : 0);
         row.put("before_cds", before != null ? before.totalCdsLength() : 0);

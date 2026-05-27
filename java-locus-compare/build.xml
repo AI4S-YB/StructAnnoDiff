@@ -9,6 +9,8 @@
     <property name="jar.file" value="${dist.dir}/java-locus-compare.jar"/>
     <property name="main.class" value="locuscompare.LocusCompareMain"/>
     <property name="analysis.dir" value=".."/>
+    <property name="jigplot.jar" value="/mnt/d/NetbeansProject2/TBtools/dist/lib/JIGplot.jar"/>
+    <property name="plot.species" value="Pineapple"/>
 
     <target name="clean">
         <delete dir="${build.dir}"/>
@@ -65,6 +67,23 @@
             <arg value="${analysis.dir}/results"/>
             <arg value="--java-results"/>
             <arg value="results"/>
+        </java>
+    </target>
+
+    <target name="plot-pineapple" depends="build">
+        <java classname="locuscompare.SingleSpeciesCurationPlotMain" fork="true" failonerror="true">
+            <jvmarg value="-Djava.awt.headless=true"/>
+            <classpath path="${classes.dir}"/>
+            <arg value="--input"/>
+            <arg value="results/curation_core_metrics.csv"/>
+            <arg value="--analysis-dir"/>
+            <arg value="${analysis.dir}"/>
+            <arg value="--species-id"/>
+            <arg value="${plot.species}"/>
+            <arg value="--output-prefix"/>
+            <arg value="results/figures/${plot.species}_curation_summary_jigplot"/>
+            <arg value="--jigplot-jar"/>
+            <arg value="${jigplot.jar}"/>
         </java>
     </target>
 </project>
